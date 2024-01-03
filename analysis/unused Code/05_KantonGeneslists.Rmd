@@ -1,0 +1,50 @@
+
+
+## Read in the tables
+```{r Read files}
+seurat_integrated<-readRDS("../Data/seurat_integrated.rds") # Read the scRNA data
+
+T4<-read.table("/files/Table4_Kanton.txt",sep="\t",header=T)
+T14<-read.table("/files/Table14_Kanton.txt",sep="\t",header=T)
+```
+
+## Split the tables per cluster
+```{r Split Groups based on cluster}
+Cluster_Groups<-split(T4, T4$cluster)
+
+for(i in 1:length(Cluster_Groups)){
+seurat_integrated<- AddModuleScore(
+  object = seurat_integrated,
+  features =list(Cluster_Groups[[i]]$gene),name=unique(Cluster_Groups[[i]]$cluster)
+)
+}
+```
+## Save the plots
+```{r Split Groups based on cluster}
+for(i in 1:length(Cluster_Groups)){
+pdf(unique(paste(i,".pdf",sep="")))
+print(FeaturePlot(seurat_integrated,features = unique(paste(Cluster_Groups[[i]]$cluster,1,sep = "")), label = TRUE, repel = TRUE) +
+  scale_colour_gradientn(colours = rev(brewer.pal(n = 11, name = "RdBu"))))
+dev.off()
+}
+```
+
+```{r Split Groups based on cluster}
+Cluster_Groups<-split(T14, T14$cluster)
+
+for(i in 1:length(Cluster_Groups)){
+seurat_integrated<- AddModuleScore(
+  object = seurat_integrated,
+  features =list(Cluster_Groups[[i]]$gene),name=unique(Cluster_Groups[[i]]$cluster)
+)
+}
+```
+## Save the plots
+```{r Split Groups based on cluster}
+for(i in 1:length(Cluster_Groups)){
+pdf(unique(paste(i,".pdf",sep="")))
+print(FeaturePlot(seurat_integrated,features = unique(paste(Cluster_Groups[[i]]$cluster,1,sep = "")), label = TRUE, repel = TRUE) +
+  scale_colour_gradientn(colours = rev(brewer.pal(n = 11, name = "RdBu"))))
+dev.off()
+}
+```

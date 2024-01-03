@@ -1,0 +1,666 @@
+---
+title: "Cluster Identification"
+date: "2023-01-12"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+# Clustering Analysis
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+```{r Calling libraries, echo=FALSE, include=FALSE}
+library(SingleR)
+library(ggpubr)
+library(SingleCellExperiment)
+library(Seurat)
+library(ggplot2)
+library(scuttle)
+library(scater)
+library(tidyverse)
+library(data.table)
+library(RColorBrewer)
+library(RCurl)
+library(randomcoloR)
+library(cowplot)
+library(viridis)
+library(gprofiler2)
+library(pals)
+library(reshape2)
+library(CATALYST)
+library(clustree)
+```
+
+
+```{r load data, include = FALSE}
+dir.create("./output/02_Clustering/", showWarnings = F)
+seurat_integrated <- readRDS(file="./data/QC_data.filt.rds")
+
+DefaultAssay(seurat_integrated) <- "RNA"
+Idents(seurat_integrated) <- "type"
+
+colsname<-unname(alphabet())[1:36]
+SamplePalette =  c("#000000","#3399FF")
+```
+
+## Clustering after batch correction
+
+```{r, Clustering after batch correction, warning=FALSE}
+
+seurat_integrated <- NormalizeData(seurat_integrated) %>% FindVariableFeatures() %>% ScaleData()
+seurat_integrated <- RunPCA(seurat_integrated)
+seurat_integrated <- FindNeighbors(object = seurat_integrated, 
+                                   reduction = "harmony",
+                                   dims = 1:40)
+
+reslist <- seq(0.2,1.6,0.2)
+seurat_integrated <- FindClusters(object = seurat_integrated,
+                                  resolution = reslist)
+
+```
+
+```{r,fig.cap="UMAP Clustering after batch correction at different resolutions", fig.width=8, fig.height=8}
+# Assign identity of clusters at various thresholds
+
+resplots=list()
+
+for(res in sort(grep("RNA_snn_res.", colnames(seurat_integrated@meta.data), value = T))){
+  Idents(object = seurat_integrated) <- res
+  a<- DimPlot(seurat_integrated,
+              reduction = "umap",
+              label = TRUE,
+              label.size = 4)+
+    theme_classic()+
+    theme(legend.position = "none")+ggtitle(res)
+  resplots[[res]]<- a
+}
+
+p1 <-ggpubr::ggarrange(plotlist = resplots)
+p1
+
+ggsave("./output/02_Clustering/Clustering_Resopt.svg", p1)
+```
+
+## Check stability of clusters
+
+```{r, fig.width=16, fig.height=8}
+p1<-clustree(seurat_integrated, prefix = "RNA_snn_res.", node_colour = "sc3_stability")
+p2<-clustree(seurat_integrated, prefix = "RNA_snn_res.")
+p1|p2
+ggsave("./output/02_Clustering/Clustering_integrated_clustree.svg", p1|p2)
+
+seurat_integrated <- FindClusters(object = seurat_integrated,
+                                  resolution = 0.6)
+
+
+```
+
+## optimize UMAP
+
+```{r, fig.width=12, fig.height=12}
+min.dist = seq(0.1,0.5, 0.1)
+spread = c(1,2,4,8,16,24)
+
+plotlist=list()
+for(md in min.dist){
+  for(s in spread){
+    title=paste0("dist_",md, "_spread_", s)
+    plotlist[[title]]<-tryCatch({
+      RunUMAP(seurat_integrated, reduction = "harmony", min.dist=md, spread=s, dims = 1:40) %>%  
+      DimPlot(group.by = "seurat_clusters")+theme_classic()+ggtitle(title)+ NoAxes() +NoLegend()
+      },
+      error = function(e){
+        print(e)
+        plotlist[[title]]<-ggplot() + annotate("text", x = 4, y = 25, size=1, label = e) + 
+  theme_void()
+      }, warning = function(w){
+        print(w)
+        plotlist[[title]]<-ggplot() + annotate("text", x = 4, y = 25, size=1, label = w) + 
+  theme_void()
+      })
+  }
+}
+```
+
+```{r, fig.width=12, fig.height=12}
+p1 <- ggarrange(plotlist=plotlist, ncol = length(spread), nrow=length(min.dist))
+p1
+ggsave("./output/02_Clustering/Clustering_UmapParamOpt.svg", p1)
+seurat_integrated <- RunUMAP(seurat_integrated, min.dist = 0.3, spread=4, reduction = "harmony", dims = 1:40)
+```
+
+## final UMAP clustering
+
+```{r}
+p2 = DimPlot(seurat_integrated, 
+             group.by = "seurat_clusters", 
+             label = T)
+p2
+ggsave("./output/02_Clustering/Clustering_final_optimized_all.svg",p2)
+```
+
+```{r, fig.width=8,fig.height=4}
+p2 = DimPlot(seurat_integrated, 
+             group.by = "seurat_clusters", split.by = "type",
+             label = T)
+p2
+ggsave("./output/02_Clustering/Clustering_UmapByType.svg")
+```
+
+# Calculate cell cycle scoring
+
+```{r, Cell cycle scoring, echo=FALSE, fig.width=12, fig.height=6}
+seurat_integrated <- CellCycleScoring(object = seurat_integrated, g2m.features = cc.genes$g2m.genes,
+    s.features = cc.genes$s.genes)
+
+p1<-VlnPlot(seurat_integrated, features = c("S.Score", "G2M.Score"), group.by = "type",
+    ncol = 2, pt.size = 0.1)
+
+p2 = DimPlot(seurat_integrated, group.by = "Phase")
+
+p1|p2
+
+ggsave("./output/02_Clustering/Clustering_CellcycleScoring.svg", p1|p2)
+```
+
+# Identification of clusters
+
+```{r, fig.width=8, fig.height=4}
+# Extract identity and sample information from seurat object to determine the number of cells per cluster per sample
+n_cells <- FetchData(seurat_integrated, 
+                     vars = c("seurat_clusters", "type")) %>%
+  dplyr::count(seurat_clusters, type) %>%
+  tidyr::spread(seurat_clusters, n)
+
+n_cells[is.na(n_cells)]=0
+
+n_cells <- n_cells %>% column_to_rownames("type")
+
+```
+
+```{r}
+corrmap = cor(n_cells %>%  t(),method = "spearman")
+pheatmap::pheatmap(corrmap, main = "Correlation Cell distribution", breaks = seq(-1,1,length.out=100))
+print(corrmap)
+```
+
+```{r, fig.width=8, fig.height=8}
+n_cells <- FetchData(seurat_integrated, 
+                     vars = c("seurat_clusters", "type")) %>%
+  dplyr::count(seurat_clusters, type) %>%
+  tidyr::spread(seurat_clusters, n)
+
+n_cells[is.na(n_cells)]=0
+long <- melt(n_cells, value.name = "ncells", variable.name="cluster")
+
+a<-ggplot(long, aes(x=type, y=cluster, size=ncells, color=type))+
+  geom_point() + scale_color_manual(values=SamplePalette)+theme_classic()+scale_size(range=c(1,10))+
+  theme(axis.text.x = element_text(angle = 90, vjust = 1, hjust=1))
+
+b<-DimPlot(seurat_integrated,
+        reduction = "umap",
+        label = TRUE,
+        group.by = "seurat_clusters")+
+  theme(legend.position = "none")+ggtitle("Seurat cluster")
+
+c<-DimPlot(seurat_integrated,
+        reduction = "umap",
+        label = TRUE,
+        group.by = "seurat_clusters",
+        split.by = "type")+
+  theme(legend.position = "none")+ggtitle("Seurat cluster")
+
+
+cdist <- ggarrange(ggarrange(a,b, ncol=2, nrow=1), (c), nrow = 2, ncol = 1)
+cdist
+ggsave("./output/02_Clustering/Clustering_Distribution.svg")
+```
+
+```{r, fig.cap="Feature plots UMAP",fig.width=8,fig.height=8}
+metrics <-  c("nCount_RNA", "nFeature_RNA", "S.Score", "G2M.Score", 
+              "percent_mito", "percent_ribo")
+
+
+qcplot<- FeaturePlot(seurat_integrated, 
+            reduction = "umap", 
+            features = metrics,
+            pt.size = 0.3, 
+            order = TRUE,
+            min.cutoff = 'q10')
+qcplot
+ggsave("./output/02_Clustering/Clustering_FeatPlot_QCMeasures.svg", qcplot)
+```
+
+```{r, fig.cap="Feature plots PCA", fig.width=8, fig.height=8}
+# Defining the information in the seurat object of interest
+columns <- c(paste0("harmony_", 1:6),
+             "seurat_clusters",
+             "umap_1", "umap_2")
+
+
+
+# Extracting this data from the seurat object
+pc_data <- FetchData(seurat_integrated, 
+                     vars = columns)
+
+
+# Adding cluster label to center of cluster on UMAP
+umap_label <- FetchData(seurat_integrated, 
+                        vars = c("seurat_clusters", "umap_1", "umap_2"))  %>%
+  group_by(seurat_clusters) %>%
+  summarise(x=mean(umap_1), y=mean(umap_2))
+
+
+# Plotting a UMAP plot for each of the PCs
+map(paste0("harmony_", 1:6), function(pc){
+  ggplot(pc_data, 
+         aes(umap_1, umap_2)) +
+    geom_point(aes_string(color=pc), 
+               alpha = 0.7, size=0.3) +
+    scale_color_viridis()  +
+    geom_text(data=umap_label, 
+              aes(label=seurat_clusters, x, y)) +
+    ggtitle(pc) + theme_classic()
+}) %>% 
+  plot_grid(plotlist = ., nrow = 3, ncol = 2)-> p1
+
+p1
+
+ggsave("./output/02_Clustering/Clustering_PCAvsCluster.svg", p1)
+```
+
+# Markers identification and visualization
+
+```{r, Identifying markers, fig.height=15, fig.width=8}
+#based on cluster resolution of 0,8
+Idents(seurat_integrated) <- "seurat_clusters"
+DefaultAssay(seurat_integrated) = "RNA"
+markers <- FindAllMarkers(object = seurat_integrated, 
+                          only.pos = TRUE,
+                          logfc.threshold = 0.25)  
+
+openxlsx2::write_xlsx(markers,"./output/02_Clustering/Cluster_markers.xls")
+
+markers %>%
+    group_by(cluster) %>%
+    top_n(n = 10, wt = avg_log2FC) -> top10
+
+p1<-DoHeatmap(seurat_integrated, features = top10$gene, slot = "scale.data")
+p1
+ggsave("./output/02_Clustering/Clustering_Heatmap_Markers.svg")
+```
+
+## Visualizing the expression of marker genes with respect to different cell types
+
+```{r}
+## marker genelist 
+Markers = list(
+NE=c("NES", "SOX2", "NOTCH1", "OCT4"),
+RG=c("GFAP", "PAX6", "SLC1A3", "HES1"),
+IPC=c("TBR2", "ASCL1"),
+Neuim=c("DCX", "TUBB3", "NEUROD1", "STMN1"),
+Neumat=c("MAP2", "DLG4", "NEFM"),
+NeuGlut=c("SLC17A7", "SLC17A6", "GRIN2B", "GLUD1"),
+NeuGABA=c("SLC6A1", "SLC17A6", "GABBR1", "GAD67"),
+NeuDopa=c("GIRK2", "TH", "DAT1", "DRD2"),
+NeuSert=c("SLC6A4", "TPH1", "HTR2A"),
+NeuChoilin=c("CHAT", "SLC18A3", "ACHE"),
+ODpre=c("PDGFRA", "CSPG4"),
+ODmat=c("OLIG1", "MBP", "SOX10", "LRP5"),
+SC=c("NCAM", "MPZ", "S100", "MOG"),
+AC=c("GFAP", "SLC1A3", "SLC1A2", "SOX10"),
+MG=c("ITGAM", "PTPRC", "SCARD1", "TNFRSF5")
+)
+
+
+reads = seurat_integrated@assays$RNA@counts
+uMarker=unique(unlist(Markers))
+datmat=matrix(0, nrow=length(uMarker), ncol=ncol(reads))
+rownames(datmat)=uMarker
+colnames(datmat)=colnames(reads)
+
+for(M in uMarker){
+  try(datmat[M,]<-reads[M,])
+}
+
+datmat<- as.data.frame(datmat)
+datatoplot_mean = aggregate(t(datmat), 
+                            list(seurat_integrated$seurat_clusters), 
+                            mean, na.rm=T) %>% 
+  as.data.frame() %>% mutate_at("Group.1",function(x){paste0("cluster_",x)}) %>% column_to_rownames("Group.1")
+
+datatoplot_mean <- datatoplot_mean %>% scale()
+
+clustersim=hclust(dist(datatoplot_mean))
+clustersorder=clustersim$labels[clustersim$order]
+
+datatoplot_mean=melt(datatoplot_mean)
+colnames(datatoplot_mean) = c("Cluster", "Gene", "Scaled_mean")
+
+datatoplot_perc = aggregate(t(datmat), list(seurat_integrated$seurat_clusters), 
+                            function(x){length(which(x>0))/length(x)})
+
+datatoplot_perc=melt(datatoplot_perc, value.name = "perc")
+
+datatoplot = cbind(datatoplot_mean, perc=datatoplot_perc$perc)
+
+datatoplot$Gene = factor(datatoplot$Gene, levels = uMarker)
+datatoplot$Cluster = factor(datatoplot$Cluster, levels = clustersorder)
+p <- ggplot(datatoplot, aes(y=Gene, x=Cluster, col=Scaled_mean, size=perc))+geom_point()+
+    theme_classic()+theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+
+```
+
+```{r, fig.width=6, fig.height=9}
+p
+ggsave("./output/02_Clustering/Clustering_NeuronalMarkers.svg", p)
+```
+
+## GO terms of clusters
+
+```{r GO res analysis, fig.height=8,warning=FALSE}
+
+genelist = list()
+for( i in unique(markers$cluster)){
+  genelist[[i]] = markers$gene[markers$cluster == i ]
+}
+
+genebackground = rownames(seurat_integrated)
+gostres = gost(query = genelist, evcodes = T, custom_bg = genebackground)
+
+names(gostres)
+
+tablegostres = gostres$result[grepl("GO:", gostres$result$source), c("query", "source", "term_name","p_value", "intersection")]
+
+DT::datatable(tablegostres, extensions = "Buttons",
+                    filter="top",
+                    options = list(
+                      pageLength = 15,
+                      info = FALSE,
+                      lengthMenu = list(c(15,50, 100, -1),
+                                        c("15","50", "100" ,"All")
+                      ),dom = 'Blfrtip',
+                      buttons = c('copy', 'csv', 'excel', 'pdf')
+                    ))
+
+openxlsx2::write_xlsx(tablegostres, "./output/02_Clustering/Clusters_GO_termsCluster.xlsx")
+```
+
+# Mapping of clusters to reference data sets
+
+## Knoblich Clusters
+
+```{r}
+library(scSorter)
+
+knoblichgenelist <- read.table("./data/Knoblich/Knoblich_GeneList.txt", header=T)
+knoblichgenelist<- knoblichgenelist[knoblichgenelist$cluster %in% c(1:20), ]
+knoblichgenelist$cluster <- paste0("knoblich_",formatC(as.numeric(knoblichgenelist$cluster), width=2, flag = "0"))
+colnames(knoblichgenelist) <- c("Type", "Marker")
+
+Idents(seurat_integrated) <- "seurat_clusters"
+data= subset(seurat_integrated, downsample = 100)
+knoblichtypes <- scSorter(data@assays$RNA@counts, knoblichgenelist)
+metadata = data@meta.data 
+metadata = metadata[,! colnames(metadata) %in% c("KnoblichPredType")]
+data@meta.data <- cbind(metadata, KnoblichPredType = knoblichtypes$Pred_Type)
+```
+
+
+```{r}
+p<-DimPlot(data, reduction = "umap", group.by = "KnoblichPredType")
+p
+ggsave("./output/02_Clustering/Clustering_KnoblichPredTypes.svg",p)
+```
+
+
+```{r}
+crosstab=table(KnoblichType = data$KnoblichPredType, Cluster=data$seurat_clusters)
+
+ggplot(as.data.frame(crosstab), aes(fill=KnoblichType, 
+                                    x=Cluster, y=Freq)) + geom_bar(position="fill", stat="identity")+theme_classic()
+crosstab
+chisq.test(crosstab)
+
+
+```
+
+## Knoblich Map to annotation
+
+```{r, fig.width=10, fig.height=5}
+scRNA.sce <- as.SingleCellExperiment(seurat_integrated)
+
+Knoblich_reference<-readRDS("./data/Knoblich/CHOOSE_ASD_Modules.rds")
+
+Idents(Knoblich_reference) <- "celltype_cl_coarse"
+
+Knoblich_reference <- subset(Knoblich_reference, cells = WhichCells(Knoblich_reference, downsample = 200))
+
+AR<- as.SingleCellExperiment(Knoblich_reference)
+pred.hneurons<-SingleR(test = scRNA.sce,ref = AR,labels = AR$celltype_cl_coarse)
+
+colnames(pred.hneurons) <- paste0("Knobl.", colnames(pred.hneurons))
+seurat_integrated@meta.data <- cbind(seurat_integrated@meta.data, pred.hneurons)
+
+p<- DimPlot(seurat_integrated, group.by = "Knobl.labels", label = T)
+
+p2<- DimPlot(seurat_integrated, group.by = "seurat_clusters", label = T)
+p|p2
+ggsave("./output/02_Clustering/Clustering_KnoblMapped.svg",p)
+
+table(seurat_integrated$seurat_clusters, seurat_integrated$Knobl.labels)
+
+```
+
+
+```{r, fig.width=12, fig.height=12}
+feats=grep("Knobl.scores", colnames(seurat_integrated@meta.data),value=T)
+p<-FeaturePlot(seurat_integrated, features = feats)+NoLegend()
+p
+ggsave("./output/02_Clustering/Clustering_KnoblScores.svg")
+```
+
+
+## Kanton et al Table 4 Celltypes
+
+```{r}
+kantongenelist <- read.table("./data/KantonGeneList/Table4_Kanton.txt", header=T, sep="\t")
+colnames(kantongenelist) <- c("Type", "Marker")
+
+kantonT4types <- scSorter(data@assays$RNA@counts, kantongenelist)
+
+metadata = data@meta.data 
+metadata = metadata[,! colnames(metadata) %in% c("KantonT4PredType")]
+data@meta.data <- cbind(metadata, KantonT4PredType = kantonT4types$Pred_Type)
+```
+
+
+```{r, fig.width=18, fig.height=5}
+p<-DimPlot(data, group.by = "KantonT4PredType", split.by = "type")
+p
+ggsave("./output/02_Clustering/Clustering_KantonT4PredTypes.svg")
+
+p<-DimPlot(data[,data$KantonT4PredType=="choroid plexus"], group.by = "KantonT4PredType", split.by = "type")
+p
+ggsave("./output/02_Clustering/Clustering_KantonT4PredTypesChoroidOnly.svg")
+```
+
+
+```{r}
+crosstab=table(KantonT4Type = data$KantonT4PredType, Cluster=data$seurat_clusters)
+
+ggplot(as.data.frame(crosstab), aes(fill=KantonT4Type, x=Cluster, y=Freq)) + geom_bar(position="fill", stat="identity")+theme_classic()
+crosstab
+chisq.test(crosstab)
+
+```
+
+## Kanton et al Table 14 Celltypes
+
+```{r}
+kantongenelist <- read.table("./data/KantonGeneList/Table14_Kanton.txt", header=T, sep="\t")
+colnames(kantongenelist) <- c("Type", "Marker")
+
+kantonT14types <- scSorter(data@assays$RNA@counts, kantongenelist)
+
+metadata = data@meta.data 
+metadata = metadata[,! colnames(metadata) %in% c("KantonT14PredType")]
+data@meta.data <- cbind(metadata, KantonT14PredType = kantonT14types$Pred_Type)
+
+DimPlot(data, group.by = "KantonT14PredType")
+
+crosstab=table(Kanton14Type = data$KantonT14PredType, Cluster=data$seurat_clusters)
+
+ggplot(as.data.frame(crosstab), aes(fill=Kanton14Type, x=Cluster, y=Freq)) + geom_bar(position="fill", stat="identity")+theme_classic()
+crosstab
+chisq.test(crosstab)
+
+```
+
+```{r}
+# cleanup 
+rm(list=list(ls()[!ls()%in%c("scRNA.sce", "seurat_integrated", "SamplePalette")]))
+gc()
+
+```
+
+
+## HumanDevData Map to annotation
+
+```{r, fig.width=20, fig.height=20}
+HumDev_reference<-readRDS("./data/HumDev/human_dev_GRCh38-3.0.0_subset_seurat.RDS")
+
+HumDev_reference$development_stage_ontology_term_id %>% table()
+HumDev_reference$Tissue%>% table()
+HumDev_reference$Subdivision %>% table()
+HumDev_reference$Subregion %>% table()
+HumDev_reference$dissection %>% table()
+HumDev_reference@meta.data %>% select("CellClass", "development_stage_ontology_term_id") %>% table()
+HumDev_reference@meta.data <- cbind(HumDev_reference@meta.data, humdev_celltype = paste0(HumDev_reference$development_stage_ontology_term_id,"_", HumDev_reference$CellClass))
+
+Idents(HumDev_reference) <- "humdev_celltype"
+
+
+## remap to Gene Symvols
+library(org.Hs.eg.db)
+master_gene_table <- mapIds(org.Hs.eg.db, keys = rownames(HumDev_reference), keytype = "ENSEMBL", column="SYMBOL")
+master_gene_table <- as.data.frame(master_gene_table)
+master_gene_table$ensembl <- rownames(HumDev_reference)
+idx =which(is.na(master_gene_table$master_gene_table))
+master_gene_table$master_gene_table[idx]<- master_gene_table$ensembl[idx]
+
+genesymbsort <- master_gene_table[rownames(HumDev_reference), "master_gene_table"]
+genesymbsort[duplicated(genesymbsort)]
+# length(unique(genesymbsort))==length(genesymbsort)
+rownames(HumDev_reference) <- genesymbsort
+
+HumDev_reference <- subset(HumDev_reference, cells = WhichCells(HumDev_reference, downsample = 200))
+
+gc()
+HumDev_reference <-   NormalizeData(HumDev_reference) 
+HumDev_reference <-   ScaleData(HumDev_reference) 
+HumDev_reference <-   FindVariableFeatures(HumDev_reference)
+HumDev_reference <-   RunPCA(HumDev_reference) 
+HumDev_reference <-   RunUMAP(HumDev_reference, reduction = "pca", dims = 1:30)
+HumDev_reference <-   FindNeighbors(HumDev_reference, dims = 1:30, reduction = "pca")
+HumDev_reference <-   FindClusters(HumDev_reference)
+gc()
+
+p<- DimPlot(HumDev_reference, group.by = "humdev_celltype")
+p
+
+AR<- as.SingleCellExperiment(HumDev_reference)
+pred.cellclass<-SingleR(test = scRNA.sce,ref = AR,labels = AR$humdev_celltype)
+
+colnames(pred.cellclass) <- paste0("Hum_dev.", colnames(pred.cellclass))
+seurat_integrated@meta.data <- cbind(seurat_integrated@meta.data, pred.cellclass)
+
+seurat_integrated@meta.data <- cbind(seurat_integrated@meta.data, Hum_dev.hsapDv=substr(pred.cellclass$Hum_dev.labels, 1,14), Hum_dev.Celltype=gsub("\'", "", substr(pred.cellclass$Hum_dev.labels, 17,100)))
+
+labelcounts <- unlist(table(pred.cellclass$Hum_dev.labels))
+setNA = names(labelcounts)[labelcounts<30]
+
+cleanedlab = pred.cellclass$Hum_dev.labels 
+cleanedlab[cleanedlab %in% setNA] = "other"
+
+seurat_integrated@meta.data <- cbind(seurat_integrated@meta.data, Hum_dev.labels.main = cleanedlab)
+seurat_integrated@meta.data <- cbind(seurat_integrated@meta.data, Hum_dev.labels.CtDv = paste0(seurat_integrated$Hum_dev.Celltype, "_", seurat_integrated$Hum_dev.hsapDv))
+
+cleanedlab = seurat_integrated$Hum_dev.labels.CtDv
+labelcounts <- unlist(table(cleanedlab))
+setNA = names(labelcounts)[labelcounts<30]
+cleanedlab[cleanedlab %in% setNA] = "other"
+seurat_integrated@meta.data <- cbind(seurat_integrated@meta.data, Hum_dev.labels.CtDv.main = cleanedlab)
+
+
+p<- DimPlot(seurat_integrated, group.by = "Hum_dev.labels.CtDv.main", label = T)
+
+p2<- DimPlot(seurat_integrated, group.by = "seurat_clusters", label = T)
+```
+
+
+```{r, fig.width=30, fig.height=15}
+p|p2
+ggsave("./output/02_Clustering/Clustering_Hum_devFullDetailsMapped.svg",p|p2)
+
+```
+
+
+```{r, fig.width=15, fig.height=8}
+p<- DimPlot(seurat_integrated, group.by = "Hum_dev.hsapDv", label = T)
+p2<- DimPlot(seurat_integrated, group.by = "Hum_dev.Celltype", label = T)
+p|p2
+ggsave("./output/02_Clustering/Clustering_Hum_devCellDevTypeMapped.svg",p|p2)
+```
+
+
+```{r, fig.width=8, fig.height=6}
+tabcelltype<-table(seurat_integrated$seurat_clusters, seurat_integrated$Hum_dev.labels.CtDv.main)
+
+longcelltype<-melt(tabcelltype)
+colnames(longcelltype) <-c("Cluster", "Celltype", "Count")
+
+p <- ggplot(longcelltype, aes(x=Celltype, y=Cluster, size=Count))+geom_point()+
+  theme_classic()+theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+
+ggsave("./output/02_Clustering/Clustering_Hum_devCellDevTypeClusterCounts.svg",p)
+```
+
+
+```{r, fig.width=12, fig.height=6}
+p <- ggplot(longcelltype, aes(fill=Celltype, x=Cluster, y=Count))+geom_bar(position="stack", stat="identity")+
+  theme_classic()+theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+
+p2 <- ggplot(longcelltype, aes(fill=Celltype, x=Cluster, y=Count))+geom_bar(position="fill", stat="identity")+
+  theme_classic()+theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+
+pcom = ggarrange(p, p2, common.legend = T, legend = "right")
+pcom
+
+ggsave("./output/02_Clustering/Clustering_Hum_devCellDevTypeClusterCountsBarplot.svg",pcom)
+```
+
+```{r, fig.width=50, fig.height=200}
+feats=grep("Hum_dev.scores", colnames(seurat_integrated@meta.data),value=T)
+p<-FeaturePlot(seurat_integrated, features = feats, keep.scale = "all", )+NoLegend()
+p
+ggsave("./output/02_Clustering/Clustering_Hum_devScores.svg", p)
+```
+
+
+
+
+```{r}
+# cleanup 
+rm(list=list(ls()[!ls()%in%c("scRNA.sce", "seurat_integrated", "SamplePalette")]))
+gc()
+
+```
+
+```{r save}
+saveRDS(seurat_integrated, file="./data/QC_data.filt.rds")
+```

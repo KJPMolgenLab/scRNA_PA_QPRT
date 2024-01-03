@@ -1,0 +1,279 @@
+---
+title: "QC"
+author: "Afsheen"
+date: "2023-01-11"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+
+```
+
+# QC of the samples
+
+```{r Calling libraries, echo=FALSE, include=FALSE}
+library(ggplot2)
+library(cowplot)
+library(DropletUtils)
+library(SingleCellExperiment)
+library(scuttle)
+library(AnnotationHub)
+library(org.Hs.eg.db)
+library(scater)
+library(Seurat)
+library(tidyverse)
+library(data.table)
+library(RColorBrewer)
+library(RCurl)
+library(randomcoloR)
+library(DoubletFinder)
+
+dir.create("./output/01_QC/", showWarnings = F)
+```
+
+## data Preparation
+
+```{r, Loading samples and performing basic QC, echo=FALSE}
+alldata<-readRDS("./data/alldata.rds")
+Idents(alldata) <- "type"
+SamplePalette =  c("#000000","#3399FF")
+```
+
+## Perform QC
+
+```{r, Performing basic QC, echo=FALSE, fig.width=12, fig.height=5}
+
+alldata <- PercentageFeatureSet(alldata, "^MT-", col.name = "percent_mito")
+
+alldata <- PercentageFeatureSet(alldata, "^RP[SL]", col.name = "percent_ribo")
+
+# Add number of genes per UMI for each cell to metadata
+alldata$log10GenesPerUMI <- log10(alldata$nFeature_RNA) / log10(alldata$nCount_RNA)
+
+feats1 <- c("nFeature_RNA", "nCount_RNA")
+feats2 <- c("percent_mito", "percent_ribo")
+
+p1 <- VlnPlot(alldata, group.by = "orig.ident", features = feats1, pt.size = 0.1, ncol = 3) +
+    NoLegend()
+
+p2<- VlnPlot(alldata, group.by = "orig.ident", features = feats2, pt.size = 0.1, ncol = 3) +
+    NoLegend()
+
+p3<-FeatureScatter(alldata, "nCount_RNA", "nFeature_RNA", group.by = "orig.ident", pt.size = 0.5)
+p4<- FeatureScatter(alldata, "nCount_RNA", "percent_ribo", group.by = "orig.ident", pt.size = 0.5)
+p5<- FeatureScatter(alldata, "nCount_RNA", "percent_mito", group.by = "orig.ident", pt.size = 0.5)
+
+p1|p2
+p3|p4|p5
+
+ggsave("./output/01_QC/QC_measures_Violin_unfiltered_all.svg", p1|p2)
+ggsave("./output/01_QC/QC_measures_Scatter_unfiltered_all.svg", p3|p4|p5)
+```
+
+## Filtering
+
+```{r, Filtering, echo=FALSE}
+selected_c <- WhichCells(alldata, expression = nFeature_RNA > 250)
+table(QCMet=alldata$nFeature_RNA>250, Sample=alldata$orig.ident)
+
+qc_genes <- Matrix::rowSums(alldata) > 3
+table(qc_genes)
+selected_f <- rownames(alldata)[qc_genes]
+
+data.filt <- subset(alldata, features = selected_f, cells = selected_c)
+dim(data.filt) # 21690 10547
+
+C <- data.filt@assays$RNA@counts
+C <- Matrix::t(Matrix::t(C)/Matrix::colSums(C)) * 100
+most_expressed <- order(apply(C, 1, median), decreasing = T)[20:1]
+
+par(mar = c(4, 5, 2, 1))
+boxplot(as.matrix(t(C[most_expressed, ])), cex = 0.09, las = 1, xlab = "% total count per cell",
+    col = (scales::hue_pal())(20)[20:1], horizontal = TRUE)
+title(main="most expressed genes unfiltered")
+
+#Mito/Ribo filtering
+
+hist(data.filt$percent_mito)
+hist(data.filt$percent_ribo)
+
+selected_mito <- WhichCells(data.filt, expression = percent_mito < 20)
+selected_ribo <- WhichCells(data.filt, expression = percent_ribo > 5)
+
+# and subset the object to only keep those cells
+data.filt <- subset(data.filt, cells = selected_mito)
+data.filt <- subset(data.filt, cells = selected_ribo)
+
+dim(data.filt) #21690  9486
+
+table(data.filt$orig.ident)#S05  S06  5105 4381 
+
+feats <- c("nFeature_RNA", "nCount_RNA", "percent_mito", "percent_ribo")
+
+p1<-VlnPlot(data.filt, group.by = "type", features = feats, pt.size = 0.1, ncol = 2) +
+    NoLegend()
+
+ggsave("./output/01_QC/QCmeasures_Violin_filtered.svg")
+#Filter genes
+
+# Filter Mitochondrial
+data.filt <- data.filt[!grepl("^MT-", rownames(data.filt)), ]
+
+# Filter Ribossomal gene (optional if that is a problem on your data) data.filt
+data.filt <- data.filt[ ! grepl('^RP[SL]', rownames(data.filt)), ]
+
+
+C <- data.filt@assays$RNA@counts
+C <- Matrix::t(Matrix::t(C)/Matrix::colSums(C)) * 100
+most_expressed <- order(apply(C, 1, median), decreasing = T)[20:1]
+
+par(mar = c(4, 8, 2, 1))
+boxplot(as.matrix(t(C[most_expressed, ])), cex = 0.09, las = 1, xlab = "% total count per cell",
+    col = (scales::hue_pal())(20)[20:1], horizontal = TRUE)
+title(main="highest expressed genes")
+
+svg("./output/01_QC/QC_Highest_expressed_genes_filtred.svg")
+par(mar = c(4, 8, 2, 1))
+boxplot(as.matrix(t(C[most_expressed, ])), cex = 0.09, las = 1, xlab = "% total count per cell",
+    col = (scales::hue_pal())(20)[20:1], horizontal = TRUE)
+title(main="highest expressed genes")
+dev.off()
+
+```
+
+## Predict doublet cells
+
+```{r, Predicting doublets, echo=FALSE, fig.width=12, fig.height=6}
+# define the expected number of doublet cellscells.
+nExp <- round(ncol(data.filt) * 0.04)  # expect 4% doublets
+data.filt <- NormalizeData(data.filt) %>% FindVariableFeatures() %>% ScaleData() %>% RunPCA() %>% RunUMAP(dims=1:20)
+data.filt <- doubletFinder_v3(data.filt, pN = 0.25, pK = 0.09, nExp = nExp, PCs = 1:20)
+
+
+DF.name = colnames(data.filt@meta.data)[grepl("DF.classification", colnames(data.filt@meta.data))]
+
+p1<- DimPlot(data.filt, group.by = "type")
+p2<- DimPlot(data.filt, group.by = DF.name)
+p3<-VlnPlot(data.filt, features = "nFeature_RNA", group.by = DF.name, pt.size = 0.1)
+
+p1|p2|p3
+
+# exclude duplettes
+table(data.filt$DF.classifications_0.25_0.09_379)
+singlets = WhichCells(data.filt, expression = DF.classifications_0.25_0.09_379=="Singlet")
+
+data.filt<- data.filt[,singlets]
+
+```
+
+```{r}
+## HARMONY
+library(harmony)
+data.filt <- NormalizeData(data.filt) %>% FindVariableFeatures() %>% ScaleData()
+data.filt<-RunHarmony(data.filt, "orig.ident")
+```
+
+```{r,eval=FALSE}
+# normalize across batches 
+metadata <- data.filt@meta.data
+split_seurat <- SplitObject(data.filt, split.by = "orig.ident")
+
+split_seurat <- split_seurat[unique(metadata$orig.ident)]
+
+for (i in 1:length(split_seurat)) {
+  split_seurat[[i]] <- NormalizeData(split_seurat[[i]], verbose = TRUE)
+  split_seurat[[i]] <- SCTransform(split_seurat[[i]], vars.to.regress = c("percent_mito", "nCount_RNA"))
+}
+
+integ_features <- SelectIntegrationFeatures(object.list = split_seurat, 
+                                            nfeatures = 3000) 
+split_seurat <- PrepSCTIntegration(object.list = split_seurat, 
+                                   anchor.features = integ_features)
+
+integ_anchors <- FindIntegrationAnchors(object.list = split_seurat, 
+                                        normalization.method = "SCT", 
+                                        anchor.features = integ_features)
+#save.image("QC6.Rdata")
+#load("QC6.Rdata")
+# Integrate across conditions
+data.filt <- IntegrateData(anchorset = integ_anchors, 
+                                   normalization.method = "SCT")
+
+
+```
+
+## Initital raw-data clustering
+
+```{r, initial clustering, echo=FALSE}
+
+data.filt <- data.filt %>% 
+  FindNeighbors(reduction="harmony") %>% FindClusters() %>% RunUMAP(dims=1:30)
+
+p1<- DimPlot(object = data.filt, reduction = "umap", group.by = "orig.ident")
+p1
+ggsave("./output/01_QC/QC_clustering_afterbatchcorr.svg", p1)
+```
+
+```{r, variable Features, echo=FALSE}
+#Find variable Genes
+print(paste("Number of Variable Features: ",length(x = VariableFeatures(object = data.filt))));
+vg <- VariableFeaturePlot(data.filt)
+print(vg);
+```
+
+## Dimensionality reduction
+
+```{r, PCA , echo=FALSE, fig.width=12, fig.height=12}
+vdl <- VizDimLoadings(object = data.filt, dims = 1:4)
+vdl
+ggsave("./output/01_QC/QC_VizDimLoadings.svg", vdl)
+```
+
+```{r, PCA cells , echo=FALSE, fig.height=12, fig.width=6}
+svg("/files/output/01_QC/QC_12PCs.svg")
+DimHeatmap(object = data.filt, dims = 1:6, cells = 250, balanced = TRUE, reduction = "harmony")
+dev.off()
+```
+
+```{r, Elbow , echo=FALSE, fig.width=18, fig.height=6}
+nPC = 50;
+
+elbow <- ElbowPlot(object = data.filt, ndims = nPC, reduction = "harmony")
+print(elbow)
+
+data.filt <- ScaleData(data.filt, assay = "RNA") %>% 
+  FindVariableFeatures(assay = "RNA") %>%  
+  RunPCA(assay = "RNA", npcs = nPC) %>%  
+  JackStraw(num.replicate = 100, dims=nPC, assay = "RNA"); # takes around 8 minutes
+
+data.filt <- ScoreJackStraw(object = data.filt, dims = 1:nPC)
+
+js <- JackStrawPlot(object = data.filt, dims = 1:nPC)
+print(js)
+
+pc.pval <- data.filt@reductions$pca@jackstraw@overall.p.values %>% as.data.frame(); # get p-value for each PC
+pc.pval
+plot(pc.pval$PC, -log10(pc.pval$Score))
+write.table(pc.pval, file="./output/01_QC/QC_PCA_jackstraw_scores.xlsx", 
+            quote=FALSE, sep='\t', col.names=TRUE)
+
+#Generate 2-dimensional layouts of the data using t-SNE and UMAP
+nPC=30
+DefaultAssay(data.filt) <- "RNA"
+
+
+data.filt <- RunUMAP(object = data.filt, reduction = "harmony", dims = 1:nPC);
+
+p2 <- DimPlot(object = data.filt, reduction = "umap", group.by = "type", pt.size=0.1)
+fp <- FeaturePlot(data.filt, features = "nCount_RNA")+scale_colour_viridis_c()
+fp1 <- FeaturePlot(data.filt, features = c("harmony_1", "harmony_2", "harmony_3", "harmony_4"))
+
+p2|fp|fp1
+ggsave("/files/output/01_QC/QC_clustering_PCAoptimized.svg", p2|fp|fp1)
+
+saveRDS(data.filt, file="./data/QC_data.filt.rds")
+
+```
