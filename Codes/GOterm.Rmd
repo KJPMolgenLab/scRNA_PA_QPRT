@@ -1,0 +1,28 @@
+library(org.Hs.eg.db)
+library(Seurat)
+library(topGO)
+
+
+seurat_integrated<-readRDS("seurat_integrated.rds") # Read the scRNA data
+scRNA.sce <- as.SingleCellExperiment(seurat_integrated)
+
+Idents(seurat_integrated) <- seurat_integrated$seurat_clusters
+
+cluster0 <- subset(seurat_integrated,idents="0")
+
+expr <- cluster0[["RNA"]]$counts
+# Select genes that are expressed > 0 in at least 75% of cells (somewhat arbitrary definition)
+n.gt.0 <- apply(expr, 1, function(x)length(which(x > 0)))
+expressed.genes <- rownames(expr)[which(n.gt.0/ncol(expr) >= 0.75)]
+all.genes <- rownames(expr)
+
+# define geneList as 1 if gene is in expressed.genes, 0 otherwise
+geneList <- ifelse(all.genes %in% expressed.genes, 1, 0)
+names(geneList) <- all.genes
+
+# Create topGOdata object
+GOdata <- new("topGOdata",
+              ontology = "BP", # use biological process ontology
+              allGenes = geneList,
+              geneSelectionFun = function(x)(x == 1),
+              annot = annFUN.org, mapping = "org.Hs.eg.db", ID = "symbol")

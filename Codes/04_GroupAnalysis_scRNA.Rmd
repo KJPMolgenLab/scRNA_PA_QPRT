@@ -1,0 +1,174 @@
+---
+title: "Diagnosis analysis"
+author: "AGC AK"
+date: "2023-02-11"
+output: html_document
+---
+
+# Compare across treatment
+
+```{r Calling libraries, echo=FALSE, include=FALSE}
+library(SingleR)
+library(DropletUtils)
+library(SingleCellExperiment)
+library(Seurat)
+library(slingshot)
+library(gprofiler2)
+library(tidyverse)
+
+dir.create("./Results/04_Biostat/", showWarnings = F)
+```
+
+```{r load files}
+seurat_integrated <- readRDS("./Data/QC_data.filt.rds")
+metadata<- seurat_integrated@meta.data
+```
+
+## DEG all cells
+
+```{r}
+Idents(seurat_integrated) <- "type"
+DEG_allcells<-FindMarkers(seurat_integrated,ident.1 = "5mM", ident.2 = "0mM")
+```
+
+```{r}
+DT::datatable(DEG_allcells, extensions = "Buttons",
+                    filter="top",
+                    options = list(
+                      pageLength = 15,
+                      info = FALSE,
+                      lengthMenu = list(c(15,50, 100, -1),
+                                        c("15","50", "100" ,"All")
+                      ),dom = 'Blfrtip',
+                      buttons = c('copy', 'csv', 'excel', 'pdf')
+                    ))
+
+DEG_allcells <- cbind("Gene"=rownames(DEG_allcells), DEG_allcells)
+openxlsx2::write_xlsx(DEG_allcells, "./Results/04_Biostat/Biostat_DEG_allcells.xlsx", as_table = T)
+```
+
+
+```{r}
+idx_sig<-DEG_allcells$p_val_adj<0.05
+idx_fdr <- abs(DEG_allcells$avg_log2FC)> 0.25 
+idx_reg <- idx_sig & idx_fdr
+idx_up<- idx_reg & sign(DEG_allcells$avg_log2FC)>0
+idx_dwn<- idx_reg & sign(DEG_allcells$avg_log2FC)<0
+
+genebackground = rownames(DEG_allcells)
+genelist = list(DEG_all_reg=genebackground[idx_reg], DEG_all_down=genebackground[idx_dwn], DEG_all_up=genebackground[idx_up])
+gostres = gost(query = genelist, evcodes = T, custom_bg = genebackground)
+
+tablegostres = gostres$result[grepl("GO:", gostres$result$source), c("query", "source", "term_name","p_value", "intersection")]
+
+DT::datatable(tablegostres, extensions = "Buttons",
+                    filter="top",
+                    options = list(
+                      pageLength = 15,
+                      info = FALSE,
+                      lengthMenu = list(c(15,50, 100, -1),
+                                        c("15","50", "100" ,"All")
+                      ),dom = 'Blfrtip',
+                      buttons = c('copy', 'csv', 'excel', 'pdf')
+                    ))
+
+openxlsx2::write_xlsx(tablegostres, "./Results/04_Biostat/Biostat_GO_termDEG_all.xlsx")
+```
+
+## Clusterwise analysis 
+
+```{r}
+clusters = unique(seurat_integrated$seurat_clusters)
+       
+DEG_reslist <- list()
+Idents(seurat_integrated) <- "seurat_clusters"
+
+for(clus in clusters){
+  clusnam <- paste0("cluster_",clus)
+  markers <-FindMarkers(seurat_integrated, ident.1 = "5mM", ident.2 = "0mM", 
+                        group.by = 'type', subset.ident = clus)
+  DEG_reslist[[clusnam]]<-markers
+  markers <- cbind("Gene"=rownames(markers), markers)
+  openxlsx2::write_xlsx(markers, paste0("./Results/04_Biostat/Biostat_DEG_",clusnam,"cells.xlsx"))
+}
+
+```
+```{r}
+goreslist <- list()
+
+for(res in names(reslist)){
+  DEGRes <- reslist[[res]]
+  idx_sig<-DEGRes$p_val_adj<0.05
+  idx_fdr <- abs(DEGRes$avg_log2FC)> 0.25 
+  idx_reg <- idx_sig & idx_fdr
+  idx_up<- idx_reg & sign(DEGRes$avg_log2FC)>0
+  idx_dwn<- idx_reg & sign(DEGRes$avg_log2FC)<0
+  
+  genebackground = rownames(DEGRes)
+  genelist = list(DEG_all_reg=genebackground[idx_reg], DEG_all_down=genebackground[idx_dwn], DEG_all_up=genebackground[idx_up])
+  names(genelist)= paste0(res, names(genelist))
+  gostres = gost(query = genelist, evcodes = T, custom_bg = genebackground)
+  goreslist[[res]]<-gostres
+  tablegostres = gostres$result[grepl("GO:", gostres$result$source), c("query", "source", "term_name","p_value", "intersection")]
+  openxlsx2::write_xlsx(tablegostres, paste0("./Results/04_Biostat/Biostat_GO_termDEG_",res,".xlsx"))
+}
+```
+
+
+## Cluster based differences in distribution
+
+```{r}
+n_cells=(table(clusters=seurat_integrated$seurat_clusters, treatment=seurat_integrated$type))
+
+n_cells %>% as.data.frame() %>% reshape(timevar = "clusters",
+                                        idvar = "treatment",
+                                        direction = "wide") %>% 
+  remove_rownames() %>% column_to_rownames("treatment") %>% t() %>% as.data.frame()-> n_cells
+
+res=list()
+
+for(i in rownames(n_cells)){
+  crosstab = rbind(colSums(n_cells[rownames(n_cells) != i,]),n_cells[i,])
+  res[[i]]<-fisher.test(crosstab)
+  
+}
+
+n_cells$OR = unlist(lapply(res, function(x){x$estimate}))
+n_cells$p.value = unlist(lapply(res, function(x){x$p.value}))
+n_cells$adj.pvalue = p.adjust(n_cells$p.value)
+
+n_cells <- cbind("cluster"=rownames(n_cells), n_cells)
+openxlsx2::write_xlsx(file="./Results/04_Biostat/Biostat_clusterFreq.xslsx",n_cells)
+```
+
+
+
+## Trajectory Lineages Samples
+```{r,fig.cap="Trajectory Lineages Samples",echo=FALSE, fig.width=16, fig.height=8}
+
+library(rstatix)
+
+  metadata$type = as.factor(metadata$type)
+  metadata$type = relevel(metadata$type, ref = "5mM")
+  
+plotlist=list()
+for(lin in c("shared.pseudo",linages)){
+  data=metadata[,c(lin, "type")]
+  colnames(data) <- c("Pseudotime", "type")
+  stat.test <- data %>% rstatix::wilcox_test(Pseudotime~type)
+  ggp2 <-ggplot(data, aes(x =Pseudotime, color=type)) + 
+    geom_density() + 
+    scale_fill_manual(values=SamplePalette, aesthetics="colour")+
+    theme_classic()+ ggtitle(lin)+xlab("pseudotime") + 
+  labs(subtitle = get_test_label(stat.test,  detailed = TRUE))
+  plotlist[[lin]]<-ggp2
+}
+
+lineagesplots <- ggpubr::ggarrange(plotlist=plotlist)
+lineagesplots
+ggsave("./Results/04_Biostat/Biostat_Comparelineages.svg")
+
+```
+```{r}
+saveRDS(file="./Data/QC_data.filt.rds", seurat_integrated)
+```
