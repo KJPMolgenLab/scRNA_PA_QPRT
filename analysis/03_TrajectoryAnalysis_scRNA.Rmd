@@ -2,9 +2,11 @@
 title: "03_TrajectoryAnalysis"
 author: "Afsheen"
 date: "2023-01-12"
-output:
-  pdf_document: default
-  html_document: default
+html_document:
+    theme: cerulean
+    toc: yes
+    toc_float:
+      collapsed: true
 ---
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
@@ -24,7 +26,7 @@ dir.create("./output/03_Trajectories/", showWarnings = F)
 ```
 
 ```{r}
-seurat_integrated <-readRDS("./data/QC_data.filt.rds")
+seurat_integrated <-readRDS("./data/QC_dataClustered.filtTyped.rds")
 DefaultAssay(seurat_integrated) <- "RNA"
 seurat_integrated@meta.data <- seurat_integrated@meta.data[,!grepl("Lineage|pseudo",colnames(seurat_integrated@meta.data))] 
 scRNA.sce <- as.SingleCellExperiment(seurat_integrated)
@@ -105,6 +107,6 @@ ggsave("./output/03_Trajectories/Trajectories_Lineages.svg",p)
 
 
 ```{r}
-saveRDS(file="./data/QC_data.filt.rds", seurat_integrated)
+saveRDS(file="./data/QC_dataClustered.filtTypedTraj.rds", seurat_integrated)
 ```
 

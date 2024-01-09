@@ -1,0 +1,308 @@
+---
+title: "Bulk_Data"
+author: "A Chiocchetti"
+date: "2024-01-09"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(knitr)
+library(RCurl) 
+library(DESeq2)
+library(RColorBrewer)
+library(glmpca)
+library(ggplot2)
+library(tidyverse)
+library(pheatmap)
+library(dendextend)
+library(gprofiler2)
+```
+
+```{r}
+options(stringsAsFactors = F)
+set.seed(157434538)
+
+Dark8 = RColorBrewer::brewer.pal(8, "Dark2")
+source(paste0("code/custom_functions.R")) #also defines colors
+```
+
+```{r getdata}
+output= paste0("output/05_Bulk_Preprocessing")
+dir.create(output, showWarnings = FALSE)
+
+filetarget <- "./data/Bulkdata_Countmatrix.rds"
+Countdata <- readRDS(filetarget)
+
+Ntot= nrow(Countdata)
+
+#merge non unique annotations
+if(length(unique(rownames(Countdata))) != Ntot){
+  Countdata = Countdata %>% group_by(row.names(Countdata)) %>% summarise_each(sum)
+  Ntot= nrow(Countdata)
+}
+
+hgnc=gconvert(query=as.numeric(rownames(Countdata)), 
+              organism = "hsapiens", 
+              numeric_ns = "ENTREZGENE_ACC",
+              target = "HGNC")
+
+Ids = hgnc %>%  dplyr::select(name, input, description) %>% group_by(input) %>% 
+  summarise(name=paste(name, sep="; ", collapse = ";"), description = dplyr::first(description))
+
+rowdescription = data.frame(entrez_gene = Ids$input, 
+                            hgnc=Ids$name, 
+                            description=Ids$description)
+
+
+rowdescription = rowdescription[match(row.names(Countdata), rowdescription$entrez_gene),]
+rownames(rowdescription)=row.names(Countdata)
+
+# load and parse sample information 
+SampleInfo <- data.frame(Fullname = make.names(colnames(Countdata)))
+
+strsplit(SampleInfo$Fullname, split = "\\.") %>% 
+  lapply(function(x) x[1]) %>% unlist -> SampleInfo$Position
+SampleInfo$Row = substr(SampleInfo$Position, 1,1)
+SampleInfo$Col = as.numeric(substr(SampleInfo$Position, 2,3))
+strsplit(SampleInfo$Fullname, split = "\\.") %>%  
+  lapply(function(x) x[3]) %>% unlist %>% as.factor()-> SampleInfo$Replicate
+
+strsplit(SampleInfo$Fullname, split = "\\.") %>%  
+  lapply(function(x) x[2]) %>% unlist -> infos
+strsplit(infos, split = "_") %>%  
+  lapply(function(x) x[1])%>% unlist %>% as.factor() -> SampleInfo$CellLine
+strsplit(infos, split = "_") %>%  
+  lapply(function(x) x[2])%>% unlist %>% as.factor() -> SampleInfo$Batch
+strsplit(infos, split = "_") %>%  
+  lapply(function(x) as.numeric(gsub("d","", x[3])))%>% unlist -> SampleInfo$Day
+strsplit(infos, split = "_") %>%  
+  lapply(function(x) factor(gsub("mM","",x[4]), levels=c(0,5)))%>% unlist -> SampleInfo$PAmM
+rownames(SampleInfo) <- SampleInfo$Fullname
+colnames(Countdata) <- make.names(colnames(Countdata))
+
+# align datasets
+checkfiles = all(rownames(SampleInfo) %in% colnames(Countdata))
+IDs=intersect(rownames(SampleInfo), colnames(Countdata))
+Countdata = Countdata[,IDs]
+SampleInfo = SampleInfo[IDs, ]
+SampleInfo$reads_per_sample = colSums(Countdata)
+```
+
+```{r display data}
+
+display_tab(head(Countdata))
+display_tab(SampleInfo)
+
+```
+
+
+```{r plot_counts, fig.height=5, fig.width=8}
+boxplot_counts = function(plotsubset,maintitle,colorcode){
+  vals=log2(plotsubset+1)
+  a =boxplot(vals, main = maintitle, 
+             col = Dark8[as.factor(SampleInfo[,colorcode])], names=NA,
+             ylab = "log2 transformed", xlab="samples", xaxt="n")
+  legend(ncol(vals)*1.1, max(vals), legend = levels(SampleInfo[,colorcode]),
+         bg="white",xpd=T,box.col = "white",
+         pch = 16, col = Dark8[1:length(unique(SampleInfo[,colorcode]))])
+}
+
+
+barplot_counts = function(DF, maintitle, colorcode, coltoplot="reads_per_sample") {
+
+  vals=log2(DF[,coltoplot])
+  barplot(vals, main = maintitle, 
+          col = Dark8[as.factor(DF[,colorcode])], names=NA, xaxt="n",
+          ylab = "log2 transformed", xlab="samples")
+  legend(length(vals)*1.25, max(vals), legend = levels(DF[,colorcode]), pch = 16, 
+         bg ="white",xpd=T, box.col="white",
+         col = Dark8[1:length(unique(DF[,colorcode]))])
+}
+
+
+par(mar=c(3,5,5,7))
+boxplot_counts(plotsubset = Countdata, maintitle = "raw counts", colorcode = "Batch")
+barplot_counts(SampleInfo, "total reads", "Batch")
+
+
+plot(density(log2(rowMeans(Countdata))), main="distribution of gene expression", 
+     xlab="mean log2(counts +1)")
+```
+
+
+```{r clean and plot_counts, fig.height=5, fig.width=8}
+# remove genes wich were not detected in at least 25% of the samples 
+keeperidx = rowSums(Countdata>1)>nrow(SampleInfo)/4
+
+Countdata_cl = Countdata[keeperidx, ]
+
+rowdescription = rowdescription[row.names(Countdata_cl),]
+
+fullmodel = as.formula("~Day+PAmM")
+
+ddsMat <- DESeqDataSetFromMatrix(countData = Countdata_cl,
+                                 colData = SampleInfo,
+                                 rowData = rowdescription,
+                                 design = fullmodel)
+
+
+ddsMat = estimateSizeFactors(ddsMat)
+ddsMat = estimateDispersions(ddsMat)
+
+reads  = as.data.frame(counts(ddsMat, normalized=T))
+
+SDs = apply(reads, 1, sd)
+keepvar = SDs>0
+
+ddsMat <- ddsMat[keepvar,]
+
+Nfilt = length(ddsMat)
+reads  = as.data.frame(counts(ddsMat, normalized=T))
+
+SampleInfo$reads_per_sample_cl= colSums(reads)
+
+
+par(mar=c(3,5,5,7))
+boxplot_counts(plotsubset = Countdata_cl, maintitle = "raw counts QCed", colorcode = "Batch")
+barplot_counts(SampleInfo, "total reads QCed", "Batch", coltoplot ="reads_per_sample_cl")
+
+
+plot(density(log2(rowMeans(Countdata_cl))), main="distribution of gene expression", 
+     xlab="mean log2(counts +1) QCed")
+
+```
+### before cleaning
+* Average reads per samples: `r format(mean(SampleInfo$reads_per_sample), big.mark=" ", scientific=F)`
+* Standard deviation reads per samples: `r format(sd(SampleInfo$reads_per_sample), big.mark=" ", scientific=F)`
+* Total genes mapped: `r format(Ntot, big.mark=" ")`
+
+### after cleaning
+
+* Average reads per samples: `r format(mean(colSums(reads)), big.mark=" ", scientific=F)`
+* Standard deviation reads per samples: `r format(sd(colSums(reads)), big.mark=" ", scientific=F)`
+* Genes removed due to low reads: `r format(Ntot-Nfilt, big.mark = " ")` 
+* Total genes included after filtering: `r format(Nfilt, big.mark=" ")`
+
+## Clustering 
+
+hierarchical clustering based on the top 2000 genes by variance 
+
+```{r hcluster, fig.height=10, fig.width=15}
+log2_cpm = log2(reads+1)
+
+varsset=apply(log2_cpm, 1, var)
+
+cpm.sel.trans = t(log2_cpm[order(varsset,decreasing = T)[1:2000],])
+
+rownames(cpm.sel.trans)=rownames(SampleInfo)
+
+distance = dist(cpm.sel.trans)
+hc = stats::hclust(distance, method="ward.D2")
+cutN=10 #number of different conditions (2xPA, 5xDay)
+clusters = cutree(hc, k=cutN)
+Colors=sample(jetcolors(cutN))[clusters]
+
+myLetters <- LETTERS[1:26]
+
+numRow=match(SampleInfo$Row, myLetters)
+addRow=LETTERS[numRow]
+
+Plotdata=data.frame(Rows=addRow, numRow = numRow, Cols = SampleInfo$Col, 
+                    Group=clusters, Colors=Colors)
+
+par(mar=c(15,3,5,3))
+plot(as.dendrogram(hc), main=paste("Similairtiy by gene expression, guessed",cutN,"clusters"), cex=0.7)
+colored_dots(colors = Colors, dend = as.dendrogram(hc), rowLabels = "cluster")
+
+```
+
+Similarity based on hcluster plot 
+#todo: check code snippet 
+```{r platesetup_cluster, fig.height=8, fig.width=15}
+
+par(mar=c(2,5,8,3))
+plot(0,0, type="n", ylab="", xlab="", 
+     ylim=rev(range(Plotdata$numRow))+c(1,-1), 
+     xlim=range(Plotdata$Cols)+c(-1,1), xaxt="n",yaxt="n" ,
+     main="plate similarity plot")
+points(y=Plotdata$numRow, x=Plotdata$Cols, pch=16, cex=4, col=Plotdata$Colors)
+text(y=Plotdata$numRow, x=Plotdata$Cols, labels = Plotdata$Group)
+text(y=Plotdata$numRow, x=Plotdata$Cols, labels = Plotdata$Group)
+axis(2, at=1:9, labels = c(paste0("P1_", LETTERS[1:8]), "P2_A"), las=1)
+axis(3, at=1:12, labels = c(paste0("Col_", 1:12)), las=3)
+abline(h=8.5)
+
+```
+
+```{r clusterandqual, fig.height=15, fig.width=15}
+sampleDistMatrix <- as.matrix(distance)
+
+#colors for plotting heatmap
+colors <- colorRampPalette(brewer.pal(9, "Spectral"))(255)
+
+PAcols = Dark8[c(1:2)+1]
+names(PAcols) = unique(SampleInfo$PAmM)
+
+Batchcols = brewer.pal(3,"Set1")[1:nlevels(SampleInfo$Batch)]
+names(Batchcols) = levels(SampleInfo$Batch)
+
+Replicol = brewer.pal(3,"Set2")[1:2]
+names(Replicol) = levels(SampleInfo$Replicate)
+
+Daycol = c("dodgerblue", "dodgerblue4")
+
+ann_colors = list(
+  PAmM = PAcols,
+  Batch = Batchcols, 
+  Replicate = Replicol,
+  Day = Daycol
+  )
+
+labels = SampleInfo[,c("Batch","Replicate", "Day", "PAmM")] %>% mutate_at(c("Batch", "Replicate", "PAmM"), as.character) %>% as.data.frame()
+
+rownames(labels)=rownames(SampleInfo)
+
+pheatmap(sampleDistMatrix,
+         clustering_distance_rows = distance,
+         clustering_distance_cols = distance,
+         clustering_method = "ward.D2",
+         scale ="row",
+         border_color = NA, 
+         annotation_row = labels,
+         annotation_col = labels,
+         annotation_colors = ann_colors,
+         col = colors, 
+         main = "Distances normalized log2 counts")
+
+```
+
+## PCA and MDS
+
+```{r PCA_MDS}
+
+# PCA
+gpca <- glmpca(t(cpm.sel.trans), L = 2)
+gpca.dat <- gpca$factors
+gpca.dat$CellLine <- SampleInfo$CellLine
+gpca.dat$Batch <- SampleInfo$Batch
+gpca.dat$PAmM<- as.factor(SampleInfo$PAmM)
+gpca.dat$Day<- SampleInfo$Day
+gpca.dat$Replicate <- as.factor(SampleInfo$Replicate)
+
+rownames(gpca.dat) = rownames(SampleInfo)
+mds = as.data.frame(SampleInfo) %>% cbind(cmdscale(distance))
+
+
+ggplot(gpca.dat, aes(x = dim1, y = dim2, color = Day, 
+                     shape = PAmM)) +
+            geom_point(size = 2)  + ggtitle("PCA with log2 counts")
+
+ggplot(mds, aes(x = `1`, y = `2`, color = Day, shape = PAmM)) +
+            geom_point(size = 2)  + ggtitle("MDS with log2 counts")
+
+saveRDS(ddsMat, file=paste0("./data/Bulk_dds_matrix.rds"))
+```

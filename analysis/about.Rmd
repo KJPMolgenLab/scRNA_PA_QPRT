@@ -7,7 +7,7 @@ editor_options:
   chunk_output_type: console
 ---
 
-# Effects of QPRT inhibitor Phtylic acid on development of cerebelar organoids
+# Effects of QPRT inhibitor phtalic acid on development of cerebral organoids
 
 **Authors:**
 

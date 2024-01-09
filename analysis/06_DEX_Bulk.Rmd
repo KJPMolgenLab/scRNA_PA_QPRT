@@ -1,0 +1,66 @@
+---
+title: "Deconvolution"
+author: "A Chiocchetti"
+date: "2024-01-09"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(knitr)
+library(RCurl) 
+library(DESeq2)
+library(RColorBrewer)
+library(glmpca)
+library(ggplot2)
+library(tidyverse)
+library(pheatmap)
+library(dendextend)
+library(gprofiler2)
+```
+```{r}
+options(stringsAsFactors = F)
+set.seed(157434538)
+reanalyze=TRUE
+Dark8 = RColorBrewer::brewer.pal(8, "Dark2")
+```
+
+```{r getdata}
+output= paste0("output/05_Bulk_DEX")
+dir.create(output, showWarnings = F)
+source("code/custom_functions.R")
+ddsMat <- readRDS("data/Bulk_dds_matrix.rds")
+SampleInfo = as.data.frame(colData(ddsMat))
+log_2cpm=log2(counts(ddsMat, normalize=T)+1)
+```
+
+```{r getdata}
+
+if(reanalyze | !file.exists(paste0(home,"/output/D62_ResTabs_KO.RData"))){
+  
+  ## comparisons against 0MM PA
+  PA=levels(SampleInfo$PAmM)
+  Days=c(sort(unique(SampleInfo$Day)))
+  
+  p = 0
+  d = Days[1]
+  target = "PAmM"
+  randomeffect = "Batch"
+  
+  for(d in Days){
+    Dayfilter = SampleInfo$Day == d
+    Set = rownames(SampleInfo)[Dayfilter]
+    lab = paste("restab", "Day", d,"0vs5mM_PA",sep="_")
+    print(lab)
+    assign(lab, comparison(dds_object = ddsMat, 
+                           samples = Set, 
+                           target = target, 
+                           randomeffect = randomeffect))
+  }
+    
+```
+
+

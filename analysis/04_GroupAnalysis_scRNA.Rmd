@@ -2,7 +2,11 @@
 title: "Diagnosis analysis"
 author: "AGC AK"
 date: "2023-02-11"
-output: html_document
+html_document:
+    theme: cerulean
+    toc: yes
+    toc_float:
+      collapsed: true
 ---
 
 # Compare across treatment
@@ -17,10 +21,11 @@ library(gprofiler2)
 library(tidyverse)
 
 dir.create("./output/04_Biostat/", showWarnings = F)
+SamplePalette =  c("#000000","#3399FF")
 ```
 
 ```{r load files}
-seurat_integrated <- readRDS("./data/QC_data.filt.rds")
+seurat_integrated <- readRDS("./data/QC_dataClustered.filtTypedTraj.rds")
 metadata<- seurat_integrated@meta.data
 ```
 
@@ -93,11 +98,12 @@ for(clus in clusters){
 }
 
 ```
+
 ```{r}
 goreslist <- list()
 
-for(res in names(reslist)){
-  DEGRes <- reslist[[res]]
+for(res in names(DEG_reslist)){
+  DEGRes <- DEG_reslist[[res]]
   idx_sig<-DEGRes$p_val_adj<0.05
   idx_fdr <- abs(DEGRes$avg_log2FC)> 0.25 
   idx_reg <- idx_sig & idx_fdr
@@ -170,14 +176,15 @@ openxlsx2::write_xlsx(file="./output/04_Biostat/Biostat_HumdevCTFreq.xslsx",n_ce
 
 ## Trajectory Lineages Samples
 ```{r,fig.cap="Trajectory Lineages Samples",echo=FALSE, fig.width=16, fig.height=8}
+lineages=grep("Lineage", colnames(metadata),value = T) 
 
 library(rstatix)
 
-  metadata$type = as.factor(metadata$type)
-  metadata$type = relevel(metadata$type, ref = "5mM")
+metadata$type = as.factor(metadata$type)
+metadata$type = relevel(metadata$type, ref = "5mM")
   
 plotlist=list()
-for(lin in c("shared.pseudo",linages)){
+for(lin in c("shared.pseudo",lineages)){
   data=metadata[,c(lin, "type")]
   colnames(data) <- c("Pseudotime", "type")
   stat.test <- data %>% rstatix::wilcox_test(Pseudotime~type)
@@ -195,5 +202,5 @@ ggsave("./output/04_Biostat/Biostat_Comparelineages.svg")
 
 ```
 ```{r}
-saveRDS(file="./data/QC_data.filt.rds", seurat_integrated)
+saveRDS(file="./data/QC_dataFinal.rds", seurat_integrated)
 ```

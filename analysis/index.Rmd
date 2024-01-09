@@ -8,12 +8,16 @@ editor_options:
   chunk_output_type: console
 ---
 
-# scRNA Analysis Results: Effects of QPRT inhibitor Phtylic acid on development of cerebelar organoids
+# scRNA Analysis Results: 
+# Effects of QPRT inhibitor Phtylic acid on development of cerebelar organoids
 
 -   [Quality control](01_QC_Singleron.html)
 
--   [Clustering and Cluster identification](02_Clustering_scRNA.html)
+-   [Clustering Unsupervised](02_01_Clustering_scRNA.html)
 
--   [Trajectory Analysis](03_TrajectoryAnalysis_scRNA.html)
+-   [Cluster Cell-type identification](02_02_Clustering_Mapping_scRNA.html)
 
--   [Group comparison](04_GroupAnalysis.html)
+-   [Trajectory analysis](03_TrajectoryAnalysis_scRNA.html)
+
+-   [Biostatistical group comparison](04_GroupAnalysis.html)
+

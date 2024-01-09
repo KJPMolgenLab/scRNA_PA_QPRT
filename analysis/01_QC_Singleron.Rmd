@@ -3,8 +3,11 @@ title: "QC"
 author: "Afsheen"
 date: "2023-01-11"
 output:
-  pdf_document: default
-  html_document: default
+  html_document: 
+    theme: cerulean
+    toc: yes
+    toc_float:
+      collapsed: true
 ---
 
 ```{r setup, include=FALSE}
@@ -38,6 +41,9 @@ dir.create("./output/01_QC/", showWarnings = F)
 
 ```{r, Loading samples and performing basic QC, echo=FALSE}
 alldata<-readRDS("./data/alldata.rds")
+
+cells_before_filt<-dim(alldata)
+
 Idents(alldata) <- "type"
 SamplePalette =  c("#000000","#3399FF")
 ```
@@ -116,7 +122,7 @@ feats <- c("nFeature_RNA", "nCount_RNA", "percent_mito", "percent_ribo")
 p1<-VlnPlot(data.filt, group.by = "type", features = feats, pt.size = 0.1, ncol = 2) +
     NoLegend()
 
-ggsave("./output/01_QC/QCmeasures_Violin_filtered.svg")
+ggsave("./output/01_QC/QC_measures_Violin_filtered.svg")
 #Filter genes
 
 # Filter Mitochondrial
@@ -167,7 +173,13 @@ singlets = WhichCells(data.filt, expression = DF.classifications_0.25_0.09_379==
 
 data.filt<- data.filt[,singlets]
 
+cells_after_filt <- dim(data.filt)
+cells_after_filt
+table(data.filt$type)
 ```
+
+
+
 
 ```{r}
 ## HARMONY
