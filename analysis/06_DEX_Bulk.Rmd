@@ -26,12 +26,12 @@ options(stringsAsFactors = F)
 set.seed(157434538)
 reanalyze=F
 cutoff = 0.05 # pavalue cutoff for DEG
-padj_cu=TRUE # use adjusted pvalue 
+padj_cu=FALSE # use adjusted pvalue 
 Dark8 = RColorBrewer::brewer.pal(8, "Dark2")
 ```
 
 ```{r getdata}
-output= paste0("output/05_Bulk_DEX")
+output= paste0("output/05_Bulk_DEX/")
 dir.create(output, showWarnings = F)
 source("code/custom_functions.R")
 ddsMat <- readRDS("data/Bulk_dds_matrix.rds")
@@ -49,18 +49,28 @@ d = Days[1]
 target = "PAmM"
 randomeffect = "Batch"
 
+geneinfo = rowData(ddsMat) %>% as.data.frame()
+geneinfo$entrez_gene = rownames(geneinfo)
+geneinfo$hgnc[is.na(geneinfo$hgnc)] <- geneinfo$entrez_gene[is.na(geneinfo$hgnc)]
+
 for(d in Days){
   Dayfilter = SampleInfo$Day == d
   Set = rownames(SampleInfo)[Dayfilter]
   lab = paste("restab", "Day", d,"0vs5mM_PA",sep="_")
   print(lab)
-  assign(lab, comparison(dds_object = ddsMat, 
-                         samples = Set, 
-                         target = target, 
-                         randomeffect = randomeffect))
+  res <- comparison(dds_object = ddsMat, 
+                    samples = Set, 
+                    target = target, 
+                    randomeffect = randomeffect)
+  res$HGNC = geneinfo[match(as.character(rownames(res)), as.character(rownames(geneinfo))), "hgnc"]
+  assign(lab, res)
 }
 
+#Lists elements are written to individual worksheets, using list names as sheet names if available
+l <- list(mget(apropos("restab_")))[[1]]
+openxlsx2::write_xlsx(l, file=paste0(output, "05_DEX_Bulk_LFC_results.xlsx"), row_names=T )
 ```
+
 
 ```{r, fig.width=15, fig.height=20}
 geneuniverses <- rownames(log_2cpm)
@@ -82,17 +92,100 @@ for (i in apropos("restab_")){
 names(GOtermlist) = gsub("restab_Day", "Day", names(GOtermlist))
 names(GOtermlist) = gsub("Day_5", "Day_05", names(GOtermlist))
 
-resGO = getGOresults(GOtermlist, genereference = NULL, evcodes = F)
+resGO = getGOresults(GOtermlist, genereference = NULL, evcodes = T)
 
-openslsx2::write
+openxlsx::write.xlsx(resGO$result, file = paste0(output, "/06_DEX_Bulk_GO_results.xlsx"))
+```
+
+```{r, fig.width=15, fig.height=20}
 
 plotlist = list()
 for (set in unique(resGO$result$query)){
   dat=resGO$result[which(resGO$result$query == set),]
-  plotlist[[set]]<-GOplot(dat, N = 10, Title = set)
-  ggsave(file=paste0("/output//05_Bulk_DEX"")
+  if(nrow(dat)>0){
+    plotlist[[set]]<-GOplot(dat, N = 10, Title = set)
+  }else{
+    text="no signifiance"
+    plotlist[[set]]<-ggplot() + annotate("text", x = 4, y = 25, label = text) + 
+      ggtitle(set) + theme_void()
+  }
 }
 
-ggpubr::ggarrange(plotlist = plotlist, common.legend = T, nrow = 5, ncol =3)
-
+p <- ggpubr::ggarrange(plotlist = plotlist, common.legend = T, nrow = 5, ncol =3)
+p
+ggsave(file=paste0(output, "/06_DEX_Bulk_top10all_GOplot.svg"), plot = p)
 ```
+
+```{r, fig.width=15, fig.height=20}
+plotlist = list()
+for (set in unique(resGO$result$query)){
+  dat=resGO$result[which(resGO$result$query == set & resGO$result$source == "GO:BP"),]
+  if(nrow(dat)>0){
+    plotlist[[set]]<-GOplot(dat, N = 10, Title = set)
+  }else{
+    text="no signifiance"
+    plotlist[[set]]<-ggplot() + annotate("text", x = 4, y = 25, label = text) + 
+      ggtitle(set) + theme_void()
+  }
+}
+
+p <- ggpubr::ggarrange(plotlist = plotlist, common.legend = T, nrow = 5, ncol =3)
+p
+ggsave(file=paste0(output, "/06_DEX_Bulk_top10_BP_GOplot.svg"), plot = p)
+```
+
+```{r, fig.width=15, fig.height=20}
+plotlist = list()
+for (set in unique(resGO$result$query)){
+  dat=resGO$result[which(resGO$result$query == set & resGO$result$source == "TF"),]
+  if(nrow(dat)>0){
+    plotlist[[set]]<-GOplot(dat, N = 10, Title = set)
+  }else{
+    text="no signifiance"
+    plotlist[[set]]<-ggplot() + annotate("text", x = 4, y = 25, label = text) + 
+      ggtitle(set) + theme_void()
+  }
+}
+
+p <- ggpubr::ggarrange(plotlist = plotlist, common.legend = T, nrow = 5, ncol =3)
+p
+ggsave(file=paste0(output, "/06_DEX_Bulk_top10_TF_GOplot.svg"), plot = p)
+```
+```{r plot top 10 DEX genes, fig.width=14, fig.height=21}}
+
+topgenes=c()
+for(r in apropos("restab_")){
+  res <- get(r)
+  topgenes <- c(topgenes, res$HGNC[1:10])
+}
+
+topgenes <- unique(topgenes)
+topgenes <- sort(topgenes)
+
+plotDEX= function(geneToPlot){
+  data.frame(reads = log_2cpm[which(geneinfo$hgnc==geneToPlot),], Group = SampleInfo$PAmM, Day = SampleInfo$Day) %>%
+    ggplot(aes(x = Group, y = reads, fill = Group)) +
+    geom_boxplot() +
+    theme_classic() + facet_wrap(~Day, nrow  = 1) +
+    theme(axis.text.x = element_text(angle = 90, hjust = 1))+
+    labs(x = "Day", y = "log2(CPM+1)", title = geneToPlot) -> p
+  return(p)
+}
+
+
+plotlist=list()
+for(g in topgenes){
+  p = plotDEX(g)
+  plotlist[[g]] <- p
+}
+
+pcomb = ggpubr::ggarrange(plotlist=plotlist, nrow = 5, ncol = 4, common.legend = T, heights = c(3,3,3,3,3), widths = c(3,3,3,3))
+ggpubr::ggexport(filename = paste0(output, "/05_DEX_Bulk_Siggenes_boxplots.pdf"), plotlist = pcomb, width = 14, height = 21, dpi = 300)
+```
+
+```{r plot top 10 DEX genes, fig.width=14, fig.height=21}} )
+```
+
+```{r plot DEX})
+```
+
