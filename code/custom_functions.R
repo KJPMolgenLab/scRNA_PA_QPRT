@@ -72,8 +72,16 @@ comparison <- function(dds_object, samples, target, randomeffect){
 
 
 # go profiler function
-getGOresults = function(geneset, genereference, evcodes=FALSE){
+getGOresults = function(geneset, genereference=NULL, evcodes=FALSE){
   require(gprofiler2)
+  if(is.null(genereference)){
+    resgo = gost(geneset, organism = "hsapiens",
+                 correction_method = "gSCS",
+                 #domain_scope = "custom",
+                 evcodes=evcodes,
+                 sources = c("GO:BP", "GO:MF", "GO:CC", "KEGG", "TF", "HP", "HPA"),
+                 numeric_ns = "ENTREZGENE_ACC")
+  } else {
   resgo = gost(geneset, organism = "hsapiens",
                correction_method = "gSCS",
                domain_scope = "custom",
@@ -81,6 +89,7 @@ getGOresults = function(geneset, genereference, evcodes=FALSE){
                sources = c("GO:BP", "GO:MF", "GO:CC", "KEGG", "TF", "HP", "HPA"),
                custom_bg = genereference,
                numeric_ns = "ENTREZGENE_ACC")
+  }
   if(length(resgo) != 0){
     return(resgo)
   } else {
@@ -109,7 +118,7 @@ GOplot = function(GOtable, N, Title="GO plot", ylabel="GO term"){
 
   Tabtoplot$term_name = sapply(Tabtoplot$term_name, wrapit, cutoff=40)
 
-  ggplot(Tabtoplot) + geom_point(aes(x =log10pvalue,
+  p <- ggplot(Tabtoplot) + geom_point(aes(x =log10pvalue,
                                      y = N:1,
                                      size=precision,
                                      colour=genperc)) +
@@ -124,7 +133,7 @@ GOplot = function(GOtable, N, Title="GO plot", ylabel="GO term"){
     guides(size = guide_legend(order = 2),
            colour = guide_colorsteps(order = 1, barheight = 4))+
     xlim(0,15)
-
+  return(p)
 }
 
 

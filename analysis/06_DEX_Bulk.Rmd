@@ -24,7 +24,9 @@ library(gprofiler2)
 ```{r}
 options(stringsAsFactors = F)
 set.seed(157434538)
-reanalyze=TRUE
+reanalyze=F
+cutoff = 0.05 # pavalue cutoff for DEG
+padj_cu=TRUE # use adjusted pvalue 
 Dark8 = RColorBrewer::brewer.pal(8, "Dark2")
 ```
 
@@ -37,30 +39,60 @@ SampleInfo = as.data.frame(colData(ddsMat))
 log_2cpm=log2(counts(ddsMat, normalize=T)+1)
 ```
 
-```{r getdata}
+```{r analyze DEX}
+## comparisons against 0MM PA
+PA=levels(SampleInfo$PAmM)
+Days=c(sort(unique(SampleInfo$Day)))
 
-if(reanalyze | !file.exists(paste0(home,"/output/D62_ResTabs_KO.RData"))){
-  
-  ## comparisons against 0MM PA
-  PA=levels(SampleInfo$PAmM)
-  Days=c(sort(unique(SampleInfo$Day)))
-  
-  p = 0
-  d = Days[1]
-  target = "PAmM"
-  randomeffect = "Batch"
-  
-  for(d in Days){
-    Dayfilter = SampleInfo$Day == d
-    Set = rownames(SampleInfo)[Dayfilter]
-    lab = paste("restab", "Day", d,"0vs5mM_PA",sep="_")
-    print(lab)
-    assign(lab, comparison(dds_object = ddsMat, 
-                           samples = Set, 
-                           target = target, 
-                           randomeffect = randomeffect))
-  }
-    
+p = 0
+d = Days[1]
+target = "PAmM"
+randomeffect = "Batch"
+
+for(d in Days){
+  Dayfilter = SampleInfo$Day == d
+  Set = rownames(SampleInfo)[Dayfilter]
+  lab = paste("restab", "Day", d,"0vs5mM_PA",sep="_")
+  print(lab)
+  assign(lab, comparison(dds_object = ddsMat, 
+                         samples = Set, 
+                         target = target, 
+                         randomeffect = randomeffect))
+}
+
 ```
 
+```{r, fig.width=15, fig.height=20}
+geneuniverses <- rownames(log_2cpm)
+GOtermlist <- list()
 
+for (i in apropos("restab_")){
+  restab <- get(i)
+  if(padj_cu){
+    GOtermlist[[paste0(i, "_all")]] <- rownames(restab)[restab$adj.P.Val < cutoff]
+    GOtermlist[[paste0(i, "_up")]] <- rownames(restab)[restab$adj.P.Val < cutoff  & restab$logFC >0]
+    GOtermlist[[paste0(i, "_dwn")]] <- rownames(restab)[restab$adj.P.Val < cutoff  & restab$logFC < 0]
+  }else{
+    GOtermlist[[paste0(i, "_all")]] <- rownames(restab)[restab$P.Value < cutoff]
+    GOtermlist[[paste0(i, "_up")]] <- rownames(restab)[restab$P.Value < cutoff  & restab$logFC >0]
+    GOtermlist[[paste0(i, "_dwn")]] <- rownames(restab)[restab$P.Value < cutoff  & restab$logFC < 0]
+  }
+}
+
+names(GOtermlist) = gsub("restab_Day", "Day", names(GOtermlist))
+names(GOtermlist) = gsub("Day_5", "Day_05", names(GOtermlist))
+
+resGO = getGOresults(GOtermlist, genereference = NULL, evcodes = F)
+
+openslsx2::write
+
+plotlist = list()
+for (set in unique(resGO$result$query)){
+  dat=resGO$result[which(resGO$result$query == set),]
+  plotlist[[set]]<-GOplot(dat, N = 10, Title = set)
+  ggsave(file=paste0("/output//05_Bulk_DEX"")
+}
+
+ggpubr::ggarrange(plotlist = plotlist, common.legend = T, nrow = 5, ncol =3)
+
+```
