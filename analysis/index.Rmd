@@ -21,3 +21,7 @@ editor_options:
 
 -   [Biostatistical group comparison](04_GroupAnalysis.html)
 
+-   [Bulk sequencing Preprocessing](05_Preprocessing_Bulk.html)
+
+-   [Bulk seq differential gene expression](06_DEX_Bulk.html)
+

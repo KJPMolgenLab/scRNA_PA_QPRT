@@ -1,0 +1,4014 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+<meta name="author" content="A Chiocchetti" />
+
+<meta name="date" content="2024-01-09" />
+
+<title>Bulk_Data</title>
+
+<script src="site_libs/header-attrs-2.25/header-attrs.js"></script>
+<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/cerulean.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/jqueryui-1.13.2/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<script src="site_libs/kePrint-0.0.1/kePrint.js"></script>
+<link href="site_libs/lightable-0.0.1/lightable.css" rel="stylesheet" />
+
+<link rel="icon" href="https://github.com/workflowr/workflowr-assets/raw/main/img/reproducible.png">
+<!-- Add a small amount of space between sections. -->
+<style type="text/css">
+div.section {
+  padding-top: 12px;
+}
+</style>
+
+
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+details > summary > p:only-child {
+  display: inline;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark the anchor link active (and if it's in a dropdown, also mark that active)
+  var dropdown = menuAnchor.closest('li.dropdown');
+  if (window.bootstrap) { // Bootstrap 4+
+    menuAnchor.addClass('active');
+    dropdown.find('> .dropdown-toggle').addClass('active');
+  } else { // Bootstrap 3
+    menuAnchor.parent().addClass('active');
+    dropdown.addClass('active');
+  }
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before, .tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "\e259";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "\e258";
+  font-family: 'Glyphicons Halflings';
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-bs-toggle="collapse" data-target="#navbar" data-bs-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">QPRT-inhibition scRNA organoids</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li>
+  <a href="about.html">About</a>
+</li>
+<li>
+  <a href="license.html">License</a>
+</li>
+<li>
+  <a href="https://chiocchettilab.uni-frankfurt.de">Chiocchettilab</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+
+
+<h1 class="title toc-ignore">Bulk_Data</h1>
+<h4 class="author">A Chiocchetti</h4>
+<h4 class="date">2024-01-09</h4>
+
+</div>
+
+
+<p>
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-report" data-toggle="collapse" data-target="#workflowr-report">
+<span class="glyphicon glyphicon-list" aria-hidden="true"></span>
+workflowr <span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span>
+</button>
+</p>
+<div id="workflowr-report" class="collapse">
+<ul class="nav nav-tabs">
+<li class="active">
+<a data-toggle="tab" href="#summary">Summary</a>
+</li>
+<li>
+<a data-toggle="tab" href="#checks"> Checks <span
+class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>
+</a>
+</li>
+<li>
+<a data-toggle="tab" href="#versions">Past versions</a>
+</li>
+</ul>
+<div class="tab-content">
+<div id="summary" class="tab-pane fade in active">
+<p>
+<strong>Last updated:</strong> 2024-01-09
+</p>
+<p>
+<strong>Checks:</strong> <span
+class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 7
+<span class="glyphicon glyphicon-exclamation-sign text-danger"
+aria-hidden="true"></span> 0
+</p>
+<p>
+<strong>Knit directory:</strong> <code>files/</code> <span
+class="glyphicon glyphicon-question-sign" aria-hidden="true"
+title="This is the local directory in which the code in this file was executed.">
+</span>
+</p>
+<p>
+This reproducible <a href="https://rmarkdown.rstudio.com">R Markdown</a>
+analysis was created with <a
+  href="https://github.com/workflowr/workflowr">workflowr</a> (version
+1.7.1). The <em>Checks</em> tab describes the reproducibility checks
+that were applied when the results were created. The <em>Past
+versions</em> tab lists the development history.
+</p>
+<hr>
+</div>
+<div id="checks" class="tab-pane fade">
+<div id="workflowr-checks" class="panel-group">
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRMarkdownfilestronguptodate">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>R Markdown file:</strong> up-to-date
+</a>
+</p>
+</div>
+<div id="strongRMarkdownfilestronguptodate"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great! Since the R Markdown file has been committed to the Git
+repository, you know the exact version of the code that produced these
+results.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongEnvironmentstrongempty">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Environment:</strong> empty </a>
+</p>
+</div>
+<div id="strongEnvironmentstrongempty" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! The global environment was empty. Objects defined in the
+global environment can affect the analysis in your R Markdown file in
+unknown ways. For reproduciblity it’s best to always run the code in an
+empty environment.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSeedstrongcodesetseed20240103code">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Seed:</strong>
+<code>set.seed(20240103)</code> </a>
+</p>
+</div>
+<div id="strongSeedstrongcodesetseed20240103code"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>The command <code>set.seed(20240103)</code> was run prior to running
+the code in the R Markdown file. Setting a seed ensures that any results
+that rely on randomness, e.g. subsampling or permutations, are
+reproducible.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSessioninformationstrongrecorded">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Session information:</strong>
+recorded </a>
+</p>
+</div>
+<div id="strongSessioninformationstrongrecorded"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! Recording the operating system, R version, and package
+versions is critical for reproducibility.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongCachestrongnone">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Cache:</strong> none </a>
+</p>
+</div>
+<div id="strongCachestrongnone" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Nice! There were no cached chunks for this analysis, so you can be
+confident that you successfully produced the results during this
+run.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongFilepathsstrongrelative">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>File paths:</strong> relative </a>
+</p>
+</div>
+<div id="strongFilepathsstrongrelative" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! Using relative paths to the files within your workflowr
+project makes it easier to run your code on other machines.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomKJPMolgenLabscRNAPAQPRTtree0488293ef9754fa16c1d7bb51351508419566f7ftargetblank0488293a">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Repository version:</strong>
+<a href="https://github.com/KJPMolgenLab/scRNA_PA_QPRT/tree/0488293ef9754fa16c1d7bb51351508419566f7f" target="_blank">0488293</a>
+</a>
+</p>
+</div>
+<div
+id="strongRepositoryversionstrongahrefhttpsgithubcomKJPMolgenLabscRNAPAQPRTtree0488293ef9754fa16c1d7bb51351508419566f7ftargetblank0488293a"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>
+Great! You are using Git for version control. Tracking code development
+and connecting the code version to the results is critical for
+reproducibility.
+</p>
+<p>
+The results in this page were generated with repository version
+<a href="https://github.com/KJPMolgenLab/scRNA_PA_QPRT/tree/0488293ef9754fa16c1d7bb51351508419566f7f" target="_blank">0488293</a>.
+See the <em>Past versions</em> tab to see a history of the changes made
+to the R Markdown and HTML files.
+</p>
+<p>
+Note that you need to be careful to ensure that all relevant files for
+the analysis have been committed to Git prior to generating the results
+(you can use <code>wflow_publish</code> or
+<code>wflow_git_commit</code>). workflowr only checks the R Markdown
+file, but you know if there are other scripts or data files that it
+depends on. Below is the status of the Git repository when the results
+were generated:
+</p>
+<pre><code>
+Ignored files:
+    Ignored:    .Rhistory
+    Ignored:    .Rprofile
+    Ignored:    .Rproj.user/
+    Ignored:    output/05_Bulk_DEX/
+    Ignored:    output/05_Bulk_Preprocessing/
+
+Untracked files:
+    Untracked:  .bashrc
+    Untracked:  .nuvolos/
+    Untracked:  core.10568
+    Untracked:  data/Bulk_dds_matrix.rds
+    Untracked:  data/Bulkdata_Countmatrix.rds
+    Untracked:  data/HumDev/
+    Untracked:  data/Kanton/
+    Untracked:  data/KantonGeneList/
+    Untracked:  data/Knoblich/
+    Untracked:  data/QC_data.filt.rds
+    Untracked:  data/QC_dataClustered.filt.rds
+    Untracked:  data/QC_dataClustered.filtTyped.rds
+    Untracked:  data/QC_dataClustered.filtTypedTraj.rds
+    Untracked:  data/QC_dataFinal.rds
+    Untracked:  data/Yoon/
+    Untracked:  data/alldata.rds
+    Untracked:  output/01_QC/QC_measures_Violin_filtered.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devCellDevTypeClusterCounts.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devFullDetailsMapped.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000099_b.Erythrocyte..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000099_b.Fibroblast..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000099_b.Glioblast..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000099_b.Immune..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000099_b.Neural.crest..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000099_b.Neuroblast..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000099_b.Neuron..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000099_b.Neuronal.IPC..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000099_b.Oligo..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000099_b.Placodes..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000099_b.Radial.glia..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000099_b.Vascular..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000100_b.Erythrocyte..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000100_b.Fibroblast..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000100_b.Glioblast..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000100_b.Immune..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000100_b.Neural.crest..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000100_b.Neuroblast..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000100_b.Neuron..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000100_b.Neuronal.IPC..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000100_b.Oligo..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000100_b.Placodes..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000100_b.Radial.glia..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000100_b.Vascular..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000101_b.Erythrocyte..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000101_b.Glioblast..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000101_b.Immune..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000101_b.Neuroblast..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000101_b.Neuron..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000101_b.Neuronal.IPC..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000101_b.Oligo..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000101_b.Radial.glia..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000101_b.Vascular..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000102_b.Erythrocyte..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000102_b.Fibroblast..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000102_b.Glioblast..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000102_b.Immune..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000102_b.Neural.crest..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000102_b.Neuroblast..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000102_b.Neuron..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000102_b.Neuronal.IPC..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000102_b.Oligo..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000102_b.Placodes..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000102_b.Radial.glia..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000102_b.Vascular..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000103_b.Erythrocyte..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000103_b.Fibroblast..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000103_b.Glioblast..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000103_b.Immune..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000103_b.Neural.crest..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000103_b.Neuroblast..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000103_b.Neuron..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000103_b.Neuronal.IPC..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000103_b.Oligo..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000103_b.Placodes..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000103_b.Radial.glia..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000103_b.Vascular..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000104_b.Erythrocyte..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000104_b.Glioblast..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000104_b.Immune..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000104_b.Neuroblast..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000104_b.Neuron..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000104_b.Neuronal.IPC..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000104_b.Oligo..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000104_b.Radial.glia..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000104_b.Vascular..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000105_b.Erythrocyte..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000105_b.Fibroblast..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000105_b.Glioblast..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000105_b.Immune..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000105_b.Neural.crest..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000105_b.Neuroblast..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000105_b.Neuron..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000105_b.Neuronal.IPC..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000105_b.Oligo..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000105_b.Radial.glia..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000105_b.Vascular..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000106_b.Erythrocyte..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000106_b.Fibroblast..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000106_b.Glioblast..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000106_b.Immune..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000106_b.Neural.crest..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000106_b.Neuroblast..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000106_b.Neuron..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000106_b.Neuronal.IPC..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000106_b.Oligo..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000106_b.Radial.glia..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000106_b.Vascular..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000107_b.Erythrocyte..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000107_b.Fibroblast..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000107_b.Glioblast..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000107_b.Immune..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000107_b.Neural.crest..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000107_b.Neuroblast..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000107_b.Neuron..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000107_b.Neuronal.IPC..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000107_b.Oligo..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000107_b.Radial.glia..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000107_b.Vascular..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000108_b.Erythrocyte..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000108_b.Fibroblast..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000108_b.Glioblast..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000108_b.Immune..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000108_b.Neural.crest..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000108_b.Neuroblast..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000108_b.Neuron..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000108_b.Neuronal.IPC..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000108_b.Oligo..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000108_b.Radial.glia..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000108_b.Vascular..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000099_b'Erythrocyte'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000099_b'Fibroblast'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000099_b'Glioblast'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000099_b'Immune'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000099_b'Neural crest'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000099_b'Neuroblast'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000099_b'Neuron'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000099_b'Neuronal IPC'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000099_b'Oligo'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000099_b'Placodes'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000099_b'Radial glia'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000099_b'Vascular'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000100_b'Erythrocyte'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000100_b'Fibroblast'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000100_b'Glioblast'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000100_b'Immune'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000100_b'Neural crest'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000100_b'Neuroblast'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000100_b'Neuron'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000100_b'Neuronal IPC'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000100_b'Oligo'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000100_b'Placodes'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000100_b'Radial glia'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000100_b'Vascular'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000101_b'Erythrocyte'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000101_b'Glioblast'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000101_b'Immune'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000101_b'Neuroblast'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000101_b'Neuron'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000101_b'Neuronal IPC'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000101_b'Oligo'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000101_b'Radial glia'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000101_b'Vascular'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000102_b'Erythrocyte'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000102_b'Fibroblast'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000102_b'Glioblast'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000102_b'Immune'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000102_b'Neural crest'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000102_b'Neuroblast'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000102_b'Neuron'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000102_b'Neuronal IPC'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000102_b'Oligo'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000102_b'Placodes'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000102_b'Radial glia'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000102_b'Vascular'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000103_b'Erythrocyte'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000103_b'Fibroblast'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000103_b'Glioblast'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000103_b'Immune'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000103_b'Neural crest'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000103_b'Neuroblast'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000103_b'Neuron'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000103_b'Neuronal IPC'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000103_b'Oligo'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000103_b'Placodes'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000103_b'Radial glia'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000103_b'Vascular'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000104_b'Erythrocyte'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000104_b'Glioblast'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000104_b'Immune'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000104_b'Neuroblast'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000104_b'Neuron'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000104_b'Neuronal IPC'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000104_b'Oligo'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000104_b'Radial glia'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000104_b'Vascular'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000105_b'Erythrocyte'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000105_b'Fibroblast'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000105_b'Glioblast'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000105_b'Immune'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000105_b'Neural crest'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000105_b'Neuroblast'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000105_b'Neuron'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000105_b'Neuronal IPC'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000105_b'Oligo'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000105_b'Radial glia'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000105_b'Vascular'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000106_b'Erythrocyte'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000106_b'Fibroblast'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000106_b'Glioblast'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000106_b'Immune'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000106_b'Neural crest'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000106_b'Neuroblast'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000106_b'Neuron'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000106_b'Neuronal IPC'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000106_b'Oligo'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000106_b'Radial glia'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000106_b'Vascular'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000107_b'Erythrocyte'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000107_b'Fibroblast'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000107_b'Glioblast'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000107_b'Immune'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000107_b'Neural crest'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000107_b'Neuroblast'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000107_b'Neuron'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000107_b'Neuronal IPC'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000107_b'Oligo'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000107_b'Radial glia'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000107_b'Vascular'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000108_b'Erythrocyte'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000108_b'Fibroblast'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000108_b'Glioblast'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000108_b'Immune'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000108_b'Neural crest'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000108_b'Neuroblast'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000108_b'Neuron'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000108_b'Neuronal IPC'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000108_b'Oligo'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000108_b'Radial glia'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000108_b'Vascular'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Erythrocyte'_HsapDv:0000099.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Erythrocyte'_HsapDv:0000100.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Erythrocyte'_HsapDv:0000101.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Erythrocyte'_HsapDv:0000102.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Erythrocyte'_HsapDv:0000103.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Erythrocyte'_HsapDv:0000104.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Erythrocyte'_HsapDv:0000105.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Erythrocyte'_HsapDv:0000106.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Erythrocyte'_HsapDv:0000107.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Erythrocyte'_HsapDv:0000108.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Fibroblast'_HsapDv:0000099.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Fibroblast'_HsapDv:0000100.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Fibroblast'_HsapDv:0000102.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Fibroblast'_HsapDv:0000103.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Fibroblast'_HsapDv:0000105.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Fibroblast'_HsapDv:0000106.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Fibroblast'_HsapDv:0000107.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Fibroblast'_HsapDv:0000108.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Glioblast'_HsapDv:0000099.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Glioblast'_HsapDv:0000100.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Glioblast'_HsapDv:0000101.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Glioblast'_HsapDv:0000102.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Glioblast'_HsapDv:0000103.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Glioblast'_HsapDv:0000104.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Glioblast'_HsapDv:0000105.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Glioblast'_HsapDv:0000106.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Glioblast'_HsapDv:0000107.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Glioblast'_HsapDv:0000108.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Immune'_HsapDv:0000099.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Immune'_HsapDv:0000100.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Immune'_HsapDv:0000101.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Immune'_HsapDv:0000102.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Immune'_HsapDv:0000103.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Immune'_HsapDv:0000104.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Immune'_HsapDv:0000105.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Immune'_HsapDv:0000106.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Immune'_HsapDv:0000107.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Immune'_HsapDv:0000108.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Neural crest'_HsapDv:0000099.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Neural crest'_HsapDv:0000100.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Neural crest'_HsapDv:0000102.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Neural crest'_HsapDv:0000103.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Neural crest'_HsapDv:0000105.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Neural crest'_HsapDv:0000106.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Neural crest'_HsapDv:0000107.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Neural crest'_HsapDv:0000108.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Neuroblast'_HsapDv:0000099.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Neuroblast'_HsapDv:0000100.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Neuroblast'_HsapDv:0000101.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Neuroblast'_HsapDv:0000102.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Neuroblast'_HsapDv:0000103.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Neuroblast'_HsapDv:0000104.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Neuroblast'_HsapDv:0000105.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Neuroblast'_HsapDv:0000106.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Neuroblast'_HsapDv:0000107.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Neuroblast'_HsapDv:0000108.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Neuron'_HsapDv:0000099.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Neuron'_HsapDv:0000100.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Neuron'_HsapDv:0000101.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Neuron'_HsapDv:0000102.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Neuron'_HsapDv:0000103.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Neuron'_HsapDv:0000104.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Neuron'_HsapDv:0000105.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Neuron'_HsapDv:0000106.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Neuron'_HsapDv:0000107.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Neuron'_HsapDv:0000108.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Neuronal IPC'_HsapDv:0000099.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Neuronal IPC'_HsapDv:0000100.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Neuronal IPC'_HsapDv:0000101.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Neuronal IPC'_HsapDv:0000102.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Neuronal IPC'_HsapDv:0000103.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Neuronal IPC'_HsapDv:0000104.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Neuronal IPC'_HsapDv:0000105.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Neuronal IPC'_HsapDv:0000106.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Neuronal IPC'_HsapDv:0000107.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Neuronal IPC'_HsapDv:0000108.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Oligo'_HsapDv:0000099.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Oligo'_HsapDv:0000100.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Oligo'_HsapDv:0000101.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Oligo'_HsapDv:0000102.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Oligo'_HsapDv:0000103.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Oligo'_HsapDv:0000104.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Oligo'_HsapDv:0000105.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Oligo'_HsapDv:0000106.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Oligo'_HsapDv:0000107.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Oligo'_HsapDv:0000108.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Placodes'_HsapDv:0000099.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Placodes'_HsapDv:0000100.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Placodes'_HsapDv:0000102.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Placodes'_HsapDv:0000103.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Radial glia'_HsapDv:0000099.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Radial glia'_HsapDv:0000100.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Radial glia'_HsapDv:0000101.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Radial glia'_HsapDv:0000102.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Radial glia'_HsapDv:0000103.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Radial glia'_HsapDv:0000104.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Radial glia'_HsapDv:0000105.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Radial glia'_HsapDv:0000106.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Radial glia'_HsapDv:0000107.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Radial glia'_HsapDv:0000108.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Vascular'_HsapDv:0000099.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Vascular'_HsapDv:0000100.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Vascular'_HsapDv:0000101.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Vascular'_HsapDv:0000102.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Vascular'_HsapDv:0000103.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Vascular'_HsapDv:0000104.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Vascular'_HsapDv:0000105.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Vascular'_HsapDv:0000106.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Vascular'_HsapDv:0000107.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Vascular'_HsapDv:0000108.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScores.svg
+    Untracked:  output/04_Biostat/Biostat_GO_termDEG_cluster_0.xlsx
+    Untracked:  output/04_Biostat/Biostat_GO_termDEG_cluster_1.xlsx
+    Untracked:  output/04_Biostat/Biostat_GO_termDEG_cluster_10.xlsx
+    Untracked:  output/04_Biostat/Biostat_GO_termDEG_cluster_11.xlsx
+    Untracked:  output/04_Biostat/Biostat_GO_termDEG_cluster_12.xlsx
+    Untracked:  output/04_Biostat/Biostat_GO_termDEG_cluster_13.xlsx
+    Untracked:  output/04_Biostat/Biostat_GO_termDEG_cluster_2.xlsx
+    Untracked:  output/04_Biostat/Biostat_GO_termDEG_cluster_3.xlsx
+    Untracked:  output/04_Biostat/Biostat_GO_termDEG_cluster_4.xlsx
+    Untracked:  output/04_Biostat/Biostat_GO_termDEG_cluster_5.xlsx
+    Untracked:  output/04_Biostat/Biostat_GO_termDEG_cluster_6.xlsx
+    Untracked:  output/04_Biostat/Biostat_GO_termDEG_cluster_7.xlsx
+    Untracked:  output/04_Biostat/Biostat_GO_termDEG_cluster_8.xlsx
+    Untracked:  output/04_Biostat/Biostat_GO_termDEG_cluster_9.xlsx
+
+Unstaged changes:
+    Modified:   .gitignore
+    Modified:   output/01_QC/QC_12PCs.svg
+    Modified:   output/01_QC/QC_Highest_expressed_genes_filtred.svg
+    Modified:   output/01_QC/QC_VizDimLoadings.svg
+    Modified:   output/01_QC/QC_clustering_PCAoptimized.svg
+    Modified:   output/01_QC/QC_clustering_afterbatchcorr.svg
+    Modified:   output/01_QC/QC_measures_Scatter_unfiltered_all.svg
+    Modified:   output/01_QC/QC_measures_Violin_unfiltered_all.svg
+    Deleted:    output/01_QC/QCmeasures_Violin_filtered.svg
+    Modified:   output/02_Clustering/Cluster_markers.xls
+    Modified:   output/02_Clustering/Clustering_CellcycleScoring.svg
+    Modified:   output/02_Clustering/Clustering_Distribution.svg
+    Modified:   output/02_Clustering/Clustering_FeatPlot_QCMeasures.svg
+    Modified:   output/02_Clustering/Clustering_Heatmap_Markers.svg
+    Modified:   output/02_Clustering/Clustering_Hum_devCellDevTypeClusterCountsBarplot.svg
+    Modified:   output/02_Clustering/Clustering_Hum_devCellDevTypeMapped.svg
+    Modified:   output/02_Clustering/Clustering_KantonT4PredTypes.svg
+    Modified:   output/02_Clustering/Clustering_KantonT4PredTypesChoroidOnly.svg
+    Modified:   output/02_Clustering/Clustering_KnoblMapped.svg
+    Modified:   output/02_Clustering/Clustering_KnoblScores.svg
+    Modified:   output/02_Clustering/Clustering_KnoblichPredTypes.svg
+    Modified:   output/02_Clustering/Clustering_NeuronalMarkers.svg
+    Modified:   output/02_Clustering/Clustering_PCAvsCluster.svg
+    Modified:   output/02_Clustering/Clustering_Resopt.svg
+    Modified:   output/02_Clustering/Clustering_UmapByType.svg
+    Modified:   output/02_Clustering/Clustering_UmapParamOpt.svg
+    Modified:   output/02_Clustering/Clustering_final_optimized_all.svg
+    Modified:   output/02_Clustering/Clustering_integrated_clustree.svg
+    Modified:   output/02_Clustering/Clusters_GO_termsCluster.xlsx
+    Modified:   output/03_Trajectories/Trajectories_All.svg
+    Modified:   output/03_Trajectories/Trajectories_Lineages.svg
+    Modified:   output/04_Biostat/Biostat_Comparelineages.svg
+    Modified:   output/04_Biostat/Biostat_DEG_allcells.xlsx
+    Modified:   output/04_Biostat/Biostat_DEG_cluster_0cells.xlsx
+    Modified:   output/04_Biostat/Biostat_DEG_cluster_10cells.xlsx
+    Modified:   output/04_Biostat/Biostat_DEG_cluster_11cells.xlsx
+    Modified:   output/04_Biostat/Biostat_DEG_cluster_12cells.xlsx
+    Modified:   output/04_Biostat/Biostat_DEG_cluster_13cells.xlsx
+    Modified:   output/04_Biostat/Biostat_DEG_cluster_1cells.xlsx
+    Modified:   output/04_Biostat/Biostat_DEG_cluster_2cells.xlsx
+    Modified:   output/04_Biostat/Biostat_DEG_cluster_3cells.xlsx
+    Modified:   output/04_Biostat/Biostat_DEG_cluster_4cells.xlsx
+    Modified:   output/04_Biostat/Biostat_DEG_cluster_5cells.xlsx
+    Modified:   output/04_Biostat/Biostat_DEG_cluster_6cells.xlsx
+    Modified:   output/04_Biostat/Biostat_DEG_cluster_7cells.xlsx
+    Modified:   output/04_Biostat/Biostat_DEG_cluster_8cells.xlsx
+    Modified:   output/04_Biostat/Biostat_DEG_cluster_9cells.xlsx
+    Modified:   output/04_Biostat/Biostat_GO_termDEG_all.xlsx
+    Modified:   output/04_Biostat/Biostat_HumdevCTFreq.xslsx
+    Modified:   output/04_Biostat/Biostat_clusterFreq.xslsx
+    Deleted:    output/archive/DE_Genes_0_5mM/S05_06_0
+    Deleted:    output/archive/DE_Genes_0_5mM/S05_06_1
+    Deleted:    output/archive/DE_Genes_0_5mM/S05_06_10
+    Deleted:    output/archive/DE_Genes_0_5mM/S05_06_11
+    Deleted:    output/archive/DE_Genes_0_5mM/S05_06_12
+    Deleted:    output/archive/DE_Genes_0_5mM/S05_06_13
+    Deleted:    output/archive/DE_Genes_0_5mM/S05_06_14
+    Deleted:    output/archive/DE_Genes_0_5mM/S05_06_15
+    Deleted:    output/archive/DE_Genes_0_5mM/S05_06_2
+    Deleted:    output/archive/DE_Genes_0_5mM/S05_06_3
+    Deleted:    output/archive/DE_Genes_0_5mM/S05_06_4
+    Deleted:    output/archive/DE_Genes_0_5mM/S05_06_5
+    Deleted:    output/archive/DE_Genes_0_5mM/S05_06_6
+    Deleted:    output/archive/DE_Genes_0_5mM/S05_06_7
+    Deleted:    output/archive/DE_Genes_0_5mM/S05_06_8
+    Deleted:    output/archive/DE_Genes_0_5mM/S05_06_9
+    Deleted:    output/archive/DE_Genes_Overall/DE_Overall_0
+    Deleted:    output/archive/DE_Genes_Overall/DE_Overall_1
+    Deleted:    output/archive/DE_Genes_Overall/DE_Overall_10
+    Deleted:    output/archive/DE_Genes_Overall/DE_Overall_11
+    Deleted:    output/archive/DE_Genes_Overall/DE_Overall_12
+    Deleted:    output/archive/DE_Genes_Overall/DE_Overall_13
+    Deleted:    output/archive/DE_Genes_Overall/DE_Overall_14
+    Deleted:    output/archive/DE_Genes_Overall/DE_Overall_15
+    Deleted:    output/archive/DE_Genes_Overall/DE_Overall_2
+    Deleted:    output/archive/DE_Genes_Overall/DE_Overall_3
+    Deleted:    output/archive/DE_Genes_Overall/DE_Overall_4
+    Deleted:    output/archive/DE_Genes_Overall/DE_Overall_5
+    Deleted:    output/archive/DE_Genes_Overall/DE_Overall_6
+    Deleted:    output/archive/DE_Genes_Overall/DE_Overall_7
+    Deleted:    output/archive/DE_Genes_Overall/DE_Overall_8
+    Deleted:    output/archive/DE_Genes_Overall/DE_Overall_9
+    Deleted:    output/archive/IndividualClusterPlots/Highlight_cluster0.pdf
+    Deleted:    output/archive/IndividualClusterPlots/Highlight_cluster1.pdf
+    Deleted:    output/archive/IndividualClusterPlots/Highlight_cluster10.pdf
+    Deleted:    output/archive/IndividualClusterPlots/Highlight_cluster11.pdf
+    Deleted:    output/archive/IndividualClusterPlots/Highlight_cluster12.pdf
+    Deleted:    output/archive/IndividualClusterPlots/Highlight_cluster13.pdf
+    Deleted:    output/archive/IndividualClusterPlots/Highlight_cluster14.pdf
+    Deleted:    output/archive/IndividualClusterPlots/Highlight_cluster15.pdf
+    Deleted:    output/archive/IndividualClusterPlots/Highlight_cluster2.pdf
+    Deleted:    output/archive/IndividualClusterPlots/Highlight_cluster3.pdf
+    Deleted:    output/archive/IndividualClusterPlots/Highlight_cluster4.pdf
+    Deleted:    output/archive/IndividualClusterPlots/Highlight_cluster5.pdf
+    Deleted:    output/archive/IndividualClusterPlots/Highlight_cluster6.pdf
+    Deleted:    output/archive/IndividualClusterPlots/Highlight_cluster7.pdf
+    Deleted:    output/archive/IndividualClusterPlots/Highlight_cluster8.pdf
+    Deleted:    output/archive/IndividualClusterPlots/Highlight_cluster9.pdf
+    Deleted:    output/archive/Knoblich/CellTypeVsSeuratClusters_Knoblich.pdf
+    Deleted:    output/archive/Knoblich/Heatmap_knoblich.pdf
+    Deleted:    output/archive/Knoblich/Knoblich_GeneClusters/1.pdf
+    Deleted:    output/archive/Knoblich/Knoblich_GeneClusters/10.pdf
+    Deleted:    output/archive/Knoblich/Knoblich_GeneClusters/11.pdf
+    Deleted:    output/archive/Knoblich/Knoblich_GeneClusters/12.pdf
+    Deleted:    output/archive/Knoblich/Knoblich_GeneClusters/13.pdf
+    Deleted:    output/archive/Knoblich/Knoblich_GeneClusters/14.pdf
+    Deleted:    output/archive/Knoblich/Knoblich_GeneClusters/15.pdf
+    Deleted:    output/archive/Knoblich/Knoblich_GeneClusters/16.pdf
+    Deleted:    output/archive/Knoblich/Knoblich_GeneClusters/17.pdf
+    Deleted:    output/archive/Knoblich/Knoblich_GeneClusters/2.pdf
+    Deleted:    output/archive/Knoblich/Knoblich_GeneClusters/3.pdf
+    Deleted:    output/archive/Knoblich/Knoblich_GeneClusters/4.pdf
+    Deleted:    output/archive/Knoblich/Knoblich_GeneClusters/5.pdf
+    Deleted:    output/archive/Knoblich/Knoblich_GeneClusters/6.pdf
+    Deleted:    output/archive/Knoblich/Knoblich_GeneClusters/7.pdf
+    Deleted:    output/archive/Knoblich/Knoblich_GeneClusters/8.pdf
+    Deleted:    output/archive/Knoblich/Knoblich_GeneClusters/9.pdf
+    Deleted:    output/archive/Knoblich/Knoblich_clusters_proportion.txt
+    Deleted:    output/archive/Knoblich/plot_knoblich.pdf
+    Deleted:    output/archive/Knoblich/plot_knoblich_sc.pdf
+    Deleted:    output/archive/Yoon/CellTypeVsSeuratClusters_Yoon.pdf
+    Deleted:    output/archive/Yoon/Yoon_Reference_0.3.pdf
+
+</code></pre>
+<p>
+Note that any generated files, e.g. HTML, png, CSS, etc., are not
+included in this status report because it is ok for generated content to
+have uncommitted changes.
+</p>
+</div>
+</div>
+</div>
+</div>
+<hr>
+</div>
+<div id="versions" class="tab-pane fade">
+
+<p>
+These are the previous versions of the repository in which changes were
+made to the R Markdown (<code>analysis/05_Preprocessing_Bulk.Rmd</code>)
+and HTML (<code>docs/05_Preprocessing_Bulk.html</code>) files. If you’ve
+configured a remote Git repository (see <code>?wflow_git_remote</code>),
+click on the hyperlinks in the table below to view the files as they
+were in that past version.
+</p>
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+File
+</th>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+<th>
+Message
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/KJPMolgenLab/scRNA_PA_QPRT/blob/bca1a73fcaee6c918ab64bd157773ebacb6c9bb4/analysis/05_Preprocessing_Bulk.Rmd" target="_blank">bca1a73</a>
+</td>
+<td>
+Andreas Chiocchetti
+</td>
+<td>
+2024-01-09
+</td>
+<td>
+intermediate stage bulk seq
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<hr>
+</div>
+</div>
+</div>
+<pre class="r"><code>library(knitr)
+library(RCurl) 
+library(DESeq2)</code></pre>
+<pre><code>Loading required package: S4Vectors</code></pre>
+<pre><code>Loading required package: stats4</code></pre>
+<pre><code>Loading required package: BiocGenerics</code></pre>
+<pre><code>
+Attaching package: &#39;BiocGenerics&#39;</code></pre>
+<pre><code>The following objects are masked from &#39;package:stats&#39;:
+
+    IQR, mad, sd, var, xtabs</code></pre>
+<pre><code>The following objects are masked from &#39;package:base&#39;:
+
+    anyDuplicated, aperm, append, as.data.frame, basename, cbind,
+    colnames, dirname, do.call, duplicated, eval, evalq, Filter, Find,
+    get, grep, grepl, intersect, is.unsorted, lapply, Map, mapply,
+    match, mget, order, paste, pmax, pmax.int, pmin, pmin.int,
+    Position, rank, rbind, Reduce, rownames, sapply, setdiff, sort,
+    table, tapply, union, unique, unsplit, which.max, which.min</code></pre>
+<pre><code>
+Attaching package: &#39;S4Vectors&#39;</code></pre>
+<pre><code>The following object is masked from &#39;package:utils&#39;:
+
+    findMatches</code></pre>
+<pre><code>The following objects are masked from &#39;package:base&#39;:
+
+    expand.grid, I, unname</code></pre>
+<pre><code>Loading required package: IRanges</code></pre>
+<pre><code>Loading required package: GenomicRanges</code></pre>
+<pre><code>Loading required package: GenomeInfoDb</code></pre>
+<pre><code>Loading required package: SummarizedExperiment</code></pre>
+<pre><code>Loading required package: MatrixGenerics</code></pre>
+<pre><code>Loading required package: matrixStats</code></pre>
+<pre><code>
+Attaching package: &#39;MatrixGenerics&#39;</code></pre>
+<pre><code>The following objects are masked from &#39;package:matrixStats&#39;:
+
+    colAlls, colAnyNAs, colAnys, colAvgsPerRowSet, colCollapse,
+    colCounts, colCummaxs, colCummins, colCumprods, colCumsums,
+    colDiffs, colIQRDiffs, colIQRs, colLogSumExps, colMadDiffs,
+    colMads, colMaxs, colMeans2, colMedians, colMins, colOrderStats,
+    colProds, colQuantiles, colRanges, colRanks, colSdDiffs, colSds,
+    colSums2, colTabulates, colVarDiffs, colVars, colWeightedMads,
+    colWeightedMeans, colWeightedMedians, colWeightedSds,
+    colWeightedVars, rowAlls, rowAnyNAs, rowAnys, rowAvgsPerColSet,
+    rowCollapse, rowCounts, rowCummaxs, rowCummins, rowCumprods,
+    rowCumsums, rowDiffs, rowIQRDiffs, rowIQRs, rowLogSumExps,
+    rowMadDiffs, rowMads, rowMaxs, rowMeans2, rowMedians, rowMins,
+    rowOrderStats, rowProds, rowQuantiles, rowRanges, rowRanks,
+    rowSdDiffs, rowSds, rowSums2, rowTabulates, rowVarDiffs, rowVars,
+    rowWeightedMads, rowWeightedMeans, rowWeightedMedians,
+    rowWeightedSds, rowWeightedVars</code></pre>
+<pre><code>Loading required package: Biobase</code></pre>
+<pre><code>Welcome to Bioconductor
+
+    Vignettes contain introductory material; view with
+    &#39;browseVignettes()&#39;. To cite Bioconductor, see
+    &#39;citation(&quot;Biobase&quot;)&#39;, and for packages &#39;citation(&quot;pkgname&quot;)&#39;.</code></pre>
+<pre><code>
+Attaching package: &#39;Biobase&#39;</code></pre>
+<pre><code>The following object is masked from &#39;package:MatrixGenerics&#39;:
+
+    rowMedians</code></pre>
+<pre><code>The following objects are masked from &#39;package:matrixStats&#39;:
+
+    anyMissing, rowMedians</code></pre>
+<pre class="r"><code>library(RColorBrewer)
+library(glmpca)
+library(ggplot2)
+library(tidyverse)</code></pre>
+<pre><code>── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
+✔ dplyr     1.1.4     ✔ readr     2.1.4
+✔ forcats   1.0.0     ✔ stringr   1.5.1
+✔ lubridate 1.9.3     ✔ tibble    3.2.1
+✔ purrr     1.0.2     ✔ tidyr     1.3.0</code></pre>
+<pre><code>── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
+✖ lubridate::%within%() masks IRanges::%within%()
+✖ dplyr::collapse()     masks IRanges::collapse()
+✖ dplyr::combine()      masks Biobase::combine(), BiocGenerics::combine()
+✖ tidyr::complete()     masks RCurl::complete()
+✖ dplyr::count()        masks matrixStats::count()
+✖ dplyr::desc()         masks IRanges::desc()
+✖ tidyr::expand()       masks S4Vectors::expand()
+✖ dplyr::filter()       masks stats::filter()
+✖ dplyr::first()        masks S4Vectors::first()
+✖ dplyr::lag()          masks stats::lag()
+✖ ggplot2::Position()   masks BiocGenerics::Position(), base::Position()
+✖ purrr::reduce()       masks GenomicRanges::reduce(), IRanges::reduce()
+✖ dplyr::rename()       masks S4Vectors::rename()
+✖ lubridate::second()   masks S4Vectors::second()
+✖ lubridate::second&lt;-() masks S4Vectors::second&lt;-()
+✖ dplyr::slice()        masks IRanges::slice()
+ℹ Use the conflicted package (&lt;http://conflicted.r-lib.org/&gt;) to force all conflicts to become errors</code></pre>
+<pre class="r"><code>library(pheatmap)
+library(dendextend)</code></pre>
+<pre><code>
+---------------------
+Welcome to dendextend version 1.17.1
+Type citation(&#39;dendextend&#39;) for how to cite the package.
+
+Type browseVignettes(package = &#39;dendextend&#39;) for the package vignette.
+The github page is: https://github.com/talgalili/dendextend/
+
+Suggestions and bug-reports can be submitted at: https://github.com/talgalili/dendextend/issues
+You may ask questions at stackoverflow, use the r and dendextend tags: 
+     https://stackoverflow.com/questions/tagged/dendextend
+
+    To suppress this message use:  suppressPackageStartupMessages(library(dendextend))
+---------------------
+
+
+Attaching package: &#39;dendextend&#39;
+
+The following object is masked from &#39;package:stats&#39;:
+
+    cutree</code></pre>
+<pre class="r"><code>library(gprofiler2)</code></pre>
+<pre class="r"><code>options(stringsAsFactors = F)
+set.seed(157434538)
+
+Dark8 = RColorBrewer::brewer.pal(8, &quot;Dark2&quot;)
+source(paste0(&quot;code/custom_functions.R&quot;)) #also defines colors</code></pre>
+<pre><code>Loading required package: kableExtra</code></pre>
+<pre><code>
+Attaching package: &#39;kableExtra&#39;</code></pre>
+<pre><code>The following object is masked from &#39;package:dplyr&#39;:
+
+    group_rows</code></pre>
+<pre><code>Loading required package: compareGroups</code></pre>
+<pre class="r"><code>output= paste0(&quot;output/05_Bulk_Preprocessing&quot;)
+dir.create(output, showWarnings = FALSE)
+
+filetarget &lt;- &quot;./data/Bulkdata_Countmatrix.rds&quot;
+Countdata &lt;- readRDS(filetarget)
+
+Ntot= nrow(Countdata)
+
+#merge non unique annotations
+if(length(unique(rownames(Countdata))) != Ntot){
+  Countdata = Countdata %&gt;% group_by(row.names(Countdata)) %&gt;% summarise_each(sum)
+  Ntot= nrow(Countdata)
+}
+
+hgnc=gconvert(query=as.numeric(rownames(Countdata)), 
+              organism = &quot;hsapiens&quot;, 
+              numeric_ns = &quot;ENTREZGENE_ACC&quot;,
+              target = &quot;HGNC&quot;)
+
+Ids = hgnc %&gt;%  dplyr::select(name, input, description) %&gt;% group_by(input) %&gt;% 
+  summarise(name=paste(name, sep=&quot;; &quot;, collapse = &quot;;&quot;), description = dplyr::first(description))
+
+rowdescription = data.frame(entrez_gene = Ids$input, 
+                            hgnc=Ids$name, 
+                            description=Ids$description)
+
+
+rowdescription = rowdescription[match(row.names(Countdata), rowdescription$entrez_gene),]
+rownames(rowdescription)=row.names(Countdata)
+
+# load and parse sample information 
+SampleInfo &lt;- data.frame(Fullname = make.names(colnames(Countdata)))
+
+strsplit(SampleInfo$Fullname, split = &quot;\\.&quot;) %&gt;% 
+  lapply(function(x) x[1]) %&gt;% unlist -&gt; SampleInfo$Position
+SampleInfo$Row = substr(SampleInfo$Position, 1,1)
+SampleInfo$Col = as.numeric(substr(SampleInfo$Position, 2,3))
+strsplit(SampleInfo$Fullname, split = &quot;\\.&quot;) %&gt;%  
+  lapply(function(x) x[3]) %&gt;% unlist %&gt;% as.factor()-&gt; SampleInfo$Replicate
+
+strsplit(SampleInfo$Fullname, split = &quot;\\.&quot;) %&gt;%  
+  lapply(function(x) x[2]) %&gt;% unlist -&gt; infos
+strsplit(infos, split = &quot;_&quot;) %&gt;%  
+  lapply(function(x) x[1])%&gt;% unlist %&gt;% as.factor() -&gt; SampleInfo$CellLine
+strsplit(infos, split = &quot;_&quot;) %&gt;%  
+  lapply(function(x) x[2])%&gt;% unlist %&gt;% as.factor() -&gt; SampleInfo$Batch
+strsplit(infos, split = &quot;_&quot;) %&gt;%  
+  lapply(function(x) as.numeric(gsub(&quot;d&quot;,&quot;&quot;, x[3])))%&gt;% unlist -&gt; SampleInfo$Day
+strsplit(infos, split = &quot;_&quot;) %&gt;%  
+  lapply(function(x) factor(gsub(&quot;mM&quot;,&quot;&quot;,x[4]), levels=c(0,5)))%&gt;% unlist -&gt; SampleInfo$PAmM
+rownames(SampleInfo) &lt;- SampleInfo$Fullname
+colnames(Countdata) &lt;- make.names(colnames(Countdata))
+
+# align datasets
+checkfiles = all(rownames(SampleInfo) %in% colnames(Countdata))
+IDs=intersect(rownames(SampleInfo), colnames(Countdata))
+Countdata = Countdata[,IDs]
+SampleInfo = SampleInfo[IDs, ]
+SampleInfo$reads_per_sample = colSums(Countdata)</code></pre>
+<pre class="r"><code>display_tab(head(Countdata))</code></pre>
+<div
+style="border: 1px solid #ddd; padding: 0px; overflow-y: scroll; height:500px; overflow-x: scroll; width:900px; ">
+<table class=" lightable-classic" style="font-family: &quot;Arial Narrow&quot;, &quot;Source Sans Pro&quot;, sans-serif; width: auto !important; ">
+<thead>
+<tr>
+<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
+</th>
+<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
+A01.H9_B13_d5_0mM_PA.1
+</th>
+<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
+B01.H9_B13_d5_0mM_PA.2
+</th>
+<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
+C01.H9_B13_d5_5mM_PA.1
+</th>
+<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
+D01.H9_B13_d5_5mM_PA.2
+</th>
+<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
+E01.H9_B14_d5_0mM_PA.1
+</th>
+<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
+F01.H9_B14_d5_0mM_PA.2
+</th>
+<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
+G01.H9_B14_d5_5mM_PA.1
+</th>
+<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
+H01.H9_B14_d5_5mM_PA.2
+</th>
+<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
+A02.H9_B13_d10_0mM_PA.1
+</th>
+<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
+B02.H9_B13_d10_0mM_PA.2
+</th>
+<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
+C02.H9_B13_d10_5mM_PA.1
+</th>
+<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
+D02.H9_B13_d10_5mM_PA.2
+</th>
+<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
+E02.H9_B14_d10_0mM_PA.1
+</th>
+<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
+F02.H9_B14_d10_0mM_PA.2
+</th>
+<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
+G02.H9_B14_d10_5mM_PA.1
+</th>
+<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
+H02.H9_B14_d10_5mM_PA.2
+</th>
+<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
+A03.H9_B13_d17_0mM_PA.1
+</th>
+<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
+B03.H9_B13_d17_0mM_PA.2
+</th>
+<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
+C03.H9_B13_d17_5mM_PA.1
+</th>
+<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
+D03.H9_B13_d17_5mM_PA.2
+</th>
+<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
+E03.H9_B14_d17_0mM_PA.1
+</th>
+<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
+F03.H9_B14_d17_0mM_PA.2
+</th>
+<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
+G03.H9_B14_d17_5mM_PA.1
+</th>
+<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
+H03.H9_B14_d17_5mM_PA.2
+</th>
+<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
+A04.H9_B13_d40_0mM_PA.1
+</th>
+<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
+B04.H9_B13_d40_0mM_PA.2
+</th>
+<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
+C04.H9_B13_d40_5mM_PA.1
+</th>
+<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
+D04.H9_B13_d40_5mM_PA.2
+</th>
+<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
+E04.H9_B14_d40_0mM_PA.1
+</th>
+<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
+F04.H9_B14_d40_0mM_PA.2
+</th>
+<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
+G04.H9_B14_d40_5mM_PA.1
+</th>
+<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
+H04.H9_B14_d40_5mM_PA.2
+</th>
+<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
+A05.H9_B13_d80_0mM_PA.1
+</th>
+<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
+B05.H9_B13_d80_0mM_PA.2
+</th>
+<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
+C05.H9_B13_d80_5mM_PA.1
+</th>
+<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
+D05.H9_B13_d80_5mM_PA.2
+</th>
+<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
+E05.H9_B14_d80_0mM_PA.1
+</th>
+<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
+F05.H9_B14_d80_0mM_PA.2
+</th>
+<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
+G05.H9_B14_d80_5mM_PA.1
+</th>
+<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
+H05.H9_B14_d80_5mM_PA.2
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+100287102
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+653635
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+2
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+1
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+1
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+1
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+1
+</td>
+<td style="text-align:left;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+102466751
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+100302278
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+645520
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+79501
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+0
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<pre class="r"><code>display_tab(SampleInfo)</code></pre>
+<div
+style="border: 1px solid #ddd; padding: 0px; overflow-y: scroll; height:500px; overflow-x: scroll; width:900px; ">
+<table class=" lightable-classic" style="font-family: &quot;Arial Narrow&quot;, &quot;Source Sans Pro&quot;, sans-serif; width: auto !important; ">
+<thead>
+<tr>
+<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
+</th>
+<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
+Fullname
+</th>
+<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
+Position
+</th>
+<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
+Row
+</th>
+<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
+Col
+</th>
+<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
+Replicate
+</th>
+<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
+CellLine
+</th>
+<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
+Batch
+</th>
+<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
+Day
+</th>
+<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
+PAmM
+</th>
+<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
+reads_per_sample
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+A01.H9_B13_d5_0mM_PA.1
+</td>
+<td style="text-align:left;">
+A01.H9_B13_d5_0mM_PA.1
+</td>
+<td style="text-align:left;">
+A01
+</td>
+<td style="text-align:left;">
+A
+</td>
+<td style="text-align:left;">
+1
+</td>
+<td style="text-align:left;">
+1
+</td>
+<td style="text-align:left;">
+H9
+</td>
+<td style="text-align:left;">
+B13
+</td>
+<td style="text-align:left;">
+5
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+28448
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+B01.H9_B13_d5_0mM_PA.2
+</td>
+<td style="text-align:left;">
+B01.H9_B13_d5_0mM_PA.2
+</td>
+<td style="text-align:left;">
+B01
+</td>
+<td style="text-align:left;">
+B
+</td>
+<td style="text-align:left;">
+1
+</td>
+<td style="text-align:left;">
+2
+</td>
+<td style="text-align:left;">
+H9
+</td>
+<td style="text-align:left;">
+B13
+</td>
+<td style="text-align:left;">
+5
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+27777
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+C01.H9_B13_d5_5mM_PA.1
+</td>
+<td style="text-align:left;">
+C01.H9_B13_d5_5mM_PA.1
+</td>
+<td style="text-align:left;">
+C01
+</td>
+<td style="text-align:left;">
+C
+</td>
+<td style="text-align:left;">
+1
+</td>
+<td style="text-align:left;">
+1
+</td>
+<td style="text-align:left;">
+H9
+</td>
+<td style="text-align:left;">
+B13
+</td>
+<td style="text-align:left;">
+5
+</td>
+<td style="text-align:left;">
+5
+</td>
+<td style="text-align:left;">
+27741
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+D01.H9_B13_d5_5mM_PA.2
+</td>
+<td style="text-align:left;">
+D01.H9_B13_d5_5mM_PA.2
+</td>
+<td style="text-align:left;">
+D01
+</td>
+<td style="text-align:left;">
+D
+</td>
+<td style="text-align:left;">
+1
+</td>
+<td style="text-align:left;">
+2
+</td>
+<td style="text-align:left;">
+H9
+</td>
+<td style="text-align:left;">
+B13
+</td>
+<td style="text-align:left;">
+5
+</td>
+<td style="text-align:left;">
+5
+</td>
+<td style="text-align:left;">
+24783
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+E01.H9_B14_d5_0mM_PA.1
+</td>
+<td style="text-align:left;">
+E01.H9_B14_d5_0mM_PA.1
+</td>
+<td style="text-align:left;">
+E01
+</td>
+<td style="text-align:left;">
+E
+</td>
+<td style="text-align:left;">
+1
+</td>
+<td style="text-align:left;">
+1
+</td>
+<td style="text-align:left;">
+H9
+</td>
+<td style="text-align:left;">
+B14
+</td>
+<td style="text-align:left;">
+5
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+25660
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+F01.H9_B14_d5_0mM_PA.2
+</td>
+<td style="text-align:left;">
+F01.H9_B14_d5_0mM_PA.2
+</td>
+<td style="text-align:left;">
+F01
+</td>
+<td style="text-align:left;">
+F
+</td>
+<td style="text-align:left;">
+1
+</td>
+<td style="text-align:left;">
+2
+</td>
+<td style="text-align:left;">
+H9
+</td>
+<td style="text-align:left;">
+B14
+</td>
+<td style="text-align:left;">
+5
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+25605
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+G01.H9_B14_d5_5mM_PA.1
+</td>
+<td style="text-align:left;">
+G01.H9_B14_d5_5mM_PA.1
+</td>
+<td style="text-align:left;">
+G01
+</td>
+<td style="text-align:left;">
+G
+</td>
+<td style="text-align:left;">
+1
+</td>
+<td style="text-align:left;">
+1
+</td>
+<td style="text-align:left;">
+H9
+</td>
+<td style="text-align:left;">
+B14
+</td>
+<td style="text-align:left;">
+5
+</td>
+<td style="text-align:left;">
+5
+</td>
+<td style="text-align:left;">
+25134
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+H01.H9_B14_d5_5mM_PA.2
+</td>
+<td style="text-align:left;">
+H01.H9_B14_d5_5mM_PA.2
+</td>
+<td style="text-align:left;">
+H01
+</td>
+<td style="text-align:left;">
+H
+</td>
+<td style="text-align:left;">
+1
+</td>
+<td style="text-align:left;">
+2
+</td>
+<td style="text-align:left;">
+H9
+</td>
+<td style="text-align:left;">
+B14
+</td>
+<td style="text-align:left;">
+5
+</td>
+<td style="text-align:left;">
+5
+</td>
+<td style="text-align:left;">
+25016
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+A02.H9_B13_d10_0mM_PA.1
+</td>
+<td style="text-align:left;">
+A02.H9_B13_d10_0mM_PA.1
+</td>
+<td style="text-align:left;">
+A02
+</td>
+<td style="text-align:left;">
+A
+</td>
+<td style="text-align:left;">
+2
+</td>
+<td style="text-align:left;">
+1
+</td>
+<td style="text-align:left;">
+H9
+</td>
+<td style="text-align:left;">
+B13
+</td>
+<td style="text-align:left;">
+10
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+25830
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+B02.H9_B13_d10_0mM_PA.2
+</td>
+<td style="text-align:left;">
+B02.H9_B13_d10_0mM_PA.2
+</td>
+<td style="text-align:left;">
+B02
+</td>
+<td style="text-align:left;">
+B
+</td>
+<td style="text-align:left;">
+2
+</td>
+<td style="text-align:left;">
+2
+</td>
+<td style="text-align:left;">
+H9
+</td>
+<td style="text-align:left;">
+B13
+</td>
+<td style="text-align:left;">
+10
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+25399
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+C02.H9_B13_d10_5mM_PA.1
+</td>
+<td style="text-align:left;">
+C02.H9_B13_d10_5mM_PA.1
+</td>
+<td style="text-align:left;">
+C02
+</td>
+<td style="text-align:left;">
+C
+</td>
+<td style="text-align:left;">
+2
+</td>
+<td style="text-align:left;">
+1
+</td>
+<td style="text-align:left;">
+H9
+</td>
+<td style="text-align:left;">
+B13
+</td>
+<td style="text-align:left;">
+10
+</td>
+<td style="text-align:left;">
+5
+</td>
+<td style="text-align:left;">
+25773
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+D02.H9_B13_d10_5mM_PA.2
+</td>
+<td style="text-align:left;">
+D02.H9_B13_d10_5mM_PA.2
+</td>
+<td style="text-align:left;">
+D02
+</td>
+<td style="text-align:left;">
+D
+</td>
+<td style="text-align:left;">
+2
+</td>
+<td style="text-align:left;">
+2
+</td>
+<td style="text-align:left;">
+H9
+</td>
+<td style="text-align:left;">
+B13
+</td>
+<td style="text-align:left;">
+10
+</td>
+<td style="text-align:left;">
+5
+</td>
+<td style="text-align:left;">
+24920
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+E02.H9_B14_d10_0mM_PA.1
+</td>
+<td style="text-align:left;">
+E02.H9_B14_d10_0mM_PA.1
+</td>
+<td style="text-align:left;">
+E02
+</td>
+<td style="text-align:left;">
+E
+</td>
+<td style="text-align:left;">
+2
+</td>
+<td style="text-align:left;">
+1
+</td>
+<td style="text-align:left;">
+H9
+</td>
+<td style="text-align:left;">
+B14
+</td>
+<td style="text-align:left;">
+10
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+23846
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+F02.H9_B14_d10_0mM_PA.2
+</td>
+<td style="text-align:left;">
+F02.H9_B14_d10_0mM_PA.2
+</td>
+<td style="text-align:left;">
+F02
+</td>
+<td style="text-align:left;">
+F
+</td>
+<td style="text-align:left;">
+2
+</td>
+<td style="text-align:left;">
+2
+</td>
+<td style="text-align:left;">
+H9
+</td>
+<td style="text-align:left;">
+B14
+</td>
+<td style="text-align:left;">
+10
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+24990
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+G02.H9_B14_d10_5mM_PA.1
+</td>
+<td style="text-align:left;">
+G02.H9_B14_d10_5mM_PA.1
+</td>
+<td style="text-align:left;">
+G02
+</td>
+<td style="text-align:left;">
+G
+</td>
+<td style="text-align:left;">
+2
+</td>
+<td style="text-align:left;">
+1
+</td>
+<td style="text-align:left;">
+H9
+</td>
+<td style="text-align:left;">
+B14
+</td>
+<td style="text-align:left;">
+10
+</td>
+<td style="text-align:left;">
+5
+</td>
+<td style="text-align:left;">
+25055
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+H02.H9_B14_d10_5mM_PA.2
+</td>
+<td style="text-align:left;">
+H02.H9_B14_d10_5mM_PA.2
+</td>
+<td style="text-align:left;">
+H02
+</td>
+<td style="text-align:left;">
+H
+</td>
+<td style="text-align:left;">
+2
+</td>
+<td style="text-align:left;">
+2
+</td>
+<td style="text-align:left;">
+H9
+</td>
+<td style="text-align:left;">
+B14
+</td>
+<td style="text-align:left;">
+10
+</td>
+<td style="text-align:left;">
+5
+</td>
+<td style="text-align:left;">
+25271
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+A03.H9_B13_d17_0mM_PA.1
+</td>
+<td style="text-align:left;">
+A03.H9_B13_d17_0mM_PA.1
+</td>
+<td style="text-align:left;">
+A03
+</td>
+<td style="text-align:left;">
+A
+</td>
+<td style="text-align:left;">
+3
+</td>
+<td style="text-align:left;">
+1
+</td>
+<td style="text-align:left;">
+H9
+</td>
+<td style="text-align:left;">
+B13
+</td>
+<td style="text-align:left;">
+17
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+20256
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+B03.H9_B13_d17_0mM_PA.2
+</td>
+<td style="text-align:left;">
+B03.H9_B13_d17_0mM_PA.2
+</td>
+<td style="text-align:left;">
+B03
+</td>
+<td style="text-align:left;">
+B
+</td>
+<td style="text-align:left;">
+3
+</td>
+<td style="text-align:left;">
+2
+</td>
+<td style="text-align:left;">
+H9
+</td>
+<td style="text-align:left;">
+B13
+</td>
+<td style="text-align:left;">
+17
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+21335
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+C03.H9_B13_d17_5mM_PA.1
+</td>
+<td style="text-align:left;">
+C03.H9_B13_d17_5mM_PA.1
+</td>
+<td style="text-align:left;">
+C03
+</td>
+<td style="text-align:left;">
+C
+</td>
+<td style="text-align:left;">
+3
+</td>
+<td style="text-align:left;">
+1
+</td>
+<td style="text-align:left;">
+H9
+</td>
+<td style="text-align:left;">
+B13
+</td>
+<td style="text-align:left;">
+17
+</td>
+<td style="text-align:left;">
+5
+</td>
+<td style="text-align:left;">
+22987
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+D03.H9_B13_d17_5mM_PA.2
+</td>
+<td style="text-align:left;">
+D03.H9_B13_d17_5mM_PA.2
+</td>
+<td style="text-align:left;">
+D03
+</td>
+<td style="text-align:left;">
+D
+</td>
+<td style="text-align:left;">
+3
+</td>
+<td style="text-align:left;">
+2
+</td>
+<td style="text-align:left;">
+H9
+</td>
+<td style="text-align:left;">
+B13
+</td>
+<td style="text-align:left;">
+17
+</td>
+<td style="text-align:left;">
+5
+</td>
+<td style="text-align:left;">
+22413
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+E03.H9_B14_d17_0mM_PA.1
+</td>
+<td style="text-align:left;">
+E03.H9_B14_d17_0mM_PA.1
+</td>
+<td style="text-align:left;">
+E03
+</td>
+<td style="text-align:left;">
+E
+</td>
+<td style="text-align:left;">
+3
+</td>
+<td style="text-align:left;">
+1
+</td>
+<td style="text-align:left;">
+H9
+</td>
+<td style="text-align:left;">
+B14
+</td>
+<td style="text-align:left;">
+17
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+20186
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+F03.H9_B14_d17_0mM_PA.2
+</td>
+<td style="text-align:left;">
+F03.H9_B14_d17_0mM_PA.2
+</td>
+<td style="text-align:left;">
+F03
+</td>
+<td style="text-align:left;">
+F
+</td>
+<td style="text-align:left;">
+3
+</td>
+<td style="text-align:left;">
+2
+</td>
+<td style="text-align:left;">
+H9
+</td>
+<td style="text-align:left;">
+B14
+</td>
+<td style="text-align:left;">
+17
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+18237
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+G03.H9_B14_d17_5mM_PA.1
+</td>
+<td style="text-align:left;">
+G03.H9_B14_d17_5mM_PA.1
+</td>
+<td style="text-align:left;">
+G03
+</td>
+<td style="text-align:left;">
+G
+</td>
+<td style="text-align:left;">
+3
+</td>
+<td style="text-align:left;">
+1
+</td>
+<td style="text-align:left;">
+H9
+</td>
+<td style="text-align:left;">
+B14
+</td>
+<td style="text-align:left;">
+17
+</td>
+<td style="text-align:left;">
+5
+</td>
+<td style="text-align:left;">
+19155
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+H03.H9_B14_d17_5mM_PA.2
+</td>
+<td style="text-align:left;">
+H03.H9_B14_d17_5mM_PA.2
+</td>
+<td style="text-align:left;">
+H03
+</td>
+<td style="text-align:left;">
+H
+</td>
+<td style="text-align:left;">
+3
+</td>
+<td style="text-align:left;">
+2
+</td>
+<td style="text-align:left;">
+H9
+</td>
+<td style="text-align:left;">
+B14
+</td>
+<td style="text-align:left;">
+17
+</td>
+<td style="text-align:left;">
+5
+</td>
+<td style="text-align:left;">
+18808
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+A04.H9_B13_d40_0mM_PA.1
+</td>
+<td style="text-align:left;">
+A04.H9_B13_d40_0mM_PA.1
+</td>
+<td style="text-align:left;">
+A04
+</td>
+<td style="text-align:left;">
+A
+</td>
+<td style="text-align:left;">
+4
+</td>
+<td style="text-align:left;">
+1
+</td>
+<td style="text-align:left;">
+H9
+</td>
+<td style="text-align:left;">
+B13
+</td>
+<td style="text-align:left;">
+40
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+25961
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+B04.H9_B13_d40_0mM_PA.2
+</td>
+<td style="text-align:left;">
+B04.H9_B13_d40_0mM_PA.2
+</td>
+<td style="text-align:left;">
+B04
+</td>
+<td style="text-align:left;">
+B
+</td>
+<td style="text-align:left;">
+4
+</td>
+<td style="text-align:left;">
+2
+</td>
+<td style="text-align:left;">
+H9
+</td>
+<td style="text-align:left;">
+B13
+</td>
+<td style="text-align:left;">
+40
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+24617
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+C04.H9_B13_d40_5mM_PA.1
+</td>
+<td style="text-align:left;">
+C04.H9_B13_d40_5mM_PA.1
+</td>
+<td style="text-align:left;">
+C04
+</td>
+<td style="text-align:left;">
+C
+</td>
+<td style="text-align:left;">
+4
+</td>
+<td style="text-align:left;">
+1
+</td>
+<td style="text-align:left;">
+H9
+</td>
+<td style="text-align:left;">
+B13
+</td>
+<td style="text-align:left;">
+40
+</td>
+<td style="text-align:left;">
+5
+</td>
+<td style="text-align:left;">
+24663
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+D04.H9_B13_d40_5mM_PA.2
+</td>
+<td style="text-align:left;">
+D04.H9_B13_d40_5mM_PA.2
+</td>
+<td style="text-align:left;">
+D04
+</td>
+<td style="text-align:left;">
+D
+</td>
+<td style="text-align:left;">
+4
+</td>
+<td style="text-align:left;">
+2
+</td>
+<td style="text-align:left;">
+H9
+</td>
+<td style="text-align:left;">
+B13
+</td>
+<td style="text-align:left;">
+40
+</td>
+<td style="text-align:left;">
+5
+</td>
+<td style="text-align:left;">
+23748
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+E04.H9_B14_d40_0mM_PA.1
+</td>
+<td style="text-align:left;">
+E04.H9_B14_d40_0mM_PA.1
+</td>
+<td style="text-align:left;">
+E04
+</td>
+<td style="text-align:left;">
+E
+</td>
+<td style="text-align:left;">
+4
+</td>
+<td style="text-align:left;">
+1
+</td>
+<td style="text-align:left;">
+H9
+</td>
+<td style="text-align:left;">
+B14
+</td>
+<td style="text-align:left;">
+40
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+22779
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+F04.H9_B14_d40_0mM_PA.2
+</td>
+<td style="text-align:left;">
+F04.H9_B14_d40_0mM_PA.2
+</td>
+<td style="text-align:left;">
+F04
+</td>
+<td style="text-align:left;">
+F
+</td>
+<td style="text-align:left;">
+4
+</td>
+<td style="text-align:left;">
+2
+</td>
+<td style="text-align:left;">
+H9
+</td>
+<td style="text-align:left;">
+B14
+</td>
+<td style="text-align:left;">
+40
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+24614
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+G04.H9_B14_d40_5mM_PA.1
+</td>
+<td style="text-align:left;">
+G04.H9_B14_d40_5mM_PA.1
+</td>
+<td style="text-align:left;">
+G04
+</td>
+<td style="text-align:left;">
+G
+</td>
+<td style="text-align:left;">
+4
+</td>
+<td style="text-align:left;">
+1
+</td>
+<td style="text-align:left;">
+H9
+</td>
+<td style="text-align:left;">
+B14
+</td>
+<td style="text-align:left;">
+40
+</td>
+<td style="text-align:left;">
+5
+</td>
+<td style="text-align:left;">
+24834
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+H04.H9_B14_d40_5mM_PA.2
+</td>
+<td style="text-align:left;">
+H04.H9_B14_d40_5mM_PA.2
+</td>
+<td style="text-align:left;">
+H04
+</td>
+<td style="text-align:left;">
+H
+</td>
+<td style="text-align:left;">
+4
+</td>
+<td style="text-align:left;">
+2
+</td>
+<td style="text-align:left;">
+H9
+</td>
+<td style="text-align:left;">
+B14
+</td>
+<td style="text-align:left;">
+40
+</td>
+<td style="text-align:left;">
+5
+</td>
+<td style="text-align:left;">
+25446
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+A05.H9_B13_d80_0mM_PA.1
+</td>
+<td style="text-align:left;">
+A05.H9_B13_d80_0mM_PA.1
+</td>
+<td style="text-align:left;">
+A05
+</td>
+<td style="text-align:left;">
+A
+</td>
+<td style="text-align:left;">
+5
+</td>
+<td style="text-align:left;">
+1
+</td>
+<td style="text-align:left;">
+H9
+</td>
+<td style="text-align:left;">
+B13
+</td>
+<td style="text-align:left;">
+80
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+25687
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+B05.H9_B13_d80_0mM_PA.2
+</td>
+<td style="text-align:left;">
+B05.H9_B13_d80_0mM_PA.2
+</td>
+<td style="text-align:left;">
+B05
+</td>
+<td style="text-align:left;">
+B
+</td>
+<td style="text-align:left;">
+5
+</td>
+<td style="text-align:left;">
+2
+</td>
+<td style="text-align:left;">
+H9
+</td>
+<td style="text-align:left;">
+B13
+</td>
+<td style="text-align:left;">
+80
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+23246
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+C05.H9_B13_d80_5mM_PA.1
+</td>
+<td style="text-align:left;">
+C05.H9_B13_d80_5mM_PA.1
+</td>
+<td style="text-align:left;">
+C05
+</td>
+<td style="text-align:left;">
+C
+</td>
+<td style="text-align:left;">
+5
+</td>
+<td style="text-align:left;">
+1
+</td>
+<td style="text-align:left;">
+H9
+</td>
+<td style="text-align:left;">
+B13
+</td>
+<td style="text-align:left;">
+80
+</td>
+<td style="text-align:left;">
+5
+</td>
+<td style="text-align:left;">
+23903
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+D05.H9_B13_d80_5mM_PA.2
+</td>
+<td style="text-align:left;">
+D05.H9_B13_d80_5mM_PA.2
+</td>
+<td style="text-align:left;">
+D05
+</td>
+<td style="text-align:left;">
+D
+</td>
+<td style="text-align:left;">
+5
+</td>
+<td style="text-align:left;">
+2
+</td>
+<td style="text-align:left;">
+H9
+</td>
+<td style="text-align:left;">
+B13
+</td>
+<td style="text-align:left;">
+80
+</td>
+<td style="text-align:left;">
+5
+</td>
+<td style="text-align:left;">
+23983
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+E05.H9_B14_d80_0mM_PA.1
+</td>
+<td style="text-align:left;">
+E05.H9_B14_d80_0mM_PA.1
+</td>
+<td style="text-align:left;">
+E05
+</td>
+<td style="text-align:left;">
+E
+</td>
+<td style="text-align:left;">
+5
+</td>
+<td style="text-align:left;">
+1
+</td>
+<td style="text-align:left;">
+H9
+</td>
+<td style="text-align:left;">
+B14
+</td>
+<td style="text-align:left;">
+80
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+21159
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+F05.H9_B14_d80_0mM_PA.2
+</td>
+<td style="text-align:left;">
+F05.H9_B14_d80_0mM_PA.2
+</td>
+<td style="text-align:left;">
+F05
+</td>
+<td style="text-align:left;">
+F
+</td>
+<td style="text-align:left;">
+5
+</td>
+<td style="text-align:left;">
+2
+</td>
+<td style="text-align:left;">
+H9
+</td>
+<td style="text-align:left;">
+B14
+</td>
+<td style="text-align:left;">
+80
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+23648
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+G05.H9_B14_d80_5mM_PA.1
+</td>
+<td style="text-align:left;">
+G05.H9_B14_d80_5mM_PA.1
+</td>
+<td style="text-align:left;">
+G05
+</td>
+<td style="text-align:left;">
+G
+</td>
+<td style="text-align:left;">
+5
+</td>
+<td style="text-align:left;">
+1
+</td>
+<td style="text-align:left;">
+H9
+</td>
+<td style="text-align:left;">
+B14
+</td>
+<td style="text-align:left;">
+80
+</td>
+<td style="text-align:left;">
+5
+</td>
+<td style="text-align:left;">
+21528
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+H05.H9_B14_d80_5mM_PA.2
+</td>
+<td style="text-align:left;">
+H05.H9_B14_d80_5mM_PA.2
+</td>
+<td style="text-align:left;">
+H05
+</td>
+<td style="text-align:left;">
+H
+</td>
+<td style="text-align:left;">
+5
+</td>
+<td style="text-align:left;">
+2
+</td>
+<td style="text-align:left;">
+H9
+</td>
+<td style="text-align:left;">
+B14
+</td>
+<td style="text-align:left;">
+80
+</td>
+<td style="text-align:left;">
+5
+</td>
+<td style="text-align:left;">
+22292
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<pre class="r"><code>boxplot_counts = function(plotsubset,maintitle,colorcode){
+  vals=log2(plotsubset+1)
+  a =boxplot(vals, main = maintitle, 
+             col = Dark8[as.factor(SampleInfo[,colorcode])], names=NA,
+             ylab = &quot;log2 transformed&quot;, xlab=&quot;samples&quot;, xaxt=&quot;n&quot;)
+  legend(ncol(vals)*1.1, max(vals), legend = levels(SampleInfo[,colorcode]),
+         bg=&quot;white&quot;,xpd=T,box.col = &quot;white&quot;,
+         pch = 16, col = Dark8[1:length(unique(SampleInfo[,colorcode]))])
+}
+
+
+barplot_counts = function(DF, maintitle, colorcode, coltoplot=&quot;reads_per_sample&quot;) {
+
+  vals=log2(DF[,coltoplot])
+  barplot(vals, main = maintitle, 
+          col = Dark8[as.factor(DF[,colorcode])], names=NA, xaxt=&quot;n&quot;,
+          ylab = &quot;log2 transformed&quot;, xlab=&quot;samples&quot;)
+  legend(length(vals)*1.25, max(vals), legend = levels(DF[,colorcode]), pch = 16, 
+         bg =&quot;white&quot;,xpd=T, box.col=&quot;white&quot;,
+         col = Dark8[1:length(unique(DF[,colorcode]))])
+}
+
+
+par(mar=c(3,5,5,7))
+boxplot_counts(plotsubset = Countdata, maintitle = &quot;raw counts&quot;, colorcode = &quot;Batch&quot;)</code></pre>
+<p><img src="figure/05_Preprocessing_Bulk.Rmd/plot_counts-1.png" width="768" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>barplot_counts(SampleInfo, &quot;total reads&quot;, &quot;Batch&quot;)</code></pre>
+<p><img src="figure/05_Preprocessing_Bulk.Rmd/plot_counts-2.png" width="768" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>plot(density(log2(rowMeans(Countdata))), main=&quot;distribution of gene expression&quot;, 
+     xlab=&quot;mean log2(counts +1)&quot;)</code></pre>
+<p><img src="figure/05_Preprocessing_Bulk.Rmd/plot_counts-3.png" width="768" style="display: block; margin: auto;" /></p>
+<pre class="r"><code># remove genes wich were not detected in at least 25% of the samples 
+keeperidx = rowSums(Countdata&gt;1)&gt;nrow(SampleInfo)/4
+
+Countdata_cl = Countdata[keeperidx, ]
+
+rowdescription = rowdescription[row.names(Countdata_cl),]
+
+fullmodel = as.formula(&quot;~Day+PAmM&quot;)
+
+ddsMat &lt;- DESeqDataSetFromMatrix(countData = Countdata_cl,
+                                 colData = SampleInfo,
+                                 rowData = rowdescription,
+                                 design = fullmodel)</code></pre>
+<pre><code>  the design formula contains one or more numeric variables with integer values,
+  specifying a model with increasing fold change for higher values.
+  did you mean for this to be a factor? if so, first convert
+  this variable to a factor using the factor() function</code></pre>
+<pre><code>  the design formula contains one or more numeric variables that have mean or
+  standard deviation larger than 5 (an arbitrary threshold to trigger this message).
+  Including numeric variables with large mean can induce collinearity with the intercept.
+  Users should center and scale numeric variables in the design to improve GLM convergence.</code></pre>
+<pre class="r"><code>ddsMat = estimateSizeFactors(ddsMat)
+ddsMat = estimateDispersions(ddsMat)</code></pre>
+<pre><code>gene-wise dispersion estimates</code></pre>
+<pre><code>mean-dispersion relationship</code></pre>
+<pre><code>final dispersion estimates</code></pre>
+<pre class="r"><code>reads  = as.data.frame(counts(ddsMat, normalized=T))
+
+SDs = apply(reads, 1, sd)
+keepvar = SDs&gt;0
+
+ddsMat &lt;- ddsMat[keepvar,]
+
+Nfilt = length(ddsMat)
+reads  = as.data.frame(counts(ddsMat, normalized=T))
+
+SampleInfo$reads_per_sample_cl= colSums(reads)
+
+
+par(mar=c(3,5,5,7))
+boxplot_counts(plotsubset = Countdata_cl, maintitle = &quot;raw counts QCed&quot;, colorcode = &quot;Batch&quot;)</code></pre>
+<p><img src="figure/05_Preprocessing_Bulk.Rmd/clean%20and%20plot_counts-1.png" width="768" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>barplot_counts(SampleInfo, &quot;total reads QCed&quot;, &quot;Batch&quot;, coltoplot =&quot;reads_per_sample_cl&quot;)</code></pre>
+<p><img src="figure/05_Preprocessing_Bulk.Rmd/clean%20and%20plot_counts-2.png" width="768" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>plot(density(log2(rowMeans(Countdata_cl))), main=&quot;distribution of gene expression&quot;, 
+     xlab=&quot;mean log2(counts +1) QCed&quot;)</code></pre>
+<p><img src="figure/05_Preprocessing_Bulk.Rmd/clean%20and%20plot_counts-3.png" width="768" style="display: block; margin: auto;" />
+### before cleaning * Average reads per samples: 23 918.33 * Standard
+deviation reads per samples: 2 385.614 * Total genes mapped: 28 395</p>
+<div id="after-cleaning" class="section level3">
+<h3>after cleaning</h3>
+<ul>
+<li>Average reads per samples: 19 494.67</li>
+<li>Standard deviation reads per samples: 1 616.038</li>
+<li>Genes removed due to low reads: 24 321</li>
+<li>Total genes included after filtering: 4 074</li>
+</ul>
+</div>
+<div id="clustering" class="section level2">
+<h2>Clustering</h2>
+<p>hierarchical clustering based on the top 2000 genes by variance</p>
+<pre class="r"><code>log2_cpm = log2(reads+1)
+
+varsset=apply(log2_cpm, 1, var)
+
+cpm.sel.trans = t(log2_cpm[order(varsset,decreasing = T)[1:2000],])
+
+rownames(cpm.sel.trans)=rownames(SampleInfo)
+
+distance = dist(cpm.sel.trans)
+hc = stats::hclust(distance, method=&quot;ward.D2&quot;)
+cutN=10 #number of different conditions (2xPA, 5xDay)
+clusters = cutree(hc, k=cutN)
+Colors=sample(jetcolors(cutN))[clusters]
+
+myLetters &lt;- LETTERS[1:26]
+
+numRow=match(SampleInfo$Row, myLetters)
+addRow=LETTERS[numRow]
+
+Plotdata=data.frame(Rows=addRow, numRow = numRow, Cols = SampleInfo$Col, 
+                    Group=clusters, Colors=Colors)
+
+par(mar=c(15,3,5,3))
+plot(as.dendrogram(hc), main=paste(&quot;Similairtiy by gene expression, guessed&quot;,cutN,&quot;clusters&quot;), cex=0.7)
+colored_dots(colors = Colors, dend = as.dendrogram(hc), rowLabels = &quot;cluster&quot;)</code></pre>
+<p><img src="figure/05_Preprocessing_Bulk.Rmd/hcluster-1.png" width="1440" style="display: block; margin: auto;" /></p>
+<p>Similarity based on hcluster plot #todo: check code snippet</p>
+<pre class="r"><code>par(mar=c(2,5,8,3))
+plot(0,0, type=&quot;n&quot;, ylab=&quot;&quot;, xlab=&quot;&quot;, 
+     ylim=rev(range(Plotdata$numRow))+c(1,-1), 
+     xlim=range(Plotdata$Cols)+c(-1,1), xaxt=&quot;n&quot;,yaxt=&quot;n&quot; ,
+     main=&quot;plate similarity plot&quot;)
+points(y=Plotdata$numRow, x=Plotdata$Cols, pch=16, cex=4, col=Plotdata$Colors)
+text(y=Plotdata$numRow, x=Plotdata$Cols, labels = Plotdata$Group)
+text(y=Plotdata$numRow, x=Plotdata$Cols, labels = Plotdata$Group)
+axis(2, at=1:9, labels = c(paste0(&quot;P1_&quot;, LETTERS[1:8]), &quot;P2_A&quot;), las=1)
+axis(3, at=1:12, labels = c(paste0(&quot;Col_&quot;, 1:12)), las=3)
+abline(h=8.5)</code></pre>
+<p><img src="figure/05_Preprocessing_Bulk.Rmd/platesetup_cluster-1.png" width="1440" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>sampleDistMatrix &lt;- as.matrix(distance)
+
+#colors for plotting heatmap
+colors &lt;- colorRampPalette(brewer.pal(9, &quot;Spectral&quot;))(255)
+
+PAcols = Dark8[c(1:2)+1]
+names(PAcols) = unique(SampleInfo$PAmM)
+
+Batchcols = brewer.pal(3,&quot;Set1&quot;)[1:nlevels(SampleInfo$Batch)]
+names(Batchcols) = levels(SampleInfo$Batch)
+
+Replicol = brewer.pal(3,&quot;Set2&quot;)[1:2]
+names(Replicol) = levels(SampleInfo$Replicate)
+
+Daycol = c(&quot;dodgerblue&quot;, &quot;dodgerblue4&quot;)
+
+ann_colors = list(
+  PAmM = PAcols,
+  Batch = Batchcols, 
+  Replicate = Replicol,
+  Day = Daycol
+  )
+
+labels = SampleInfo[,c(&quot;Batch&quot;,&quot;Replicate&quot;, &quot;Day&quot;, &quot;PAmM&quot;)] %&gt;% mutate_at(c(&quot;Batch&quot;, &quot;Replicate&quot;, &quot;PAmM&quot;), as.character) %&gt;% as.data.frame()
+
+rownames(labels)=rownames(SampleInfo)
+
+pheatmap(sampleDistMatrix,
+         clustering_distance_rows = distance,
+         clustering_distance_cols = distance,
+         clustering_method = &quot;ward.D2&quot;,
+         scale =&quot;row&quot;,
+         border_color = NA, 
+         annotation_row = labels,
+         annotation_col = labels,
+         annotation_colors = ann_colors,
+         col = colors, 
+         main = &quot;Distances normalized log2 counts&quot;)</code></pre>
+<p><img src="figure/05_Preprocessing_Bulk.Rmd/clusterandqual-1.png" width="1440" style="display: block; margin: auto;" /></p>
+</div>
+<div id="pca-and-mds" class="section level2">
+<h2>PCA and MDS</h2>
+<pre class="r"><code># PCA
+gpca &lt;- glmpca(t(cpm.sel.trans), L = 2)
+gpca.dat &lt;- gpca$factors
+gpca.dat$CellLine &lt;- SampleInfo$CellLine
+gpca.dat$Batch &lt;- SampleInfo$Batch
+gpca.dat$PAmM&lt;- as.factor(SampleInfo$PAmM)
+gpca.dat$Day&lt;- SampleInfo$Day
+gpca.dat$Replicate &lt;- as.factor(SampleInfo$Replicate)
+
+rownames(gpca.dat) = rownames(SampleInfo)
+mds = as.data.frame(SampleInfo) %&gt;% cbind(cmdscale(distance))
+
+
+ggplot(gpca.dat, aes(x = dim1, y = dim2, color = Day, 
+                     shape = PAmM)) +
+            geom_point(size = 2)  + ggtitle(&quot;PCA with log2 counts&quot;)</code></pre>
+<p><img src="figure/05_Preprocessing_Bulk.Rmd/PCA_MDS-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>ggplot(mds, aes(x = `1`, y = `2`, color = Day, shape = PAmM)) +
+            geom_point(size = 2)  + ggtitle(&quot;MDS with log2 counts&quot;)</code></pre>
+<p><img src="figure/05_Preprocessing_Bulk.Rmd/PCA_MDS-2.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>saveRDS(ddsMat, file=paste0(&quot;./data/Bulk_dds_matrix.rds&quot;))</code></pre>
+<br>
+<p>
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
+<span class="glyphicon glyphicon-wrench" aria-hidden="true"></span>
+Session information
+</button>
+</p>
+<div id="workflowr-sessioninfo" class="collapse">
+<pre class="r"><code>sessionInfo()</code></pre>
+<pre><code>R version 4.3.1 (2023-06-16)
+Platform: x86_64-pc-linux-gnu (64-bit)
+Running under: Ubuntu 22.04.2 LTS
+
+Matrix products: default
+BLAS:   /usr/lib/x86_64-linux-gnu/openblas-pthread/libblas.so.3 
+LAPACK: /usr/lib/x86_64-linux-gnu/openblas-pthread/libopenblasp-r0.3.20.so;  LAPACK version 3.10.0
+
+locale:
+ [1] LC_CTYPE=en_US.UTF-8       LC_NUMERIC=C              
+ [3] LC_TIME=en_US.UTF-8        LC_COLLATE=en_US.UTF-8    
+ [5] LC_MONETARY=en_US.UTF-8    LC_MESSAGES=en_US.UTF-8   
+ [7] LC_PAPER=en_US.UTF-8       LC_NAME=C                 
+ [9] LC_ADDRESS=C               LC_TELEPHONE=C            
+[11] LC_MEASUREMENT=en_US.UTF-8 LC_IDENTIFICATION=C       
+
+time zone: Etc/UTC
+tzcode source: system (glibc)
+
+attached base packages:
+[1] stats4    stats     graphics  grDevices utils     datasets  methods  
+[8] base     
+
+other attached packages:
+ [1] compareGroups_4.7.2         kableExtra_1.3.4           
+ [3] gprofiler2_0.2.2            dendextend_1.17.1          
+ [5] pheatmap_1.0.12             lubridate_1.9.3            
+ [7] forcats_1.0.0               stringr_1.5.1              
+ [9] dplyr_1.1.4                 purrr_1.0.2                
+[11] readr_2.1.4                 tidyr_1.3.0                
+[13] tibble_3.2.1                tidyverse_2.0.0            
+[15] ggplot2_3.4.4               glmpca_0.2.0               
+[17] RColorBrewer_1.1-3          DESeq2_1.40.2              
+[19] SummarizedExperiment_1.32.0 Biobase_2.62.0             
+[21] MatrixGenerics_1.14.0       matrixStats_1.1.0          
+[23] GenomicRanges_1.54.1        GenomeInfoDb_1.38.1        
+[25] IRanges_2.36.0              S4Vectors_0.40.2           
+[27] BiocGenerics_0.48.1         RCurl_1.98-1.13            
+[29] knitr_1.45                  workflowr_1.7.1            
+
+loaded via a namespace (and not attached):
+  [1] splines_4.3.1           later_1.3.2             bitops_1.0-7           
+  [4] HardyWeinberg_1.7.5     rpart_4.1.23            lifecycle_1.0.4        
+  [7] rprojroot_2.0.4         processx_3.8.3          Rsolnp_1.16            
+ [10] lattice_0.22-5          MASS_7.3-60             backports_1.4.1        
+ [13] magrittr_2.0.3          plotly_4.10.3           sass_0.4.8             
+ [16] rmarkdown_2.25          jquerylib_0.1.4         yaml_2.3.8             
+ [19] httpuv_1.6.13           zip_2.3.0               askpass_1.2.0          
+ [22] minqa_1.2.6             abind_1.4-5             zlibbioc_1.48.0        
+ [25] rvest_1.0.3             nnet_7.3-19             git2r_0.33.0           
+ [28] gdtools_0.3.5           GenomeInfoDbData_1.2.11 crul_1.4.0             
+ [31] svglite_2.1.3           codetools_0.2-19        DelayedArray_0.28.0    
+ [34] xml2_1.3.6              tidyselect_1.2.0        shape_1.4.6            
+ [37] farver_2.1.1            httpcode_0.3.0          lme4_1.1-35.1          
+ [40] viridis_0.6.4           webshot_0.5.5           jsonlite_1.8.8         
+ [43] mitml_0.4-5             ellipsis_0.3.2          survival_3.5-7         
+ [46] iterators_1.0.14        systemfonts_1.0.5       foreach_1.5.2          
+ [49] tools_4.3.1             chron_2.3-61            ragg_1.2.7             
+ [52] Rcpp_1.0.11             glue_1.6.2              gridExtra_2.3          
+ [55] pan_1.9                 SparseArray_1.2.2       xfun_0.41              
+ [58] withr_2.5.2             fastmap_1.1.1           boot_1.3-28.1          
+ [61] fansi_1.0.6             openssl_2.1.1           callr_3.7.3            
+ [64] digest_0.6.33           truncnorm_1.0-9         timechange_0.2.0       
+ [67] R6_2.5.1                mime_0.12               mice_3.16.0            
+ [70] textshaping_0.3.7       colorspace_2.1-0        utf8_1.2.4             
+ [73] generics_0.1.3          fontLiberation_0.1.0    data.table_1.14.10     
+ [76] httr_1.4.7              htmlwidgets_1.6.4       S4Arrays_1.2.0         
+ [79] whisker_0.4.1           pkgconfig_2.0.3         gtable_0.3.4           
+ [82] XVector_0.42.0          htmltools_0.5.7         fontBitstreamVera_0.1.1
+ [85] scales_1.3.0            rstudioapi_0.15.0       tzdb_0.4.0             
+ [88] uuid_1.1-1              nlme_3.1-164            curl_5.2.0             
+ [91] nloptr_2.0.3            cachem_1.0.8            flextable_0.9.4        
+ [94] parallel_4.3.1          pillar_1.9.0            grid_4.3.1             
+ [97] vctrs_0.6.5             promises_1.2.1          jomo_2.7-6             
+[100] xtable_1.8-4            evaluate_0.23           cli_3.6.2              
+[103] locfit_1.5-9.8          compiler_4.3.1          rlang_1.1.2            
+[106] crayon_1.5.2            labeling_0.4.3          ps_1.7.5               
+[109] getPass_0.2-4           fs_1.6.3                writexl_1.4.2          
+[112] stringi_1.8.3           viridisLite_0.4.2       BiocParallel_1.34.2    
+[115] munsell_0.5.0           lazyeval_0.2.2          glmnet_4.1-8           
+[118] fontquiver_0.2.1        Matrix_1.6-4            hms_1.1.3              
+[121] gfonts_0.2.0            shiny_1.8.0             highr_0.10             
+[124] broom_1.0.5             bslib_0.6.1             officer_0.6.3          </code></pre>
+</div>
+</div>
+
+
+<!-- Adjust MathJax settings so that all math formulae are shown using
+TeX fonts only; see
+https://docs.mathjax.org/en/latest/web/configuration.html. This will make
+the presentation more consistent at the cost of the webpage sometimes
+taking slightly longer to load. Note that this only works because the
+footer is added to webpages before the MathJax javascript. -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    "HTML-CSS": { availableFonts: ["TeX"] }
+  });
+</script>
+
+
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+
+<script>
+$(document).ready(function ()  {
+
+    // temporarily add toc-ignore selector to headers for the consistency with Pandoc
+    $('.unlisted.unnumbered').addClass('toc-ignore')
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

@@ -31,7 +31,7 @@ Dark8 = RColorBrewer::brewer.pal(8, "Dark2")
 ```
 
 ```{r getdata}
-output= paste0("output/05_Bulk_DEX/")
+output= paste0("output/06_Bulk_DEX/")
 dir.create(output, showWarnings = F)
 source("code/custom_functions.R")
 ddsMat <- readRDS("data/Bulk_dds_matrix.rds")
@@ -68,7 +68,9 @@ for(d in Days){
 
 #Lists elements are written to individual worksheets, using list names as sheet names if available
 l <- list(mget(apropos("restab_")))[[1]]
-openxlsx2::write_xlsx(l, file=paste0(output, "05_DEX_Bulk_LFC_results.xlsx"), row_names=T )
+names(l) = gsub("restab_", "", names(l)) %>% gsub("Day_5", "Day_05",.)
+l = l[sort(names(l))]
+openxlsx2::write_xlsx(l, file=paste0(output, "06_Bulk_DEX_LFC_results.xlsx"), row_names=T )
 ```
 
 
@@ -91,10 +93,12 @@ for (i in apropos("restab_")){
 
 names(GOtermlist) = gsub("restab_Day", "Day", names(GOtermlist))
 names(GOtermlist) = gsub("Day_5", "Day_05", names(GOtermlist))
+GOtermlist = GOtermlist[sort(names(GOtermlist))]
 
 resGO = getGOresults(GOtermlist, genereference = NULL, evcodes = T)
 
-openxlsx::write.xlsx(resGO$result, file = paste0(output, "/06_DEX_Bulk_GO_results.xlsx"))
+openxlsx::write.xlsx(file = paste0(output, "/06_Bulk_DEX_GO_results.xlsx"), as.data.frame(resGO$result))
+
 ```
 
 ```{r, fig.width=15, fig.height=20}
@@ -113,7 +117,7 @@ for (set in unique(resGO$result$query)){
 
 p <- ggpubr::ggarrange(plotlist = plotlist, common.legend = T, nrow = 5, ncol =3)
 p
-ggsave(file=paste0(output, "/06_DEX_Bulk_top10all_GOplot.svg"), plot = p)
+ggsave(file=paste0(output, "/06_Bulk_DEX_top10all_GOplot.svg"), plot = p)
 ```
 
 ```{r, fig.width=15, fig.height=20}
@@ -131,7 +135,7 @@ for (set in unique(resGO$result$query)){
 
 p <- ggpubr::ggarrange(plotlist = plotlist, common.legend = T, nrow = 5, ncol =3)
 p
-ggsave(file=paste0(output, "/06_DEX_Bulk_top10_BP_GOplot.svg"), plot = p)
+ggsave(file=paste0(output, "/06_Bulk_DEX_top10_BP_GOplot.svg"), plot = p)
 ```
 
 ```{r, fig.width=15, fig.height=20}
@@ -149,9 +153,9 @@ for (set in unique(resGO$result$query)){
 
 p <- ggpubr::ggarrange(plotlist = plotlist, common.legend = T, nrow = 5, ncol =3)
 p
-ggsave(file=paste0(output, "/06_DEX_Bulk_top10_TF_GOplot.svg"), plot = p)
+ggsave(file=paste0(output, "/06_Bulk_DEX_top10_TF_GOplot.svg"), plot = p)
 ```
-```{r plot top 10 DEX genes, fig.width=14, fig.height=21}}
+```{r plot top 10 DEX genes, fig.width=14, fig.height=21}
 
 topgenes=c()
 for(r in apropos("restab_")){
@@ -180,12 +184,7 @@ for(g in topgenes){
 }
 
 pcomb = ggpubr::ggarrange(plotlist=plotlist, nrow = 5, ncol = 4, common.legend = T, heights = c(3,3,3,3,3), widths = c(3,3,3,3))
-ggpubr::ggexport(filename = paste0(output, "/05_DEX_Bulk_Siggenes_boxplots.pdf"), plotlist = pcomb, width = 14, height = 21, dpi = 300)
+ggpubr::ggexport(filename = paste0(output, "/06_Bulk_DEX_Siggenes_boxplots.pdf"), plotlist = pcomb, width = 14, height = 21, dpi = 300)
 ```
 
-```{r plot top 10 DEX genes, fig.width=14, fig.height=21}} )
-```
-
-```{r plot DEX})
-```
 

@@ -1,0 +1,1840 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+
+<meta name="date" content="2023-01-12" />
+
+<title>Cluster Identification</title>
+
+<script src="site_libs/header-attrs-2.25/header-attrs.js"></script>
+<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/cerulean.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/jqueryui-1.13.2/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+
+<link rel="icon" href="https://github.com/workflowr/workflowr-assets/raw/main/img/reproducible.png">
+<!-- Add a small amount of space between sections. -->
+<style type="text/css">
+div.section {
+  padding-top: 12px;
+}
+</style>
+
+
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+details > summary > p:only-child {
+  display: inline;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark the anchor link active (and if it's in a dropdown, also mark that active)
+  var dropdown = menuAnchor.closest('li.dropdown');
+  if (window.bootstrap) { // Bootstrap 4+
+    menuAnchor.addClass('active');
+    dropdown.find('> .dropdown-toggle').addClass('active');
+  } else { // Bootstrap 3
+    menuAnchor.parent().addClass('active');
+    dropdown.addClass('active');
+  }
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before, .tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "\e259";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "\e258";
+  font-family: 'Glyphicons Halflings';
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-bs-toggle="collapse" data-target="#navbar" data-bs-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">QPRT-inhibition scRNA organoids</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li>
+  <a href="about.html">About</a>
+</li>
+<li>
+  <a href="license.html">License</a>
+</li>
+<li>
+  <a href="https://chiocchettilab.uni-frankfurt.de">Chiocchettilab</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+
+
+<h1 class="title toc-ignore">Cluster Identification</h1>
+<h4 class="date">2023-01-12</h4>
+
+</div>
+
+
+<p>
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-report" data-toggle="collapse" data-target="#workflowr-report">
+<span class="glyphicon glyphicon-list" aria-hidden="true"></span>
+workflowr <span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span>
+</button>
+</p>
+<div id="workflowr-report" class="collapse">
+<ul class="nav nav-tabs">
+<li class="active">
+<a data-toggle="tab" href="#summary">Summary</a>
+</li>
+<li>
+<a data-toggle="tab" href="#checks"> Checks <span
+class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>
+</a>
+</li>
+<li>
+<a data-toggle="tab" href="#versions">Past versions</a>
+</li>
+</ul>
+<div class="tab-content">
+<div id="summary" class="tab-pane fade in active">
+<p>
+<strong>Last updated:</strong> 2024-01-09
+</p>
+<p>
+<strong>Checks:</strong> <span
+class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 7
+<span class="glyphicon glyphicon-exclamation-sign text-danger"
+aria-hidden="true"></span> 0
+</p>
+<p>
+<strong>Knit directory:</strong> <code>files/</code> <span
+class="glyphicon glyphicon-question-sign" aria-hidden="true"
+title="This is the local directory in which the code in this file was executed.">
+</span>
+</p>
+<p>
+This reproducible <a href="https://rmarkdown.rstudio.com">R Markdown</a>
+analysis was created with <a
+  href="https://github.com/workflowr/workflowr">workflowr</a> (version
+1.7.1). The <em>Checks</em> tab describes the reproducibility checks
+that were applied when the results were created. The <em>Past
+versions</em> tab lists the development history.
+</p>
+<hr>
+</div>
+<div id="checks" class="tab-pane fade">
+<div id="workflowr-checks" class="panel-group">
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRMarkdownfilestronguptodate">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>R Markdown file:</strong> up-to-date
+</a>
+</p>
+</div>
+<div id="strongRMarkdownfilestronguptodate"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great! Since the R Markdown file has been committed to the Git
+repository, you know the exact version of the code that produced these
+results.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongEnvironmentstrongempty">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Environment:</strong> empty </a>
+</p>
+</div>
+<div id="strongEnvironmentstrongempty" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! The global environment was empty. Objects defined in the
+global environment can affect the analysis in your R Markdown file in
+unknown ways. For reproduciblity it’s best to always run the code in an
+empty environment.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSeedstrongcodesetseed20240103code">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Seed:</strong>
+<code>set.seed(20240103)</code> </a>
+</p>
+</div>
+<div id="strongSeedstrongcodesetseed20240103code"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>The command <code>set.seed(20240103)</code> was run prior to running
+the code in the R Markdown file. Setting a seed ensures that any results
+that rely on randomness, e.g. subsampling or permutations, are
+reproducible.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSessioninformationstrongrecorded">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Session information:</strong>
+recorded </a>
+</p>
+</div>
+<div id="strongSessioninformationstrongrecorded"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! Recording the operating system, R version, and package
+versions is critical for reproducibility.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongCachestrongnone">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Cache:</strong> none </a>
+</p>
+</div>
+<div id="strongCachestrongnone" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Nice! There were no cached chunks for this analysis, so you can be
+confident that you successfully produced the results during this
+run.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongFilepathsstrongrelative">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>File paths:</strong> relative </a>
+</p>
+</div>
+<div id="strongFilepathsstrongrelative" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! Using relative paths to the files within your workflowr
+project makes it easier to run your code on other machines.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomKJPMolgenLabscRNAPAQPRTtree0488293ef9754fa16c1d7bb51351508419566f7ftargetblank0488293a">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Repository version:</strong>
+<a href="https://github.com/KJPMolgenLab/scRNA_PA_QPRT/tree/0488293ef9754fa16c1d7bb51351508419566f7f" target="_blank">0488293</a>
+</a>
+</p>
+</div>
+<div
+id="strongRepositoryversionstrongahrefhttpsgithubcomKJPMolgenLabscRNAPAQPRTtree0488293ef9754fa16c1d7bb51351508419566f7ftargetblank0488293a"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>
+Great! You are using Git for version control. Tracking code development
+and connecting the code version to the results is critical for
+reproducibility.
+</p>
+<p>
+The results in this page were generated with repository version
+<a href="https://github.com/KJPMolgenLab/scRNA_PA_QPRT/tree/0488293ef9754fa16c1d7bb51351508419566f7f" target="_blank">0488293</a>.
+See the <em>Past versions</em> tab to see a history of the changes made
+to the R Markdown and HTML files.
+</p>
+<p>
+Note that you need to be careful to ensure that all relevant files for
+the analysis have been committed to Git prior to generating the results
+(you can use <code>wflow_publish</code> or
+<code>wflow_git_commit</code>). workflowr only checks the R Markdown
+file, but you know if there are other scripts or data files that it
+depends on. Below is the status of the Git repository when the results
+were generated:
+</p>
+<pre><code>
+Ignored files:
+    Ignored:    .Rhistory
+    Ignored:    .Rprofile
+    Ignored:    .Rproj.user/
+    Ignored:    output/05_Bulk_DEX/
+    Ignored:    output/05_Bulk_Preprocessing/
+
+Untracked files:
+    Untracked:  .bashrc
+    Untracked:  .nuvolos/
+    Untracked:  core.10568
+    Untracked:  data/Bulk_dds_matrix.rds
+    Untracked:  data/Bulkdata_Countmatrix.rds
+    Untracked:  data/HumDev/
+    Untracked:  data/Kanton/
+    Untracked:  data/KantonGeneList/
+    Untracked:  data/Knoblich/
+    Untracked:  data/QC_data.filt.rds
+    Untracked:  data/QC_dataClustered.filt.rds
+    Untracked:  data/QC_dataClustered.filtTyped.rds
+    Untracked:  data/Yoon/
+    Untracked:  data/alldata.rds
+    Untracked:  output/01_QC/QC_measures_Violin_filtered.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devCellDevTypeClusterCounts.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devFullDetailsMapped.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000099_b.Erythrocyte..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000099_b.Fibroblast..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000099_b.Glioblast..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000099_b.Immune..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000099_b.Neural.crest..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000099_b.Neuroblast..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000099_b.Neuron..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000099_b.Neuronal.IPC..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000099_b.Oligo..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000099_b.Placodes..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000099_b.Radial.glia..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000099_b.Vascular..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000100_b.Erythrocyte..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000100_b.Fibroblast..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000100_b.Glioblast..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000100_b.Immune..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000100_b.Neural.crest..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000100_b.Neuroblast..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000100_b.Neuron..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000100_b.Neuronal.IPC..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000100_b.Oligo..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000100_b.Placodes..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000100_b.Radial.glia..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000100_b.Vascular..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000101_b.Erythrocyte..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000101_b.Glioblast..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000101_b.Immune..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000101_b.Neuroblast..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000101_b.Neuron..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000101_b.Neuronal.IPC..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000101_b.Oligo..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000101_b.Radial.glia..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000101_b.Vascular..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000102_b.Erythrocyte..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000102_b.Fibroblast..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000102_b.Glioblast..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000102_b.Immune..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000102_b.Neural.crest..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000102_b.Neuroblast..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000102_b.Neuron..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000102_b.Neuronal.IPC..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000102_b.Oligo..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000102_b.Placodes..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000102_b.Radial.glia..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000102_b.Vascular..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000103_b.Erythrocyte..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000103_b.Fibroblast..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000103_b.Glioblast..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000103_b.Immune..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000103_b.Neural.crest..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000103_b.Neuroblast..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000103_b.Neuron..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000103_b.Neuronal.IPC..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000103_b.Oligo..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000103_b.Placodes..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000103_b.Radial.glia..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000103_b.Vascular..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000104_b.Erythrocyte..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000104_b.Glioblast..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000104_b.Immune..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000104_b.Neuroblast..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000104_b.Neuron..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000104_b.Neuronal.IPC..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000104_b.Oligo..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000104_b.Radial.glia..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000104_b.Vascular..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000105_b.Erythrocyte..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000105_b.Fibroblast..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000105_b.Glioblast..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000105_b.Immune..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000105_b.Neural.crest..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000105_b.Neuroblast..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000105_b.Neuron..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000105_b.Neuronal.IPC..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000105_b.Oligo..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000105_b.Radial.glia..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000105_b.Vascular..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000106_b.Erythrocyte..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000106_b.Fibroblast..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000106_b.Glioblast..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000106_b.Immune..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000106_b.Neural.crest..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000106_b.Neuroblast..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000106_b.Neuron..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000106_b.Neuronal.IPC..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000106_b.Oligo..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000106_b.Radial.glia..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000106_b.Vascular..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000107_b.Erythrocyte..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000107_b.Fibroblast..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000107_b.Glioblast..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000107_b.Immune..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000107_b.Neural.crest..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000107_b.Neuroblast..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000107_b.Neuron..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000107_b.Neuronal.IPC..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000107_b.Oligo..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000107_b.Radial.glia..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000107_b.Vascular..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000108_b.Erythrocyte..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000108_b.Fibroblast..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000108_b.Glioblast..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000108_b.Immune..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000108_b.Neural.crest..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000108_b.Neuroblast..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000108_b.Neuron..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000108_b.Neuronal.IPC..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000108_b.Oligo..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000108_b.Radial.glia..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv.0000108_b.Vascular..svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000099_b'Erythrocyte'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000099_b'Fibroblast'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000099_b'Glioblast'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000099_b'Immune'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000099_b'Neural crest'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000099_b'Neuroblast'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000099_b'Neuron'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000099_b'Neuronal IPC'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000099_b'Oligo'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000099_b'Placodes'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000099_b'Radial glia'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000099_b'Vascular'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000100_b'Erythrocyte'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000100_b'Fibroblast'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000100_b'Glioblast'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000100_b'Immune'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000100_b'Neural crest'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000100_b'Neuroblast'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000100_b'Neuron'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000100_b'Neuronal IPC'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000100_b'Oligo'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000100_b'Placodes'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000100_b'Radial glia'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000100_b'Vascular'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000101_b'Erythrocyte'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000101_b'Glioblast'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000101_b'Immune'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000101_b'Neuroblast'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000101_b'Neuron'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000101_b'Neuronal IPC'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000101_b'Oligo'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000101_b'Radial glia'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000101_b'Vascular'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000102_b'Erythrocyte'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000102_b'Fibroblast'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000102_b'Glioblast'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000102_b'Immune'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000102_b'Neural crest'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000102_b'Neuroblast'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000102_b'Neuron'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000102_b'Neuronal IPC'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000102_b'Oligo'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000102_b'Placodes'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000102_b'Radial glia'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000102_b'Vascular'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000103_b'Erythrocyte'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000103_b'Fibroblast'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000103_b'Glioblast'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000103_b'Immune'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000103_b'Neural crest'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000103_b'Neuroblast'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000103_b'Neuron'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000103_b'Neuronal IPC'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000103_b'Oligo'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000103_b'Placodes'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000103_b'Radial glia'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000103_b'Vascular'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000104_b'Erythrocyte'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000104_b'Glioblast'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000104_b'Immune'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000104_b'Neuroblast'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000104_b'Neuron'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000104_b'Neuronal IPC'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000104_b'Oligo'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000104_b'Radial glia'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000104_b'Vascular'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000105_b'Erythrocyte'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000105_b'Fibroblast'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000105_b'Glioblast'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000105_b'Immune'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000105_b'Neural crest'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000105_b'Neuroblast'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000105_b'Neuron'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000105_b'Neuronal IPC'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000105_b'Oligo'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000105_b'Radial glia'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000105_b'Vascular'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000106_b'Erythrocyte'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000106_b'Fibroblast'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000106_b'Glioblast'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000106_b'Immune'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000106_b'Neural crest'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000106_b'Neuroblast'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000106_b'Neuron'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000106_b'Neuronal IPC'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000106_b'Oligo'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000106_b'Radial glia'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000106_b'Vascular'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000107_b'Erythrocyte'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000107_b'Fibroblast'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000107_b'Glioblast'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000107_b'Immune'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000107_b'Neural crest'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000107_b'Neuroblast'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000107_b'Neuron'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000107_b'Neuronal IPC'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000107_b'Oligo'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000107_b'Radial glia'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000107_b'Vascular'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000108_b'Erythrocyte'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000108_b'Fibroblast'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000108_b'Glioblast'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000108_b'Immune'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000108_b'Neural crest'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000108_b'Neuroblast'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000108_b'Neuron'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000108_b'Neuronal IPC'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000108_b'Oligo'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000108_b'Radial glia'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.HsapDv:0000108_b'Vascular'.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScores.svg
+    Untracked:  output/04_Biostat/Biostat_GO_termDEG_cluster_0.xlsx
+    Untracked:  output/04_Biostat/Biostat_GO_termDEG_cluster_1.xlsx
+    Untracked:  output/04_Biostat/Biostat_GO_termDEG_cluster_10.xlsx
+    Untracked:  output/04_Biostat/Biostat_GO_termDEG_cluster_11.xlsx
+    Untracked:  output/04_Biostat/Biostat_GO_termDEG_cluster_12.xlsx
+    Untracked:  output/04_Biostat/Biostat_GO_termDEG_cluster_13.xlsx
+    Untracked:  output/04_Biostat/Biostat_GO_termDEG_cluster_2.xlsx
+    Untracked:  output/04_Biostat/Biostat_GO_termDEG_cluster_3.xlsx
+    Untracked:  output/04_Biostat/Biostat_GO_termDEG_cluster_4.xlsx
+    Untracked:  output/04_Biostat/Biostat_GO_termDEG_cluster_5.xlsx
+    Untracked:  output/04_Biostat/Biostat_GO_termDEG_cluster_6.xlsx
+    Untracked:  output/04_Biostat/Biostat_GO_termDEG_cluster_7.xlsx
+    Untracked:  output/04_Biostat/Biostat_GO_termDEG_cluster_8.xlsx
+    Untracked:  output/04_Biostat/Biostat_GO_termDEG_cluster_9.xlsx
+
+Unstaged changes:
+    Modified:   .gitignore
+    Modified:   output/01_QC/QC_12PCs.svg
+    Modified:   output/01_QC/QC_Highest_expressed_genes_filtred.svg
+    Modified:   output/01_QC/QC_VizDimLoadings.svg
+    Modified:   output/01_QC/QC_clustering_PCAoptimized.svg
+    Modified:   output/01_QC/QC_clustering_afterbatchcorr.svg
+    Modified:   output/01_QC/QC_measures_Scatter_unfiltered_all.svg
+    Modified:   output/01_QC/QC_measures_Violin_unfiltered_all.svg
+    Deleted:    output/01_QC/QCmeasures_Violin_filtered.svg
+    Modified:   output/02_Clustering/Cluster_markers.xls
+    Modified:   output/02_Clustering/Clustering_CellcycleScoring.svg
+    Modified:   output/02_Clustering/Clustering_Distribution.svg
+    Modified:   output/02_Clustering/Clustering_FeatPlot_QCMeasures.svg
+    Modified:   output/02_Clustering/Clustering_Heatmap_Markers.svg
+    Modified:   output/02_Clustering/Clustering_Hum_devCellDevTypeClusterCountsBarplot.svg
+    Modified:   output/02_Clustering/Clustering_Hum_devCellDevTypeMapped.svg
+    Modified:   output/02_Clustering/Clustering_KantonT4PredTypes.svg
+    Modified:   output/02_Clustering/Clustering_KantonT4PredTypesChoroidOnly.svg
+    Modified:   output/02_Clustering/Clustering_KnoblMapped.svg
+    Modified:   output/02_Clustering/Clustering_KnoblScores.svg
+    Modified:   output/02_Clustering/Clustering_KnoblichPredTypes.svg
+    Modified:   output/02_Clustering/Clustering_NeuronalMarkers.svg
+    Modified:   output/02_Clustering/Clustering_PCAvsCluster.svg
+    Modified:   output/02_Clustering/Clustering_Resopt.svg
+    Modified:   output/02_Clustering/Clustering_UmapByType.svg
+    Modified:   output/02_Clustering/Clustering_UmapParamOpt.svg
+    Modified:   output/02_Clustering/Clustering_final_optimized_all.svg
+    Modified:   output/02_Clustering/Clustering_integrated_clustree.svg
+    Modified:   output/02_Clustering/Clusters_GO_termsCluster.xlsx
+    Modified:   output/03_Trajectories/Trajectories_All.svg
+    Modified:   output/03_Trajectories/Trajectories_Lineages.svg
+    Modified:   output/04_Biostat/Biostat_Comparelineages.svg
+    Modified:   output/04_Biostat/Biostat_DEG_allcells.xlsx
+    Modified:   output/04_Biostat/Biostat_DEG_cluster_0cells.xlsx
+    Modified:   output/04_Biostat/Biostat_DEG_cluster_10cells.xlsx
+    Modified:   output/04_Biostat/Biostat_DEG_cluster_11cells.xlsx
+    Modified:   output/04_Biostat/Biostat_DEG_cluster_12cells.xlsx
+    Modified:   output/04_Biostat/Biostat_DEG_cluster_13cells.xlsx
+    Modified:   output/04_Biostat/Biostat_DEG_cluster_1cells.xlsx
+    Modified:   output/04_Biostat/Biostat_DEG_cluster_2cells.xlsx
+    Modified:   output/04_Biostat/Biostat_DEG_cluster_3cells.xlsx
+    Modified:   output/04_Biostat/Biostat_DEG_cluster_4cells.xlsx
+    Modified:   output/04_Biostat/Biostat_DEG_cluster_5cells.xlsx
+    Modified:   output/04_Biostat/Biostat_DEG_cluster_6cells.xlsx
+    Modified:   output/04_Biostat/Biostat_DEG_cluster_7cells.xlsx
+    Modified:   output/04_Biostat/Biostat_DEG_cluster_8cells.xlsx
+    Modified:   output/04_Biostat/Biostat_DEG_cluster_9cells.xlsx
+    Modified:   output/04_Biostat/Biostat_GO_termDEG_all.xlsx
+    Modified:   output/04_Biostat/Biostat_HumdevCTFreq.xslsx
+    Modified:   output/04_Biostat/Biostat_clusterFreq.xslsx
+    Deleted:    output/archive/DE_Genes_0_5mM/S05_06_0
+    Deleted:    output/archive/DE_Genes_0_5mM/S05_06_1
+    Deleted:    output/archive/DE_Genes_0_5mM/S05_06_10
+    Deleted:    output/archive/DE_Genes_0_5mM/S05_06_11
+    Deleted:    output/archive/DE_Genes_0_5mM/S05_06_12
+    Deleted:    output/archive/DE_Genes_0_5mM/S05_06_13
+    Deleted:    output/archive/DE_Genes_0_5mM/S05_06_14
+    Deleted:    output/archive/DE_Genes_0_5mM/S05_06_15
+    Deleted:    output/archive/DE_Genes_0_5mM/S05_06_2
+    Deleted:    output/archive/DE_Genes_0_5mM/S05_06_3
+    Deleted:    output/archive/DE_Genes_0_5mM/S05_06_4
+    Deleted:    output/archive/DE_Genes_0_5mM/S05_06_5
+    Deleted:    output/archive/DE_Genes_0_5mM/S05_06_6
+    Deleted:    output/archive/DE_Genes_0_5mM/S05_06_7
+    Deleted:    output/archive/DE_Genes_0_5mM/S05_06_8
+    Deleted:    output/archive/DE_Genes_0_5mM/S05_06_9
+    Deleted:    output/archive/DE_Genes_Overall/DE_Overall_0
+    Deleted:    output/archive/DE_Genes_Overall/DE_Overall_1
+    Deleted:    output/archive/DE_Genes_Overall/DE_Overall_10
+    Deleted:    output/archive/DE_Genes_Overall/DE_Overall_11
+    Deleted:    output/archive/DE_Genes_Overall/DE_Overall_12
+    Deleted:    output/archive/DE_Genes_Overall/DE_Overall_13
+    Deleted:    output/archive/DE_Genes_Overall/DE_Overall_14
+    Deleted:    output/archive/DE_Genes_Overall/DE_Overall_15
+    Deleted:    output/archive/DE_Genes_Overall/DE_Overall_2
+    Deleted:    output/archive/DE_Genes_Overall/DE_Overall_3
+    Deleted:    output/archive/DE_Genes_Overall/DE_Overall_4
+    Deleted:    output/archive/DE_Genes_Overall/DE_Overall_5
+    Deleted:    output/archive/DE_Genes_Overall/DE_Overall_6
+    Deleted:    output/archive/DE_Genes_Overall/DE_Overall_7
+    Deleted:    output/archive/DE_Genes_Overall/DE_Overall_8
+    Deleted:    output/archive/DE_Genes_Overall/DE_Overall_9
+    Deleted:    output/archive/IndividualClusterPlots/Highlight_cluster0.pdf
+    Deleted:    output/archive/IndividualClusterPlots/Highlight_cluster1.pdf
+    Deleted:    output/archive/IndividualClusterPlots/Highlight_cluster10.pdf
+    Deleted:    output/archive/IndividualClusterPlots/Highlight_cluster11.pdf
+    Deleted:    output/archive/IndividualClusterPlots/Highlight_cluster12.pdf
+    Deleted:    output/archive/IndividualClusterPlots/Highlight_cluster13.pdf
+    Deleted:    output/archive/IndividualClusterPlots/Highlight_cluster14.pdf
+    Deleted:    output/archive/IndividualClusterPlots/Highlight_cluster15.pdf
+    Deleted:    output/archive/IndividualClusterPlots/Highlight_cluster2.pdf
+    Deleted:    output/archive/IndividualClusterPlots/Highlight_cluster3.pdf
+    Deleted:    output/archive/IndividualClusterPlots/Highlight_cluster4.pdf
+    Deleted:    output/archive/IndividualClusterPlots/Highlight_cluster5.pdf
+    Deleted:    output/archive/IndividualClusterPlots/Highlight_cluster6.pdf
+    Deleted:    output/archive/IndividualClusterPlots/Highlight_cluster7.pdf
+    Deleted:    output/archive/IndividualClusterPlots/Highlight_cluster8.pdf
+    Deleted:    output/archive/IndividualClusterPlots/Highlight_cluster9.pdf
+    Deleted:    output/archive/Knoblich/CellTypeVsSeuratClusters_Knoblich.pdf
+    Deleted:    output/archive/Knoblich/Heatmap_knoblich.pdf
+    Deleted:    output/archive/Knoblich/Knoblich_GeneClusters/1.pdf
+    Deleted:    output/archive/Knoblich/Knoblich_GeneClusters/10.pdf
+    Deleted:    output/archive/Knoblich/Knoblich_GeneClusters/11.pdf
+    Deleted:    output/archive/Knoblich/Knoblich_GeneClusters/12.pdf
+    Deleted:    output/archive/Knoblich/Knoblich_GeneClusters/13.pdf
+    Deleted:    output/archive/Knoblich/Knoblich_GeneClusters/14.pdf
+    Deleted:    output/archive/Knoblich/Knoblich_GeneClusters/15.pdf
+    Deleted:    output/archive/Knoblich/Knoblich_GeneClusters/16.pdf
+    Deleted:    output/archive/Knoblich/Knoblich_GeneClusters/17.pdf
+    Deleted:    output/archive/Knoblich/Knoblich_GeneClusters/2.pdf
+    Deleted:    output/archive/Knoblich/Knoblich_GeneClusters/3.pdf
+    Deleted:    output/archive/Knoblich/Knoblich_GeneClusters/4.pdf
+    Deleted:    output/archive/Knoblich/Knoblich_GeneClusters/5.pdf
+    Deleted:    output/archive/Knoblich/Knoblich_GeneClusters/6.pdf
+    Deleted:    output/archive/Knoblich/Knoblich_GeneClusters/7.pdf
+    Deleted:    output/archive/Knoblich/Knoblich_GeneClusters/8.pdf
+    Deleted:    output/archive/Knoblich/Knoblich_GeneClusters/9.pdf
+    Deleted:    output/archive/Knoblich/Knoblich_clusters_proportion.txt
+    Deleted:    output/archive/Knoblich/plot_knoblich.pdf
+    Deleted:    output/archive/Knoblich/plot_knoblich_sc.pdf
+    Deleted:    output/archive/Yoon/CellTypeVsSeuratClusters_Yoon.pdf
+    Deleted:    output/archive/Yoon/Yoon_Reference_0.3.pdf
+
+</code></pre>
+<p>
+Note that any generated files, e.g. HTML, png, CSS, etc., are not
+included in this status report because it is ok for generated content to
+have uncommitted changes.
+</p>
+</div>
+</div>
+</div>
+</div>
+<hr>
+</div>
+<div id="versions" class="tab-pane fade">
+
+<p>
+These are the previous versions of the repository in which changes were
+made to the R Markdown
+(<code>analysis/02_02_Clustering_Mapping_scRNA.Rmd</code>) and HTML
+(<code>docs/02_02_Clustering_Mapping_scRNA.html</code>) files. If you’ve
+configured a remote Git repository (see <code>?wflow_git_remote</code>),
+click on the hyperlinks in the table below to view the files as they
+were in that past version.
+</p>
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+File
+</th>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+<th>
+Message
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/KJPMolgenLab/scRNA_PA_QPRT/blob/bca1a73fcaee6c918ab64bd157773ebacb6c9bb4/analysis/02_02_Clustering_Mapping_scRNA.Rmd" target="_blank">bca1a73</a>
+</td>
+<td>
+Andreas Chiocchetti
+</td>
+<td>
+2024-01-09
+</td>
+<td>
+intermediate stage bulk seq
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<hr>
+</div>
+</div>
+</div>
+<div id="clustering-analysis" class="section level1">
+<h1>Clustering Analysis</h1>
+</div>
+<div id="mapping-of-clusters-to-reference-data-sets"
+class="section level1">
+<h1>Mapping of clusters to reference data sets</h1>
+<div id="knoblich-clusters" class="section level2">
+<h2>Knoblich Clusters</h2>
+<pre><code>Warning in data_preprocess(expr, anno_processed): The following specified
+marker genes are not found from the expression data: CRACD, H3-3B, SOX2, TLE5,
+MARCHF6, RPS13, ARMH4, RPL38, BMERB1, RPS6KA2, TENT2, SEPTIN3, DOP1A, RPS27L,
+RPS19, RPS6, RPS11, RPL15, RPL7, RPS14, RPS8, RPS7, RPL13A, RPL8, RPS2, RPL6,
+RPL35A, CEMIP2, RPL27A, RPLP0, RPL5, RPS25, RPS29, RPS27A, RPL41, HNRNPA1,
+RPL10A, RPL4, RPL19, RPL3, RPS3, RPL7A, SEPTIN11, RPL28, RPLP1, RPS9, RPL23,
+RPL13, RPS20, RPL10, RPL23A, RPL11, RPS15, RPL21, RPS27, RPS16, RPS4X, RPL14,
+RPL35, H2AZ2, RPL29, RPSA, RPL12, RPL27, RPS12, DARS1, RPL18, RPL36, RPS3A,
+SSTR2, DOP1B, ITPRID1, ASNS, AC025159.1, MARCHF1, RPS6KL1, TAFA1, BAIAP2-DT,
+SEPTIN6, PWAR6, AC124312.1, TAFA5, TPTEP2-CSNK1E, SARS1, POU3F3, PLAAT3,
+ITPRID2, LRATD2, LINC02588, SEPTIN7, MT-CO1, MT-ND3, GASK1B, MT-CO2, MT-CYB,
+RPL22L1, MT-CO3, MICOS13, PRXL2A, RPS18, SEPTIN2, MT-ATP6, RPS23, RPS5, RPS24,
+MT1X, NARS1, RPL32, MT-ND4, RPS28, RPS15A, MT-ND1, RPL37, RPL30, RPLP2, RPL37A,
+RPL34, SNHG32, RPL31, RPL22, RPS17, LARS1, RPL24, MT-ND6, RPL39,
+AFTER-FLOX.FLAG.NLS.CAS9.DTOM.WPRE.HAL.SV40,
+ICROP-CHONG.GUIDES.AND.BC.MASKED.FIX, LINC02197, MARCHF4, MRTFA, AC009403.1,
+ILF3-DT, TAFA2, SHLD2, RAB30-DT, MT-ND5, SLC49A4, CDKL3, GARS1, MT-ND2, H4C3,
+H1-5, H1-2, H1-3, H3C2, H2AC20, H1-4, H2AC11, H2AC12, H3C8, H2AC14, H2BC9,
+H4C4, H3C7, H2AC8, H4C8, H2BC4, H3C12, H2AC13, H2BC13, H2AC21, H2AC17, H4C5,
+RRM2.1, H2BC15, H2AX, H3C10, AC091057.6, H2BC18, H2AC4, H2AC15, H3C11, H2BC17,
+H2AZ1, H2BC7, H3C6, H2AC6, MACROH2A1, SEPTIN10, EFCAB11, H1-10, UMAD1,
+AC006296.1, H2BC5, H2AW, H2BC8, H2BC6, MRPS6, H1-0, CRPPA, IDO1, AL353747.4,
+LINC00513.1, AL035078.4, SEPTIN9, ARL6IP1, CALM2, TENT4A, RPL39L, CU633967.1,
+AP002495.2, PLAAT1, GMDS-DT, SLC10A1, IARS1, CAPN10-DT, AL355075.4, ZNF229,
+LNCTAM34A, CERT1, AARS1, RPS26, RPS10-NUDT3, ELFN2, AL662796.1, LINC02160,
+CCN3, MARCHF3, AC092040.1, NUP50-DT, DIPK1A, RPS6KA6, MT-ND4L, RARS1, NECAP1,
+DHRS4L2, H2AJ, RELCH, RPS6KA5, SNHG30, MT-ATP8, MRTFB, MTRNR2L8, MTRNR2L12,
+DPH6-DT, CCN4, TUT4, COL3A1, POSTN, AL513283.1, SRPX2, FGF10-AS1, BGN,
+AC010737.1, HEYL, ALDH1A3, CYTL1, EDN3, LINC01116, ABCA9, CH25H, CXCL6, LAMC3,
+PIK3R6, SIM1, MYHAS, TBX2, IL1R1, CXCL1, CCL11, LINC02172, APELA, CARMN,
+VSIG10L2, DPT, AC112721.2, RFX8, AC062004.1, TNFRSF4, TNFRSF18, DIRC1, MYL9,
+PRF1, HTRA3, GGT5, CAVIN3, SH3TC1, RBMS3-AS2, LINC01568, HOXD3, XAF1, TRIM38,
+WNT2, PALM2AKAP2, HOXB3, FLI1, CSPG4, AC005291.1, FMOD, MRGPRF, LTBR, TMEM204,
+HOXD10, FZD10, GPR174, OLFML1, LINC01117, LINC01679, TNNT3, AC026904.4, TXNDC5,
+AC092114.1, AC116345.1, MEOX1, LINC02507, VDR, POGLUT3, LY96, ABO, AC090617.5,
+DENND2B, TENT5A, ADAMTS9-AS1, NIBAN1, OGN, AC098850.3, AC090617.4, FGL1, CD40,
+WARS1, CCDC200, FP671120.1, TASOR2, FP236383.1, TARS1, AC096711.2, RPS21, FBH1,
+ARL6IP4, RPL36AL.</code></pre>
+<p><img src="figure/02_02_Clustering_Mapping_scRNA.Rmd/unnamed-chunk-2-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Saving 7 x 5 in image</code></pre>
+<p><img src="figure/02_02_Clustering_Mapping_scRNA.Rmd/unnamed-chunk-3-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>             Cluster
+KnoblichType   0  1  2  3  4  5  6  7  8  9 10 11 12 13
+  knoblich_01 71  3  4  5  0  6  0  1 28  0 12  5 43 28
+  knoblich_02  0  0  0  3  1  0 18  0  9  1  2  1  1  0
+  knoblich_03  2  5 28 11  0  2  2  4  1  5 19  2  5  0
+  knoblich_04  0  0  0 12  1  0 32  1  0  0  5  0  0  0
+  knoblich_05  0  7  6  2  0  1  0 20  0  0  6 59  5  1
+  knoblich_06  0  0  0  0  4  0  0  0  0 11  0  0  0  0
+  knoblich_07 20 41 43 23 28 50 13 42 44 33 33 20 36 19
+  knoblich_08  0 20  0 30 12 25  7 10  7  3 10  1  0  0
+  knoblich_09  3  0  0  0  6  2  1  1  9 31  0  0  0  0
+  knoblich_10  1  0  0  9 44  1 22  0  0  7  1  1  0  0
+  knoblich_12  0  0  2  0  0  0  1  0  0  0  3  0  0  0
+  knoblich_13  2  4  9  0  0  1  1  5  0  0  0  5  7  5
+  knoblich_14  1 17  1  0  0  3  1 16  0  1  0  6  3  1
+  knoblich_15  0  0  0  3  0  0  2  0  0  0  4  0  0  0
+  knoblich_16  0  3  7  2  4  9  0  0  2  8  5  0  0  0</code></pre>
+<pre><code>Warning in chisq.test(crosstab): Chi-squared approximation may be incorrect</code></pre>
+<pre><code>
+    Pearson&#39;s Chi-squared test
+
+data:  crosstab
+X-squared = 2429.9, df = 182, p-value &lt; 2.2e-16</code></pre>
+<pre><code>           used  (Mb) gc trigger   (Mb)  max used   (Mb)
+Ncells 10188622 544.2   17926108  957.4  17926108  957.4
+Vcells 78404804 598.2  258868752 1975.1 323585939 2468.8</code></pre>
+</div>
+<div id="knoblich-map-to-annotation" class="section level2">
+<h2>Knoblich Map to annotation</h2>
+<pre><code>Warning: useNames = NA is deprecated. Instead, specify either useNames = TRUE
+or useNames = FALSE.</code></pre>
+<p><img src="figure/02_02_Clustering_Mapping_scRNA.Rmd/unnamed-chunk-5-1.png" width="960" style="display: block; margin: auto;" /></p>
+<pre><code>Saving 10 x 5 in image</code></pre>
+<pre><code>    
+     Astrocytes ccRG ccvRG CGE_IN CGE_LGE_IN  INP   IP  L23   L4  L56 L6_CThPN
+  0           1    0     1   1852          7   20    2    0    0    3        0
+  1          16    0     0     15          0    3  119   63   53 1428       13
+  2          11    0     0      8          0    0    3  585   11   64      188
+  3         158   34     0      1          0    1    7    0    0    1        0
+  4          10  219   287      8          0   81    3    0    0    0        0
+  5          11   22     7      5          1    4  387    0    0  143        0
+  6         431    0    15      1          0   34    2    0    0    0        0
+  7           5    0     0     12          0    0   43   58    8  364       39
+  8           3    0     6    208         10  160    0    0    0    0        0
+  9           0  135   214      0          0    1    1    0    0    0        0
+  10         75   11     0      3          0    3   17    0    0    0        0
+  11         10    0     1     30          1    0   28   20    1   53       81
+  12          4    0     1    202          1    9    0    1    0    1        0
+  13          0    0     0     54          0    0    0    0    0    0        0
+    
+     LGE_IN mesenchyme  oRG   RG  vRG
+  0     121          0    1    0    0
+  1       1          0    1    0    0
+  2       0          0    0    0    0
+  3       0          0  432   12    1
+  4       1          0    1    0    7
+  5       0          0    7    0    0
+  6       1          0    0    0   67
+  7       0          0    0    0    0
+  8      12          0    0    0    0
+  9       0          0    0    0    0
+  10      0          1  217    4    1
+  11      1          0    0    0    0
+  12      5          0    0    0    0
+  13      0          0    0    0    0</code></pre>
+<p><img src="figure/02_02_Clustering_Mapping_scRNA.Rmd/unnamed-chunk-6-1.png" width="1152" style="display: block; margin: auto;" /></p>
+<pre><code>Saving 12 x 12 in image</code></pre>
+<pre><code>           used  (Mb) gc trigger   (Mb)  max used   (Mb)
+Ncells 10274248 548.8   17926108  957.4  17926108  957.4
+Vcells 79031610 603.0  515546164 3933.4 805540880 6145.8</code></pre>
+</div>
+<div id="kanton-et-al-table-4-celltypes" class="section level2">
+<h2>Kanton et al Table 4 Celltypes</h2>
+<pre><code>Warning in data_preprocess(expr, anno_processed): The following specified
+marker genes are not found from the expression data: SSTR2, HMP19, VAMP2, HN1,
+NEUROD1, TMEM35, PAK7, MLLT4, SEP 03, ATP1A3, COMMD3, RPS6KL1, AC004158.3,
+RP11-490M8.1, TMEM57, NDUFC2, NECAP1, RP11-395G23.3, RPL36A, ASNS, ALDOC,
+RP11-148B6.1, POU5F1, L1TD1, TDGF1, LIN28A, LINC00678, RPS2, RPL12, MT-CO2,
+FOXD3-AS1, LECT1, KIAA0101, MYL9, RP11-1144P22.1, MT-ND4, RPS6, MT-CO3, RPL8,
+D21S2088E, MT-CO1, RPL39L, MT-ND6, RPLP1, RPL22L1, RPS18, MT1X, OAZ1, MT-CYB,
+RPS29, TSTD1, RPL3, ZFP42, EEF1E1, RPS12, RPL15, FKBP1A, RPS3, APELA, ARL2,
+PLPP2, RP11-568A7.4, GCSH, PRR13, RPL7, EMG1, RPS27A, RPS9, RPSA, FAM60A,
+ATP5I, MT-ATP6, RPL18A, STRA13, CLDN7, SEPW1, TAF9, RP11-12G12.7, NANOG,
+RPL13A, RP11-469A15.2, RPLP0, PWAR6, RPL23A, RPS5, RPS23, RPL19, C11ORF73,
+FAM195A, RPL10A, RPS19BP1, MT-ND1, RPS7, PMF1, CNPY2, NMRK2, SPTSSA, SHFM1,
+ZSCAN10, RPS3A, FOXH1, FXN, EXOSC3, TMEM14B, MRPL12, RPL11, C11ORF31, IRX2,
+RPS28, GNB2L1, RPS16, RPS14, RPL28, RPS19, RPL13, RPL27A, RPS27, RPL35,
+RPL36AL, B3GNT7, RP11-132A1.3, DANT1, PRKCDBP, TRIML2, RPL4, RPS4X, PARL,
+ARL6IP4, RPS26, RPL7A, RP11-89K21.1, RPS20, RPL14, SEPP1, RPL10, RPS8, HILPDA,
+RPL18, RPL29, TMEM261, RPL5, RPL9, FEN1, C14ORF166, RPL24, HN1L, RPS17, OVOS2,
+RPL21, RP11-11N9.4, RPL23, MRPS6, ATP5G3, NME1, ADSL, RP11-20D14.6, FAM64A,
+CTSD, LIMD2, ATP5G1, ATPIF1, ATP5H, UFD1L, ATP5B, SDHD, C19ORF60, APOA1BP,
+NAA10, CLN6, MT-ND2, POU5F1B, ATP5A1, HRSP12, LINC00545, NGFRAP1, ATP5F1,
+C14ORF1, ATP5D, CALM2, AC004540.4, C10ORF35, SEP 06, WHSC1L1, ATP5E, PRRT2,
+LINC01420, NDUFB8, FAM127A, SMARCC2, FAM65B, C11ORF96, RPL38, C19ORF43, SEP 07,
+USMG5, FAM215B, APOPT1, WBP5, MT-ND4L, PNMAL1, PRR4, ZNF503, GUCY1A3, LHFP,
+MT-ND3, RP11-382A20.3, MT-ND5, HSD11B1L, LINC00969, TCTEX1D2, SOX2, RPS27L,
+RPS24, C8ORF4, RPL39, RPL41, RPS15, RPL37, RPS15A, RPS11, RPL36, RPL30, RPL37A,
+RPL35A, RPS21, RPS10, RPL17, SEP 11, FAM92A1, GLTSCR2, RP3-395M20.12, RPL6,
+ATP5G2, SEP 02, LINC00998, RP11-620J15.3, HIGD1A, BORCS7, KDELR2, SIX6,
+HNRNPA1, COL13A1, RP11-96L14.7, RPL34, RPL26, FAM175A, PVRL2, SGOL2, SGOL1,
+CASC5, ARHGAP11B, KIAA1524, GSX2, SPAG5, COX8A, POU3F3, TP53I13, CCDC109B,
+WHSC1, RHNO1, ARL6IP1, PTGDS, RP11-849I19.1, UG0898H09, RP11-436D23.1,
+CTD-2336O2.1, SPG20, RP3-525N10.2, KIAA1715, SELK, GBAS, LEPROT, EIF4A1,
+RP11-356J5.12, ADRBK2, GUCY1B3, FAM134B, KIAA2022, RPRM, C6ORF1, PCDHA12,
+LINC00657, RP1-39G22.7, FAM134A, ABHD14A, EBLN3, SATB1, MIF, RPL22,
+RP11-798M19.6, RPS13, BEND5, CRYZL1, FAM63B, RPS25, RPL32, RPL31, RPLP2, RPL27,
+RAD51, C9ORF142, CTB-193M12.5, METTL10, CTB-50L17.10, SEP 10, VKORC1, ATP5J2,
+NEDD8, C14ORF2, TCEB2, TCEB1, PSMA2, TMEM256, TMEM141, RBM7, TIMM10B, COL3A1,
+BGN, POSTN, OGN, CDC42EP5, INSC, IGF2, TFAP2B, CYTL1, FXYD1, IFITM1, SELM,
+PDLIM2, SEP 09, ARPC1A, PDE6H, PGM5P3-AS1, LINC00305, TRAC, C1ORF168, SLC4A5,
+PTRF, MICA, GRAMD3, AC007325.4, SLC5A3, ORAI3, UQCR11, TMEM205, SYS1, UNC119,
+ATP5L, MMP24-AS1, BLOC1S1, MINOS1, C7ORF73, HIGD2A.</code></pre>
+<p><img src="figure/02_02_Clustering_Mapping_scRNA.Rmd/unnamed-chunk-9-1.png" width="1728" style="display: block; margin: auto;" /></p>
+<pre><code>Saving 18 x 5 in image</code></pre>
+<p><img src="figure/02_02_Clustering_Mapping_scRNA.Rmd/unnamed-chunk-9-2.png" width="1728" style="display: block; margin: auto;" /></p>
+<pre><code>Saving 18 x 5 in image</code></pre>
+<p><img src="figure/02_02_Clustering_Mapping_scRNA.Rmd/unnamed-chunk-10-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>                                   Cluster
+KantonT4Type                         0  1  2  3  4  5  6  7  8  9 10 11 12 13
+  choroid plexus                     0  0  1  3  0  0  2  0  0  0  7  0  0  0
+  cortical neurons 1                 0  0  9  0  0  0  1  1  0  0  2  6  0  0
+  cortical neurons 2                 2  5 33  1  0  3  0  4  1  1  7  5  6  5
+  G2M/S dorsal progenitors 1         0  0  0  1  0  0  1  0  0  1  0  0  0  0
+  G2M/S dorsal progenitors 2         0  0  0  2  9  0  1  0  0  7  4  1  0  0
+  G2M/S NPCs                         0  0  0  0 23  0  1  0  0 19  0  0  0  0
+  G2M/S ventral progenitors and IPs  0  1  0  0 25  4  2  1  1 39  0  0  0  0
+  gliogenic/outer radial glia        1  0  1 29  1  1 44  2  1  4 33  1  4  1
+  IPs and early cortical neurons     0 28  3  6 13 51  6 23 28  4  2  4  1  0
+  mesenchymal-like cells             0  0  0  3  1  0  5  0  0  0  4  0  0  0
+  midbrain/hindbrain                 6 14 11  5  0  5  1 11  7  0  8  4  1  6
+  neuroectodermal-like cells         0  0  0  0  0  0  1  1  0  0  0  0  0  0
+  NSC/radial glia                    0  0  0  0  0  0  2  0  0  0  0  0  0  0
+  radial glia 1                      0  0  0 20  0  0  6  0  0  0  0  0  0  0
+  radial glia 2                      0  0  0  0  0  0  1  0  0  0  2  0  0  0
+  stem cells 1                       0  0  0  1  0  0  0  0  0  0  4  0  0  0
+  stem cells 2                       0  0  0  4  5  0  6  0  0  2  1  1  0  0
+  stem cells 3                       0  0  0  5  6  1  4  1  1  0  2  0  0  0
+  ventral progenitors and neurons 1 41 35 34  7  6  7  8 37 34  8  6 21 40 29
+  ventral progenitors and neurons 2 47  7  1  3  3  3  6 17 18  1 13 56 45  8
+  ventral progenitors and neurons 3  3  9  7  9  7 20  0  2  8 12  5  1  3  5
+  ventral progenitors and neurons 4  0  1  0  1  1  5  2  0  1  2  0  0  0  0</code></pre>
+<pre><code>Warning in chisq.test(crosstab): Chi-squared approximation may be incorrect</code></pre>
+<pre><code>
+    Pearson&#39;s Chi-squared test
+
+data:  crosstab
+X-squared = 2415, df = 273, p-value &lt; 2.2e-16</code></pre>
+</div>
+<div id="kanton-et-al-table-14-celltypes" class="section level2">
+<h2>Kanton et al Table 14 Celltypes</h2>
+<pre><code>Warning in data_preprocess(expr, anno_processed): The following specified
+marker genes are not found from the expression data: KCNIP4-IT1, MEG3, CALM2,
+SATB1, MAG, PTGDS, CLDN11, MIR219A2, KLK6, OPALIN, SEP 04, RNASE1, SEP 07,
+ATP5E, RPS9, RPS26, MT-CO2, RPL27A, RPL18, RPS15, RPL10, RPL19, RPL13, NDUFA13,
+RPL13A, RPL21, ATP5I, RPS27A, RPS28, RPL37, RPS18, RPL35, RPL24, RPL32, RPLP1,
+C14ORF2, RPL28, RPS27, RPL35A, RPL23A, RPS2, RPS19, ATP1A3, PEG3, HGNC:24955,
+ALDOC, PWAR6, ARL6IP1, MT-CO3, MT1X, CST1, FXYD1, RPS25, RPL41, RPS24, RPL31,
+RPL26, RPL36A, RPL11, RPS20, RPS12, RPS23, SLC38A11, RPS6, RPL37A, RPL34,
+RPS14, RPL36AL, RPS13, RPS21, RPL7, RPS29, COX7A1, RPL23, RPL38, RPS3A, RPL30,
+RPL39, RPL36, RPL12, RPL22, RPS10, RPS8, RPL27, RPLP2, RPL14, RPS7, ATP5EP2,
+RPS16, RPS4X, RPL9, RPS3, UQCR11, RPS17, RPL5, MINOS1, RPSA, TESPA1, USMG5,
+RPS15A, RPL6, RPS11, RPL18A, ATP5J2, PPP3R1, RPL8, ATPIF1, RPL3, RPL15, ATP5G2,
+ATP5L, RPL4, RPL10A, VAMP2, COX8A, RPS5, SELENOH, NEDD8, MT-ND1, TGM2, ADIRF,
+MT-CYB, MT-ND2, OAZ1.</code></pre>
+<p><img src="figure/02_02_Clustering_Mapping_scRNA.Rmd/unnamed-chunk-11-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/02_02_Clustering_Mapping_scRNA.Rmd/unnamed-chunk-11-2.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>            Cluster
+Kanton14Type  0  1  2  3  4  5  6  7  8  9 10 11 12 13
+     Ast      3  3 19 35  4  3 35  3  2  5 51  3  7  1
+     End/Per  3 37  4 25 39 51 12 29 37 26 20 38 15 13
+     Ex      31 34 22  5  7  8  2 39  6  4  5 42 27 24
+     In      40  0  0  0  1  0  1  0 10  0  0  4 13  6
+     Mic     11  3  4  6  2  5  4  4  4  2  1  1  6  1
+     Oli      3 12 31 15 37 23  6  6  9 60 21  6 18  2
+     OPC      9 11 20 14 10 10 40 19 32  3  2  6 14  7</code></pre>
+<pre><code>Warning in chisq.test(crosstab): Chi-squared approximation may be incorrect</code></pre>
+<pre><code>
+    Pearson&#39;s Chi-squared test
+
+data:  crosstab
+X-squared = 1093.7, df = 78, p-value &lt; 2.2e-16</code></pre>
+<pre><code>           used  (Mb) gc trigger   (Mb)  max used   (Mb)
+Ncells 10244505 547.2   17926108  957.4  17926108  957.4
+Vcells 78814818 601.4  329961533 2517.5 805540880 6145.8</code></pre>
+</div>
+<div id="humandevdata-map-to-annotation" class="section level2">
+<h2>HumanDevData Map to annotation</h2>
+<pre><code>.
+HsapDv:0000099 HsapDv:0000100 HsapDv:0000101 HsapDv:0000102 HsapDv:0000103 
+         36490         210331          16843          83258          34820 
+HsapDv:0000104 HsapDv:0000105 HsapDv:0000106 HsapDv:0000107 HsapDv:0000108 
+         26622          30871          25957          11630          23178 </code></pre>
+<pre><code>.
+                b&#39;Brain&#39;       b&#39;Caudate-Putamen&#39;            b&#39;Cerebellum&#39; 
+                   25722                     3965                    42608 
+               b&#39;Cortex&#39;          b&#39;Cortical hem&#39;          b&#39;Diencephalon&#39; 
+                   44764                     2107                    10338 
+      b&#39;Dorsal midbrain&#39;     b&#39;Enthorinal cortex&#39;      b&#39;Forebrain cortex&#39; 
+                   13075                     3230                     4769 
+            b&#39;Forebrain&#39; b&#39;Frontotemporal cortex&#39;                  b&#39;Head&#39; 
+                   58623                     6732                     2034 
+            b&#39;Hindbrain&#39;           b&#39;Hippocampus&#39;          b&#39;Hypothalamus&#39; 
+                   14771                    10478                    14098 
+         b&#39;Lower cortex&#39;               b&#39;Medulla&#39;         b&#39;Mesencephalon&#39; 
+                    5446                    38461                    48963 
+             b&#39;Midbrain&#39;      b&#39;Occipital cortex&#39;                  b&#39;Pons&#39; 
+                    9984                     4063                    18849 
+           b&#39;Pons/Cereb&#39;          b&#39;Pons/Medulla&#39;              b&#39;Striatum&#39; 
+                   10061                     4109                    28578 
+            b&#39;Subcortex&#39; b&#39;Subcortical forebrain&#39;      b&#39;Tel/diencephalon&#39; 
+                    8736                    16143                     5033 
+        b&#39;Telencephalon&#39;              b&#39;Thalamus&#39;          b&#39;Upper cortex&#39; 
+                    2161                    33097                     4043 
+     b&#39;Ventral midbrain&#39; 
+                    4959 </code></pre>
+<pre><code>.
+              b&#39;Brain&#39;     b&#39;Caudate+Putamen&#39;          b&#39;Cerebellum&#39; 
+                 25722                   3965                  42608 
+  b&#39;Cortex entorhinal&#39;      b&#39;Cortex frontal&#39; b&#39;Cortex hemisphere A&#39; 
+                  3230                   6732                   2128 
+b&#39;Cortex hemisphere B&#39;    b&#39;Cortex occipital&#39;     b&#39;Cortex parietal&#39; 
+                  3921                   4063                   4043 
+    b&#39;Cortex temporal&#39;              b&#39;Cortex&#39;        b&#39;Cortical hem&#39; 
+                  5446                  43484                   2107 
+       b&#39;Diencephalon&#39;           b&#39;Forebrain&#39;                b&#39;Head&#39; 
+                 10338                  63656                   2034 
+          b&#39;Hindbrain&#39;         b&#39;Hippocampus&#39;        b&#39;Hypothalamus&#39; 
+                 18880                   4691                  14098 
+            b&#39;Medulla&#39;     b&#39;Midbrain dorsal&#39;    b&#39;Midbrain ventral&#39; 
+                 38461                  13075                   4959 
+           b&#39;Midbrain&#39;                b&#39;Pons&#39;            b&#39;Striatum&#39; 
+                 58947                  28910                  28578 
+          b&#39;Subcortex&#39;       b&#39;Telencephalon&#39;            b&#39;Thalamus&#39; 
+                 30666                   2161                  33097 </code></pre>
+<pre><code>.
+           b&#39;Brain&#39;       b&#39;Cerebellum&#39;           b&#39;Cortex&#39;     b&#39;Diencephalon&#39; 
+              25722               42608               75154               10338 
+       b&#39;Forebrain&#39;             b&#39;Head&#39;        b&#39;Hindbrain&#39;      b&#39;Hippocampus&#39; 
+              63656                2034               18880                4691 
+    b&#39;Hypothalamus&#39;          b&#39;Medulla&#39;  b&#39;Midbrain dorsal&#39; b&#39;Midbrain ventral&#39; 
+              14098               38461               13075                4959 
+        b&#39;Midbrain&#39;             b&#39;Pons&#39;         b&#39;Striatum&#39;        b&#39;Subcortex&#39; 
+              58947               28910               32543               30666 
+   b&#39;Telencephalon&#39;         b&#39;Thalamus&#39; 
+               2161               33097 </code></pre>
+<pre><code>.
+                b&#39;Brain&#39;       b&#39;Caudate-Putamen&#39;            b&#39;Cerebellum&#39; 
+                   25722                     3965                    42608 
+               b&#39;Cortex&#39;          b&#39;Cortical hem&#39;          b&#39;Diencephalon&#39; 
+                   44764                     2107                    10338 
+      b&#39;Dorsal midbrain&#39;     b&#39;Enthorinal cortex&#39;      b&#39;Forebrain cortex&#39; 
+                   13075                     3230                     4769 
+            b&#39;Forebrain&#39; b&#39;Frontotemporal cortex&#39;                  b&#39;Head&#39; 
+                   58623                     6732                     2034 
+            b&#39;Hindbrain&#39;           b&#39;Hippocampus&#39;          b&#39;Hypothalamus&#39; 
+                   14771                    10478                    14098 
+         b&#39;Lower cortex&#39;               b&#39;Medulla&#39;         b&#39;Mesencephalon&#39; 
+                    5446                    38461                    48963 
+             b&#39;Midbrain&#39;      b&#39;Occipital cortex&#39;                  b&#39;Pons&#39; 
+                    9984                     4063                    18849 
+           b&#39;Pons/Cereb&#39;          b&#39;Pons/Medulla&#39;              b&#39;Striatum&#39; 
+                   10061                     4109                    28578 
+            b&#39;Subcortex&#39; b&#39;Subcortical forebrain&#39;      b&#39;Tel/diencephalon&#39; 
+                    8736                    16143                     5033 
+        b&#39;Telencephalon&#39;              b&#39;Thalamus&#39;          b&#39;Upper cortex&#39; 
+                    2161                    33097                     4043 
+     b&#39;Ventral midbrain&#39; 
+                    4959 </code></pre>
+<pre><code>                 development_stage_ontology_term_id
+CellClass         HsapDv:0000099 HsapDv:0000100 HsapDv:0000101 HsapDv:0000102
+  b&#39;Erythrocyte&#39;             178            489             42            308
+  b&#39;Fibroblast&#39;             4009            117              0            470
+  b&#39;Glioblast&#39;                 2           1064           1019           6072
+  b&#39;Immune&#39;                   72            329             31            250
+  b&#39;Neural crest&#39;            113             48              0             22
+  b&#39;Neuroblast&#39;             5254          37245           2935          12777
+  b&#39;Neuron&#39;                 8655          64546           5811          37036
+  b&#39;Neuronal IPC&#39;            655          10264           2101           5755
+  b&#39;Oligo&#39;                     1             17              8            175
+  b&#39;Placodes&#39;                104            155              0              1
+  b&#39;Radial glia&#39;           17349          95493           4828          20056
+  b&#39;Vascular&#39;                 98            564             68            336
+                 development_stage_ontology_term_id
+CellClass         HsapDv:0000103 HsapDv:0000104 HsapDv:0000105 HsapDv:0000106
+  b&#39;Erythrocyte&#39;             126             27            460            568
+  b&#39;Fibroblast&#39;              475              0            439             15
+  b&#39;Glioblast&#39;              5359           3168           5959           7458
+  b&#39;Immune&#39;                  139             49            326            284
+  b&#39;Neural crest&#39;             32              0             34             12
+  b&#39;Neuroblast&#39;             4949           4828           6165           5858
+  b&#39;Neuron&#39;                13509          10008          12009           6640
+  b&#39;Neuronal IPC&#39;           2934           2180           2627           2449
+  b&#39;Oligo&#39;                   208             58            235            456
+  b&#39;Placodes&#39;                  2              0              0              0
+  b&#39;Radial glia&#39;            6894           6247           2118           1697
+  b&#39;Vascular&#39;                193             57            499            520
+                 development_stage_ontology_term_id
+CellClass         HsapDv:0000107 HsapDv:0000108
+  b&#39;Erythrocyte&#39;              58            427
+  b&#39;Fibroblast&#39;               37            201
+  b&#39;Glioblast&#39;              3073           6456
+  b&#39;Immune&#39;                  164            665
+  b&#39;Neural crest&#39;              6              1
+  b&#39;Neuroblast&#39;             1929           4135
+  b&#39;Neuron&#39;                 3763           6521
+  b&#39;Neuronal IPC&#39;           1223           2625
+  b&#39;Oligo&#39;                   311            402
+  b&#39;Placodes&#39;                  0              0
+  b&#39;Radial glia&#39;             839            851
+  b&#39;Vascular&#39;                227            894</code></pre>
+<pre><code>Loading required package: AnnotationDbi</code></pre>
+<pre><code>
+Attaching package: &#39;AnnotationDbi&#39;</code></pre>
+<pre><code>The following object is masked from &#39;package:dplyr&#39;:
+
+    select</code></pre>
+<pre><code></code></pre>
+<pre><code>&#39;select()&#39; returned 1:many mapping between keys and columns</code></pre>
+<pre><code>            used   (Mb) gc trigger    (Mb)   max used    (Mb)
+Ncells  11346585  606.0   17926108   957.4   17926108   957.4
+Vcells 156500417 1194.1 5398859944 41190.1 6214217109 47410.8</code></pre>
+<pre><code>Normalizing layer: counts</code></pre>
+<pre><code>Centering and scaling data matrix</code></pre>
+<pre><code>Finding variable features for layer counts</code></pre>
+<pre><code>PC_ 1 
+Positive:  IFITM3, FN1, IGFBP7, B2M, COL4A1, GNG11, FCGRT, HLA.E, S100A11, EGFL7 
+       ENG, COBLL1, FLT1, KLF2, ADGRF5, ESAM, A2M, MYL12A, C1orf54, DLC1 
+       ETS1, CYBA, COL4A2, SERPINH1, FOXQ1, MYH9, FLI1, ITM2A, NID1, VAMP5 
+Negative:  CADM1, STMN2, DCC, DLGAP1, HES6, GAP43, FABP7, MYT1L, PPP2R2B, BCL11B 
+       NRG1, EPHA5, SLC44A5, LINC01122, ADGRV1, GRIA1, LOC101927314, GRIA2, ASCL1, DPP10 
+       TENM2, SOX6, KCNB2, PCDH9, GRIK2, INA, NKAIN3, ERBB4, GRIA4, NCAM2 
+PC_ 2 
+Positive:  C1QC, TYROBP, AIF1, C1QB, SPP1, C1QA, LAPTM5, CSF1R, DOCK8, CD53 
+       SAMSN1, LY86, CD68, FOLR2, TREM2, PLD4, CX3CR1, ITGB2, RGS10, FCER1G 
+       C3, APBB1IP, PTPRC, VSIG4, ADAM28, HPGDS, CYBB, SPI1, FCGR1A, MNDA 
+Negative:  CALD1, SPARC, FN1, COL4A2, COL4A1, CDH11, LAMA4, AKAP12, PTN, LHFPL6 
+       DLC1, RORA, IFITM3, COL5A2, GNG11, COBLL1, VIM, BGN, IGFBP7, SEMA5A 
+       FOXC1, COL1A2, SPTBN1, UACA, MYO1B, COL18A1, NID1, ITIH5, EDNRA, NR2F2 
+PC_ 3 
+Positive:  COL1A2, PLAC9, COL1A1, PCOLCE, COLEC12, LUM, LGALS1, LAMA2, FRZB, COL6A3 
+       EDNRA, ATP1A2, ADAM12, SIDT1, TMEM132C, SLC6A13, COL18A1, TBX18, COL6A1, OGN 
+       ABCA9, ISLR, CYP1B1, ITIH5, CD248, BMP5, MYOF, SLC6A1, PTGDS, ITGA8 
+Negative:  CLDN5, ADGRL4, SOX18, SLC7A5, SLC38A5, CD34, PTPRB, TIE1, EDN1, ROBO4 
+       SLC7A1, CD93, TM4SF18, DIPK2B, ICAM2, SRARP, KDR, ENSG00000279686, SOX17, FLT1 
+       PODXL, VWF, AFAP1L1, SPINK8, TEK, ST8SIA6, SLC2A1, PRKCH, ABCB1, MMP28 
+PC_ 4 
+Positive:  CCDC3, RGS5, KCNJ8, HIGD1B, ABCC9, ITGA1, FOXS1, TBX2, RASL12, MIR4435.2HG 
+       ENSG00000280878, CYTOR, HEYL, FAM162B, CSPG4, PRELP, SLC38A11, NODAL, GUCY1A2, AGRN 
+       PDGFRB, LINC01099, ENSG00000249669, ADAMTS18, TESC, TFPI, FOXF2, GJC1, PRKG1, MGLL 
+Negative:  PTGDS, OGN, ISLR, COL6A3, COL1A1, SLC7A11, CYP1B1, SLC6A13, CXCL12, KCNK2 
+       COL15A1, BMP5, EDN3, BMP6, ARHGAP20, CMBL, FAP, SERPIND1, COL13A1, VCAN 
+       TMEM132C, ITGA8, TGFBR3, WNT4, WFIKKN2, LAMA2, AHNAK, SNED1, C16orf89, CTHRC1 
+PC_ 5 
+Positive:  KCND2, PCDH15, CSMD1, OPCML, OLIG1, DPP6, NTM, LRRC4C, CNTN1, LSAMP 
+       LHFPL3, CA10, SCRG1, CSMD3, OLIG2, GRID2, MDGA2, S100B, NXPH1, LRRTM4 
+       SCN1A, NCAM2, BRINP3, PMP2, PPP2R2B, RIT2, GRID1, NKX2.2, GRIA2, SGCZ 
+Negative:  AHSP, HBA1, ALAS2, HBA2, HBM, SLC25A37, ENSG00000284931, HBG1, GYPB, GYPA 
+       HEMGN, HBQ1, SLC4A1, GYPC, SELENBP1, HBB, MYL4, ENSG00000239920, EPB42, SMIM1 
+       SNCA, MT1G, HBE1, FECH, KLF1, BPGM, C17orf99, RHAG, MT1E, SPTA1 </code></pre>
+<pre><code>Warning: The default method for RunUMAP has changed from calling Python UMAP via reticulate to the R-native UWOT using the cosine metric
+To use Python UMAP via reticulate, set umap.method to &#39;umap-learn&#39; and metric to &#39;correlation&#39;
+This message will be shown once per session</code></pre>
+<pre><code>21:03:14 UMAP embedding parameters a = 0.9922 b = 1.112</code></pre>
+<pre><code>Found more than one class &quot;dist&quot; in cache; using the first, from namespace &#39;BiocGenerics&#39;</code></pre>
+<pre><code>Also defined by &#39;spam&#39;</code></pre>
+<pre><code>21:03:14 Read 17262 rows and found 30 numeric columns</code></pre>
+<pre><code>21:03:14 Using Annoy for neighbor search, n_neighbors = 30</code></pre>
+<pre><code>Found more than one class &quot;dist&quot; in cache; using the first, from namespace &#39;BiocGenerics&#39;</code></pre>
+<pre><code>Also defined by &#39;spam&#39;</code></pre>
+<pre><code>21:03:14 Building Annoy index with metric = cosine, n_trees = 50</code></pre>
+<pre><code>0%   10   20   30   40   50   60   70   80   90   100%</code></pre>
+<pre><code>[----|----|----|----|----|----|----|----|----|----|</code></pre>
+<pre><code>**************************************************|
+21:03:16 Writing NN index file to temp file /tmp/RtmpGurrWW/file4e2f64245f37
+21:03:16 Searching Annoy index using 1 thread, search_k = 3000
+21:03:20 Annoy recall = 99.79%
+21:03:21 Commencing smooth kNN distance calibration using 1 thread with target n_neighbors = 30
+21:03:21 69 smooth knn distance failures
+21:03:23 Initializing from normalized Laplacian + noise (using RSpectra)
+21:03:25 Commencing optimization for 200 epochs, with 703070 positive edges
+21:03:33 Optimization finished
+Computing nearest neighbor graph
+Computing SNN</code></pre>
+<pre><code>Modularity Optimizer version 1.3.0 by Ludo Waltman and Nees Jan van Eck
+
+Number of nodes: 17262
+Number of edges: 592468
+
+Running Louvain algorithm...
+Maximum modularity in 10 random starts: 0.9375
+Number of communities: 31
+Elapsed time: 1 seconds</code></pre>
+<pre><code>            used   (Mb) gc trigger    (Mb)   max used    (Mb)
+Ncells  11447346  611.4   17926108   957.4   17926108   957.4
+Vcells 814076376 6211.0 2211373034 16871.5 6214217109 47410.8</code></pre>
+<p><img src="figure/02_02_Clustering_Mapping_scRNA.Rmd/maphumdev%20plot%20humdev%20ref%20cluster-1.png" width="576" style="display: block; margin: auto;" /></p>
+<pre><code>Warning: useNames = NA is deprecated. Instead, specify either useNames = TRUE
+or useNames = FALSE.</code></pre>
+<p><img src="figure/02_02_Clustering_Mapping_scRNA.Rmd/maphumdevplot%20details-1.png" width="1728" style="display: block; margin: auto;" /></p>
+<pre><code>Saving 18 x 6 in image</code></pre>
+<p><img src="figure/02_02_Clustering_Mapping_scRNA.Rmd/unnamed-chunk-12-1.png" width="1440" style="display: block; margin: auto;" /></p>
+<pre><code>Saving 15 x 8 in image</code></pre>
+<p><img src="figure/02_02_Clustering_Mapping_scRNA.Rmd/maphumdev%20plot%20counts-1.png" width="768" style="display: block; margin: auto;" /></p>
+<pre><code>Saving 8 x 6 in image</code></pre>
+<p><img src="figure/02_02_Clustering_Mapping_scRNA.Rmd/maphumdev%20plot%20bars-1.png" width="1152" style="display: block; margin: auto;" /></p>
+<pre><code>Saving 12 x 6 in image</code></pre>
+<pre><code>Saving 15 x 10 in image
+Saving 15 x 10 in image
+Saving 15 x 10 in image
+Saving 15 x 10 in image
+Saving 15 x 10 in image
+Saving 15 x 10 in image
+Saving 15 x 10 in image
+Saving 15 x 10 in image
+Saving 15 x 10 in image
+Saving 15 x 10 in image
+Saving 15 x 10 in image
+Saving 15 x 10 in image
+Saving 15 x 10 in image
+Saving 15 x 10 in image
+Saving 15 x 10 in image
+Saving 15 x 10 in image
+Saving 15 x 10 in image
+Saving 15 x 10 in image
+Saving 15 x 10 in image
+Saving 15 x 10 in image
+Saving 15 x 10 in image
+Saving 15 x 10 in image
+Saving 15 x 10 in image
+Saving 15 x 10 in image
+Saving 15 x 10 in image
+Saving 15 x 10 in image
+Saving 15 x 10 in image
+Saving 15 x 10 in image
+Saving 15 x 10 in image
+Saving 15 x 10 in image
+Saving 15 x 10 in image
+Saving 15 x 10 in image
+Saving 15 x 10 in image
+Saving 15 x 10 in image
+Saving 15 x 10 in image
+Saving 15 x 10 in image
+Saving 15 x 10 in image
+Saving 15 x 10 in image
+Saving 15 x 10 in image
+Saving 15 x 10 in image
+Saving 15 x 10 in image
+Saving 15 x 10 in image
+Saving 15 x 10 in image
+Saving 15 x 10 in image
+Saving 15 x 10 in image
+Saving 15 x 10 in image
+Saving 15 x 10 in image
+Saving 15 x 10 in image
+Saving 15 x 10 in image
+Saving 15 x 10 in image
+Saving 15 x 10 in image
+Saving 15 x 10 in image
+Saving 15 x 10 in image
+Saving 15 x 10 in image
+Saving 15 x 10 in image
+Saving 15 x 10 in image
+Saving 15 x 10 in image
+Saving 15 x 10 in image
+Saving 15 x 10 in image
+Saving 15 x 10 in image
+Saving 15 x 10 in image
+Saving 15 x 10 in image
+Saving 15 x 10 in image
+Saving 15 x 10 in image
+Saving 15 x 10 in image
+Saving 15 x 10 in image
+Saving 15 x 10 in image
+Saving 15 x 10 in image
+Saving 15 x 10 in image
+Saving 15 x 10 in image
+Saving 15 x 10 in image
+Saving 15 x 10 in image
+Saving 15 x 10 in image
+Saving 15 x 10 in image
+Saving 15 x 10 in image
+Saving 15 x 10 in image
+Saving 15 x 10 in image
+Saving 15 x 10 in image
+Saving 15 x 10 in image
+Saving 15 x 10 in image
+Saving 15 x 10 in image
+Saving 15 x 10 in image
+Saving 15 x 10 in image
+Saving 15 x 10 in image
+Saving 15 x 10 in image
+Saving 15 x 10 in image
+Saving 15 x 10 in image
+Saving 15 x 10 in image
+Saving 15 x 10 in image
+Saving 15 x 10 in image
+Saving 15 x 10 in image
+Saving 15 x 10 in image
+Saving 15 x 10 in image
+Saving 15 x 10 in image
+Saving 15 x 10 in image
+Saving 15 x 10 in image
+Saving 15 x 10 in image
+Saving 15 x 10 in image
+Saving 15 x 10 in image
+Saving 15 x 10 in image
+Saving 15 x 10 in image
+Saving 15 x 10 in image
+Saving 15 x 10 in image
+Saving 15 x 10 in image
+Saving 15 x 10 in image
+Saving 15 x 10 in image
+Saving 15 x 10 in image
+Saving 15 x 10 in image
+Saving 15 x 10 in image
+Saving 15 x 10 in image</code></pre>
+<pre><code>$`1`</code></pre>
+<p><img src="figure/02_02_Clustering_Mapping_scRNA.Rmd/plot%20all%20scores-1.png" width="1440" style="display: block; margin: auto;" /></p>
+<pre><code>
+$`2`</code></pre>
+<p><img src="figure/02_02_Clustering_Mapping_scRNA.Rmd/plot%20all%20scores-2.png" width="1440" style="display: block; margin: auto;" /></p>
+<pre><code>
+$`3`</code></pre>
+<p><img src="figure/02_02_Clustering_Mapping_scRNA.Rmd/plot%20all%20scores-3.png" width="1440" style="display: block; margin: auto;" /></p>
+<pre><code>
+$`4`</code></pre>
+<p><img src="figure/02_02_Clustering_Mapping_scRNA.Rmd/plot%20all%20scores-4.png" width="1440" style="display: block; margin: auto;" /></p>
+<pre><code>
+$`5`</code></pre>
+<p><img src="figure/02_02_Clustering_Mapping_scRNA.Rmd/plot%20all%20scores-5.png" width="1440" style="display: block; margin: auto;" /></p>
+<pre><code>
+$`6`</code></pre>
+<p><img src="figure/02_02_Clustering_Mapping_scRNA.Rmd/plot%20all%20scores-6.png" width="1440" style="display: block; margin: auto;" /></p>
+<pre><code>
+$`7`</code></pre>
+<p><img src="figure/02_02_Clustering_Mapping_scRNA.Rmd/plot%20all%20scores-7.png" width="1440" style="display: block; margin: auto;" /></p>
+<pre><code>
+attr(,&quot;class&quot;)
+[1] &quot;list&quot;      &quot;ggarrange&quot;</code></pre>
+<pre><code>           used  (Mb) gc trigger    (Mb)   max used    (Mb)
+Ncells 11916773 636.5   25248017  1348.4   25248017  1348.4
+Vcells 94377331 720.1 2122982112 16197.1 6214217109 47410.8</code></pre>
+<br>
+<p>
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
+<span class="glyphicon glyphicon-wrench" aria-hidden="true"></span>
+Session information
+</button>
+</p>
+<div id="workflowr-sessioninfo" class="collapse">
+<pre><code>R version 4.3.1 (2023-06-16)
+Platform: x86_64-pc-linux-gnu (64-bit)
+Running under: Ubuntu 22.04.2 LTS
+
+Matrix products: default
+BLAS:   /usr/lib/x86_64-linux-gnu/openblas-pthread/libblas.so.3 
+LAPACK: /usr/lib/x86_64-linux-gnu/openblas-pthread/libopenblasp-r0.3.20.so;  LAPACK version 3.10.0
+
+locale:
+ [1] LC_CTYPE=en_US.UTF-8       LC_NUMERIC=C              
+ [3] LC_TIME=en_US.UTF-8        LC_COLLATE=en_US.UTF-8    
+ [5] LC_MONETARY=en_US.UTF-8    LC_MESSAGES=en_US.UTF-8   
+ [7] LC_PAPER=en_US.UTF-8       LC_NAME=C                 
+ [9] LC_ADDRESS=C               LC_TELEPHONE=C            
+[11] LC_MEASUREMENT=en_US.UTF-8 LC_IDENTIFICATION=C       
+
+time zone: Etc/UTC
+tzcode source: system (glibc)
+
+attached base packages:
+[1] stats4    stats     graphics  grDevices utils     datasets  methods  
+[8] base     
+
+other attached packages:
+ [1] org.Hs.eg.db_3.17.0         AnnotationDbi_1.64.1       
+ [3] scSorter_0.0.2              clustree_0.5.1             
+ [5] ggraph_2.1.0                CATALYST_1.24.0            
+ [7] reshape2_1.4.4              pals_1.8                   
+ [9] gprofiler2_0.2.2            viridis_0.6.4              
+[11] viridisLite_0.4.2           cowplot_1.1.2              
+[13] randomcoloR_1.1.0.1         RCurl_1.98-1.13            
+[15] RColorBrewer_1.1-3          data.table_1.14.10         
+[17] lubridate_1.9.3             forcats_1.0.0              
+[19] stringr_1.5.1               dplyr_1.1.4                
+[21] purrr_1.0.2                 readr_2.1.4                
+[23] tidyr_1.3.0                 tibble_3.2.1               
+[25] tidyverse_2.0.0             scater_1.28.0              
+[27] scuttle_1.10.3              Seurat_5.0.1               
+[29] SeuratObject_5.0.1          sp_2.1-2                   
+[31] SingleCellExperiment_1.24.0 ggpubr_0.6.0               
+[33] ggplot2_3.4.4               SingleR_2.2.0              
+[35] SummarizedExperiment_1.32.0 Biobase_2.62.0             
+[37] GenomicRanges_1.54.1        GenomeInfoDb_1.38.1        
+[39] IRanges_2.36.0              S4Vectors_0.40.2           
+[41] BiocGenerics_0.48.1         MatrixGenerics_1.14.0      
+[43] matrixStats_1.1.0           workflowr_1.7.1            
+
+loaded via a namespace (and not attached):
+  [1] dichromat_2.0-0.1           goftest_1.2-3              
+  [3] Biostrings_2.68.1           TH.data_1.1-2              
+  [5] vctrs_0.6.5                 spatstat.random_3.2-2      
+  [7] digest_0.6.33               png_0.1-8                  
+  [9] shape_1.4.6                 git2r_0.33.0               
+ [11] ggrepel_0.9.4               deldir_2.0-2               
+ [13] parallelly_1.36.0           MASS_7.3-60                
+ [15] httpuv_1.6.13               foreach_1.5.2              
+ [17] withr_2.5.2                 xfun_0.41                  
+ [19] ellipsis_0.3.2              survival_3.5-7             
+ [21] memoise_2.0.1               ggbeeswarm_0.7.2           
+ [23] RProtoBufLib_2.12.1         drc_3.0-1                  
+ [25] systemfonts_1.0.5           ragg_1.2.7                 
+ [27] zoo_1.8-12                  GlobalOptions_0.1.2        
+ [29] gtools_3.9.5                V8_4.4.1                   
+ [31] pbapply_1.7-2               KEGGREST_1.40.1            
+ [33] promises_1.2.1              httr_1.4.7                 
+ [35] rstatix_0.7.2               globals_0.16.2             
+ [37] fitdistrplus_1.1-11         ps_1.7.5                   
+ [39] rstudioapi_0.15.0           miniUI_0.1.1.1             
+ [41] generics_0.1.3              processx_3.8.3             
+ [43] curl_5.2.0                  zlibbioc_1.48.0            
+ [45] ScaledMatrix_1.8.1          polyclip_1.10-6            
+ [47] GenomeInfoDbData_1.2.11     SparseArray_1.2.2          
+ [49] xtable_1.8-4                doParallel_1.0.17          
+ [51] evaluate_0.23               S4Arrays_1.2.0             
+ [53] hms_1.1.3                   irlba_2.3.5.1              
+ [55] colorspace_2.1-0            ROCR_1.0-11                
+ [57] reticulate_1.34.0           spatstat.data_3.0-3        
+ [59] magrittr_2.0.3              lmtest_0.9-40              
+ [61] later_1.3.2                 lattice_0.22-5             
+ [63] mapproj_1.2.11              spatstat.geom_3.2-7        
+ [65] future.apply_1.11.1         getPass_0.2-4              
+ [67] scattermore_1.2             XML_3.99-0.16              
+ [69] RcppAnnoy_0.0.21            pillar_1.9.0               
+ [71] nlme_3.1-164                iterators_1.0.14           
+ [73] compiler_4.3.1              beachmat_2.16.0            
+ [75] RSpectra_0.16-1             stringi_1.8.3              
+ [77] tensor_1.5                  plyr_1.8.9                 
+ [79] crayon_1.5.2                abind_1.4-5                
+ [81] graphlayouts_1.0.2          bit_4.0.5                  
+ [83] sandwich_3.1-0              whisker_0.4.1              
+ [85] codetools_0.2-19            multcomp_1.4-25            
+ [87] textshaping_0.3.7           BiocSingular_1.16.0        
+ [89] bslib_0.6.1                 GetoptLong_1.0.5           
+ [91] plotly_4.10.3               mime_0.12                  
+ [93] splines_4.3.1               circlize_0.4.15            
+ [95] Rcpp_1.0.11                 fastDummies_1.7.3          
+ [97] sparseMatrixStats_1.12.2    knitr_1.45                 
+ [99] blob_1.2.4                  utf8_1.2.4                 
+[101] clue_0.3-65                 fs_1.6.3                   
+[103] listenv_0.9.0               nnls_1.5                   
+[105] DelayedMatrixStats_1.22.6   ggsignif_0.6.4             
+[107] Matrix_1.6-4                callr_3.7.3                
+[109] tzdb_0.4.0                  svglite_2.1.3              
+[111] tweenr_2.0.2                pkgconfig_2.0.3            
+[113] tools_4.3.1                 cachem_1.0.8               
+[115] RSQLite_2.3.4               DBI_1.2.0                  
+[117] fastmap_1.1.1               rmarkdown_2.25             
+[119] scales_1.3.0                grid_4.3.1                 
+[121] ica_1.0-3                   broom_1.0.5                
+[123] sass_0.4.8                  patchwork_1.1.3            
+[125] dotCall64_1.1-1             carData_3.0-5              
+[127] RANN_2.6.1                  farver_2.1.1               
+[129] tidygraph_1.3.0             yaml_2.3.8                 
+[131] cli_3.6.2                   leiden_0.4.3.1             
+[133] lifecycle_1.0.4             uwot_0.1.16                
+[135] mvtnorm_1.2-4               backports_1.4.1            
+[137] BiocParallel_1.34.2         cytolib_2.12.1             
+[139] timechange_0.2.0            gtable_0.3.4               
+[141] rjson_0.2.21                ggridges_0.5.5             
+[143] progressr_0.14.0            parallel_4.3.1             
+[145] jsonlite_1.8.8              RcppHNSW_0.5.0             
+[147] bitops_1.0-7                bit64_4.0.5                
+[149] Rtsne_0.17                  FlowSOM_2.8.0              
+[151] spatstat.utils_3.0-4        BiocNeighbors_1.18.0       
+[153] flowCore_2.12.2             jquerylib_0.1.4            
+[155] highr_0.10                  lazyeval_0.2.2             
+[157] shiny_1.8.0                 ConsensusClusterPlus_1.64.0
+[159] htmltools_0.5.7             sctransform_0.4.1          
+[161] glue_1.6.2                  spam_2.10-0                
+[163] XVector_0.42.0              rprojroot_2.0.4            
+[165] gridExtra_2.3               igraph_1.6.0               
+[167] R6_2.5.1                    labeling_0.4.3             
+[169] cluster_2.1.6               DelayedArray_0.28.0        
+[171] tidyselect_1.2.0            vipor_0.4.7                
+[173] plotrix_3.8-4               maps_3.4.2                 
+[175] ggforce_0.4.1               car_3.1-2                  
+[177] future_1.33.1               rsvd_1.0.5                 
+[179] munsell_0.5.0               KernSmooth_2.23-22         
+[181] htmlwidgets_1.6.4           ComplexHeatmap_2.16.0      
+[183] rlang_1.1.2                 spatstat.sparse_3.0-3      
+[185] spatstat.explore_3.2-5      colorRamps_2.3.1           
+[187] ggnewscale_0.4.9            fansi_1.0.6                
+[189] beeswarm_0.4.0             </code></pre>
+</div>
+</div>
+</div>
+
+
+<!-- Adjust MathJax settings so that all math formulae are shown using
+TeX fonts only; see
+https://docs.mathjax.org/en/latest/web/configuration.html. This will make
+the presentation more consistent at the cost of the webpage sometimes
+taking slightly longer to load. Note that this only works because the
+footer is added to webpages before the MathJax javascript. -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    "HTML-CSS": { availableFonts: ["TeX"] }
+  });
+</script>
+
+
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+
+<script>
+$(document).ready(function ()  {
+
+    // temporarily add toc-ignore selector to headers for the consistency with Pandoc
+    $('.unlisted.unnumbered').addClass('toc-ignore')
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
