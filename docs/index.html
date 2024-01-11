@@ -284,7 +284,7 @@ $(document).ready(function () {
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-report" data-toggle="collapse" data-target="#workflowr-report">
 <span class="glyphicon glyphicon-list" aria-hidden="true"></span>
-workflowr <span class="glyphicon glyphicon-exclamation-sign text-danger"
+workflowr <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span>
 </button>
 </p>
@@ -295,8 +295,8 @@ aria-hidden="true"></span>
 </li>
 <li>
 <a data-toggle="tab" href="#checks"> Checks <span
-class="glyphicon glyphicon-exclamation-sign text-danger"
-aria-hidden="true"></span> </a>
+class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>
+</a>
 </li>
 <li>
 <a data-toggle="tab" href="#versions">Past versions</a>
@@ -309,9 +309,9 @@ aria-hidden="true"></span> </a>
 </p>
 <p>
 <strong>Checks:</strong> <span
-class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 1
+class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 2
 <span class="glyphicon glyphicon-exclamation-sign text-danger"
-aria-hidden="true"></span> 1
+aria-hidden="true"></span> 0
 </p>
 <p>
 <strong>Knit directory:</strong> <code>files/</code> <span
@@ -334,36 +334,33 @@ versions</em> tab lists the development history.
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRMarkdownfilestronguncommittedchanges">
-<span class="glyphicon glyphicon-exclamation-sign text-danger"
-aria-hidden="true"></span> <strong>R Markdown file:</strong> uncommitted
-changes </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRMarkdownfilestronguptodate">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>R Markdown file:</strong> up-to-date
+</a>
 </p>
 </div>
-<div id="strongRMarkdownfilestronguncommittedchanges"
+<div id="strongRMarkdownfilestronguptodate"
 class="panel-collapse collapse">
 <div class="panel-body">
-<p>The R Markdown file has unstaged changes. To know which version of
-the R Markdown file created these results, you’ll want to first commit
-it to the Git repo. If you’re still working on the analysis, you can
-ignore this warning. When you’re finished, you can run
-<code>wflow_publish</code> to commit the R Markdown file and build the
-HTML.</p>
+<p>Great! Since the R Markdown file has been committed to the Git
+repository, you know the exact version of the code that produced these
+results.</p>
 </div>
 </div>
 </div>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomKJPMolgenLabscRNAPAQPRTtreee6ee176f53438a82428b0756717d7c916446bfaetargetblanke6ee176a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomKJPMolgenLabscRNAPAQPRTtreef206c289f1dda0185da1dcbfdc067a262aba4279targetblankf206c28a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/KJPMolgenLab/scRNA_PA_QPRT/tree/e6ee176f53438a82428b0756717d7c916446bfae" target="_blank">e6ee176</a>
+<a href="https://github.com/KJPMolgenLab/scRNA_PA_QPRT/tree/f206c289f1dda0185da1dcbfdc067a262aba4279" target="_blank">f206c28</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomKJPMolgenLabscRNAPAQPRTtreee6ee176f53438a82428b0756717d7c916446bfaetargetblanke6ee176a"
+id="strongRepositoryversionstrongahrefhttpsgithubcomKJPMolgenLabscRNAPAQPRTtreef206c289f1dda0185da1dcbfdc067a262aba4279targetblankf206c28a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -373,7 +370,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/KJPMolgenLab/scRNA_PA_QPRT/tree/e6ee176f53438a82428b0756717d7c916446bfae" target="_blank">e6ee176</a>.
+<a href="https://github.com/KJPMolgenLab/scRNA_PA_QPRT/tree/f206c289f1dda0185da1dcbfdc067a262aba4279" target="_blank">f206c28</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -391,6 +388,7 @@ Ignored files:
     Ignored:    .Rhistory
     Ignored:    .Rprofile
     Ignored:    .Rproj.user/
+    Ignored:    output/05_Bulk_Preprocessing/
 
 Untracked files:
     Untracked:  .bashrc
@@ -409,61 +407,186 @@ Untracked files:
     Untracked:  data/QC_dataFinal.rds
     Untracked:  data/Yoon/
     Untracked:  data/alldata.rds
+    Untracked:  output/01_QC/QC_measures_Violin_filtered.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devCellDevTypeClusterCounts.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devFullDetailsMapped.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Erythrocyte'_HsapDv:0000099.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Erythrocyte'_HsapDv:0000100.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Erythrocyte'_HsapDv:0000101.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Erythrocyte'_HsapDv:0000102.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Erythrocyte'_HsapDv:0000103.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Erythrocyte'_HsapDv:0000104.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Erythrocyte'_HsapDv:0000105.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Erythrocyte'_HsapDv:0000106.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Erythrocyte'_HsapDv:0000107.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Erythrocyte'_HsapDv:0000108.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Fibroblast'_HsapDv:0000099.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Fibroblast'_HsapDv:0000100.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Fibroblast'_HsapDv:0000102.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Fibroblast'_HsapDv:0000103.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Fibroblast'_HsapDv:0000105.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Fibroblast'_HsapDv:0000106.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Fibroblast'_HsapDv:0000107.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Fibroblast'_HsapDv:0000108.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Glioblast'_HsapDv:0000099.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Glioblast'_HsapDv:0000100.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Glioblast'_HsapDv:0000101.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Glioblast'_HsapDv:0000102.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Glioblast'_HsapDv:0000103.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Glioblast'_HsapDv:0000104.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Glioblast'_HsapDv:0000105.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Glioblast'_HsapDv:0000106.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Glioblast'_HsapDv:0000107.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Glioblast'_HsapDv:0000108.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Immune'_HsapDv:0000099.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Immune'_HsapDv:0000100.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Immune'_HsapDv:0000101.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Immune'_HsapDv:0000102.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Immune'_HsapDv:0000103.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Immune'_HsapDv:0000104.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Immune'_HsapDv:0000105.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Immune'_HsapDv:0000106.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Immune'_HsapDv:0000107.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Immune'_HsapDv:0000108.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Neural crest'_HsapDv:0000099.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Neural crest'_HsapDv:0000100.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Neural crest'_HsapDv:0000102.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Neural crest'_HsapDv:0000103.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Neural crest'_HsapDv:0000105.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Neural crest'_HsapDv:0000106.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Neural crest'_HsapDv:0000107.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Neural crest'_HsapDv:0000108.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Neuroblast'_HsapDv:0000099.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Neuroblast'_HsapDv:0000100.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Neuroblast'_HsapDv:0000101.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Neuroblast'_HsapDv:0000102.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Neuroblast'_HsapDv:0000103.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Neuroblast'_HsapDv:0000104.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Neuroblast'_HsapDv:0000105.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Neuroblast'_HsapDv:0000106.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Neuroblast'_HsapDv:0000107.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Neuroblast'_HsapDv:0000108.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Neuron'_HsapDv:0000099.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Neuron'_HsapDv:0000100.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Neuron'_HsapDv:0000101.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Neuron'_HsapDv:0000102.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Neuron'_HsapDv:0000103.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Neuron'_HsapDv:0000104.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Neuron'_HsapDv:0000105.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Neuron'_HsapDv:0000106.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Neuron'_HsapDv:0000107.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Neuron'_HsapDv:0000108.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Neuronal IPC'_HsapDv:0000099.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Neuronal IPC'_HsapDv:0000100.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Neuronal IPC'_HsapDv:0000101.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Neuronal IPC'_HsapDv:0000102.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Neuronal IPC'_HsapDv:0000103.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Neuronal IPC'_HsapDv:0000104.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Neuronal IPC'_HsapDv:0000105.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Neuronal IPC'_HsapDv:0000106.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Neuronal IPC'_HsapDv:0000107.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Neuronal IPC'_HsapDv:0000108.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Oligo'_HsapDv:0000099.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Oligo'_HsapDv:0000100.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Oligo'_HsapDv:0000101.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Oligo'_HsapDv:0000102.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Oligo'_HsapDv:0000103.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Oligo'_HsapDv:0000104.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Oligo'_HsapDv:0000105.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Oligo'_HsapDv:0000106.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Oligo'_HsapDv:0000107.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Oligo'_HsapDv:0000108.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Placodes'_HsapDv:0000099.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Placodes'_HsapDv:0000100.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Placodes'_HsapDv:0000102.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Placodes'_HsapDv:0000103.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Radial glia'_HsapDv:0000099.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Radial glia'_HsapDv:0000100.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Radial glia'_HsapDv:0000101.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Radial glia'_HsapDv:0000102.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Radial glia'_HsapDv:0000103.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Radial glia'_HsapDv:0000104.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Radial glia'_HsapDv:0000105.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Radial glia'_HsapDv:0000106.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Radial glia'_HsapDv:0000107.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Radial glia'_HsapDv:0000108.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Vascular'_HsapDv:0000099.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Vascular'_HsapDv:0000100.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Vascular'_HsapDv:0000101.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Vascular'_HsapDv:0000102.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Vascular'_HsapDv:0000103.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Vascular'_HsapDv:0000104.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Vascular'_HsapDv:0000105.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Vascular'_HsapDv:0000106.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Vascular'_HsapDv:0000107.svg
+    Untracked:  output/02_Clustering/Clustering_Hum_devScore_Hum_dev.scores.b'Vascular'_HsapDv:0000108.svg
+    Untracked:  output/04_Biostat/Biostat_GO_termDEG_cluster_0.xlsx
+    Untracked:  output/04_Biostat/Biostat_GO_termDEG_cluster_1.xlsx
+    Untracked:  output/04_Biostat/Biostat_GO_termDEG_cluster_10.xlsx
+    Untracked:  output/04_Biostat/Biostat_GO_termDEG_cluster_11.xlsx
+    Untracked:  output/04_Biostat/Biostat_GO_termDEG_cluster_12.xlsx
+    Untracked:  output/04_Biostat/Biostat_GO_termDEG_cluster_13.xlsx
+    Untracked:  output/04_Biostat/Biostat_GO_termDEG_cluster_2.xlsx
+    Untracked:  output/04_Biostat/Biostat_GO_termDEG_cluster_3.xlsx
+    Untracked:  output/04_Biostat/Biostat_GO_termDEG_cluster_4.xlsx
+    Untracked:  output/04_Biostat/Biostat_GO_termDEG_cluster_5.xlsx
+    Untracked:  output/04_Biostat/Biostat_GO_termDEG_cluster_6.xlsx
+    Untracked:  output/04_Biostat/Biostat_GO_termDEG_cluster_7.xlsx
+    Untracked:  output/04_Biostat/Biostat_GO_termDEG_cluster_8.xlsx
+    Untracked:  output/04_Biostat/Biostat_GO_termDEG_cluster_9.xlsx
+    Untracked:  output/06_Bulk_DEX/
 
 Unstaged changes:
     Modified:   .gitignore
-    Modified:   analysis/06_DEX_Bulk.Rmd
-    Modified:   analysis/index.Rmd
-    Deleted:    output/01_QC/QC_12PCs.svg
-    Deleted:    output/01_QC/QC_Highest_expressed_genes_filtred.svg
-    Deleted:    output/01_QC/QC_PCA_jackstraw_scores.xlsx
-    Deleted:    output/01_QC/QC_VizDimLoadings.svg
-    Deleted:    output/01_QC/QC_clustering_PCAoptimized.svg
-    Deleted:    output/01_QC/QC_clustering_afterbatchcorr.svg
-    Deleted:    output/01_QC/QC_measures_Scatter_unfiltered_all.svg
-    Deleted:    output/01_QC/QC_measures_Violin_unfiltered_all.svg
+    Modified:   output/01_QC/QC_12PCs.svg
+    Modified:   output/01_QC/QC_Highest_expressed_genes_filtred.svg
+    Modified:   output/01_QC/QC_VizDimLoadings.svg
+    Modified:   output/01_QC/QC_clustering_PCAoptimized.svg
+    Modified:   output/01_QC/QC_clustering_afterbatchcorr.svg
+    Modified:   output/01_QC/QC_measures_Scatter_unfiltered_all.svg
+    Modified:   output/01_QC/QC_measures_Violin_unfiltered_all.svg
     Deleted:    output/01_QC/QCmeasures_Violin_filtered.svg
-    Deleted:    output/02_Clustering/Cluster_markers.xls
-    Deleted:    output/02_Clustering/Clustering_CellcycleScoring.svg
-    Deleted:    output/02_Clustering/Clustering_Distribution.svg
-    Deleted:    output/02_Clustering/Clustering_FeatPlot_QCMeasures.svg
-    Deleted:    output/02_Clustering/Clustering_Heatmap_Markers.svg
-    Deleted:    output/02_Clustering/Clustering_Hum_devCellDevTypeClusterCountsBarplot.svg
-    Deleted:    output/02_Clustering/Clustering_Hum_devCellDevTypeMapped.svg
-    Deleted:    output/02_Clustering/Clustering_KantonT4PredTypes.svg
-    Deleted:    output/02_Clustering/Clustering_KantonT4PredTypesChoroidOnly.svg
-    Deleted:    output/02_Clustering/Clustering_KnoblMapped.svg
-    Deleted:    output/02_Clustering/Clustering_KnoblScores.svg
-    Deleted:    output/02_Clustering/Clustering_KnoblichPredTypes.svg
-    Deleted:    output/02_Clustering/Clustering_NeuronalMarkers.svg
-    Deleted:    output/02_Clustering/Clustering_PCAvsCluster.svg
-    Deleted:    output/02_Clustering/Clustering_Resopt.svg
-    Deleted:    output/02_Clustering/Clustering_UmapByType.svg
-    Deleted:    output/02_Clustering/Clustering_UmapParamOpt.svg
-    Deleted:    output/02_Clustering/Clustering_final_optimized_all.svg
-    Deleted:    output/02_Clustering/Clustering_integrated_clustree.svg
-    Deleted:    output/02_Clustering/Clusters_GO_termsCluster.xlsx
-    Deleted:    output/03_Trajectories/Trajectories_All.svg
-    Deleted:    output/03_Trajectories/Trajectories_Lineages.svg
-    Deleted:    output/04_Biostat/Biostat_Comparelineages.svg
-    Deleted:    output/04_Biostat/Biostat_DEG_allcells.xlsx
-    Deleted:    output/04_Biostat/Biostat_DEG_cluster_0cells.xlsx
-    Deleted:    output/04_Biostat/Biostat_DEG_cluster_10cells.xlsx
-    Deleted:    output/04_Biostat/Biostat_DEG_cluster_11cells.xlsx
-    Deleted:    output/04_Biostat/Biostat_DEG_cluster_12cells.xlsx
-    Deleted:    output/04_Biostat/Biostat_DEG_cluster_13cells.xlsx
-    Deleted:    output/04_Biostat/Biostat_DEG_cluster_1cells.xlsx
-    Deleted:    output/04_Biostat/Biostat_DEG_cluster_2cells.xlsx
-    Deleted:    output/04_Biostat/Biostat_DEG_cluster_3cells.xlsx
-    Deleted:    output/04_Biostat/Biostat_DEG_cluster_4cells.xlsx
-    Deleted:    output/04_Biostat/Biostat_DEG_cluster_5cells.xlsx
-    Deleted:    output/04_Biostat/Biostat_DEG_cluster_6cells.xlsx
-    Deleted:    output/04_Biostat/Biostat_DEG_cluster_7cells.xlsx
-    Deleted:    output/04_Biostat/Biostat_DEG_cluster_8cells.xlsx
-    Deleted:    output/04_Biostat/Biostat_DEG_cluster_9cells.xlsx
-    Deleted:    output/04_Biostat/Biostat_GO_termDEG_all.xlsx
-    Deleted:    output/04_Biostat/Biostat_HumdevCTFreq.xslsx
-    Deleted:    output/04_Biostat/Biostat_clusterFreq.xslsx
+    Modified:   output/02_Clustering/Cluster_markers.xls
+    Modified:   output/02_Clustering/Clustering_CellcycleScoring.svg
+    Modified:   output/02_Clustering/Clustering_Distribution.svg
+    Modified:   output/02_Clustering/Clustering_FeatPlot_QCMeasures.svg
+    Modified:   output/02_Clustering/Clustering_Heatmap_Markers.svg
+    Modified:   output/02_Clustering/Clustering_Hum_devCellDevTypeClusterCountsBarplot.svg
+    Modified:   output/02_Clustering/Clustering_Hum_devCellDevTypeMapped.svg
+    Modified:   output/02_Clustering/Clustering_KantonT4PredTypes.svg
+    Modified:   output/02_Clustering/Clustering_KantonT4PredTypesChoroidOnly.svg
+    Modified:   output/02_Clustering/Clustering_KnoblMapped.svg
+    Modified:   output/02_Clustering/Clustering_KnoblScores.svg
+    Modified:   output/02_Clustering/Clustering_KnoblichPredTypes.svg
+    Modified:   output/02_Clustering/Clustering_NeuronalMarkers.svg
+    Modified:   output/02_Clustering/Clustering_PCAvsCluster.svg
+    Modified:   output/02_Clustering/Clustering_Resopt.svg
+    Modified:   output/02_Clustering/Clustering_UmapByType.svg
+    Modified:   output/02_Clustering/Clustering_UmapParamOpt.svg
+    Modified:   output/02_Clustering/Clustering_final_optimized_all.svg
+    Modified:   output/02_Clustering/Clustering_integrated_clustree.svg
+    Modified:   output/02_Clustering/Clusters_GO_termsCluster.xlsx
+    Modified:   output/03_Trajectories/Trajectories_All.svg
+    Modified:   output/03_Trajectories/Trajectories_Lineages.svg
+    Modified:   output/04_Biostat/Biostat_Comparelineages.svg
+    Modified:   output/04_Biostat/Biostat_DEG_allcells.xlsx
+    Modified:   output/04_Biostat/Biostat_DEG_cluster_0cells.xlsx
+    Modified:   output/04_Biostat/Biostat_DEG_cluster_10cells.xlsx
+    Modified:   output/04_Biostat/Biostat_DEG_cluster_11cells.xlsx
+    Modified:   output/04_Biostat/Biostat_DEG_cluster_12cells.xlsx
+    Modified:   output/04_Biostat/Biostat_DEG_cluster_13cells.xlsx
+    Modified:   output/04_Biostat/Biostat_DEG_cluster_1cells.xlsx
+    Modified:   output/04_Biostat/Biostat_DEG_cluster_2cells.xlsx
+    Modified:   output/04_Biostat/Biostat_DEG_cluster_3cells.xlsx
+    Modified:   output/04_Biostat/Biostat_DEG_cluster_4cells.xlsx
+    Modified:   output/04_Biostat/Biostat_DEG_cluster_5cells.xlsx
+    Modified:   output/04_Biostat/Biostat_DEG_cluster_6cells.xlsx
+    Modified:   output/04_Biostat/Biostat_DEG_cluster_7cells.xlsx
+    Modified:   output/04_Biostat/Biostat_DEG_cluster_8cells.xlsx
+    Modified:   output/04_Biostat/Biostat_DEG_cluster_9cells.xlsx
+    Modified:   output/04_Biostat/Biostat_GO_termDEG_all.xlsx
+    Modified:   output/04_Biostat/Biostat_HumdevCTFreq.xslsx
+    Modified:   output/04_Biostat/Biostat_clusterFreq.xslsx
     Deleted:    output/archive/DE_Genes_0_5mM/S05_06_0
     Deleted:    output/archive/DE_Genes_0_5mM/S05_06_1
     Deleted:    output/archive/DE_Genes_0_5mM/S05_06_10
@@ -580,6 +703,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/KJPMolgenLab/scRNA_PA_QPRT/blob/f206c289f1dda0185da1dcbfdc067a262aba4279/analysis/index.Rmd" target="_blank">f206c28</a>
+</td>
+<td>
+Andreas Chiocchetti
+</td>
+<td>
+2024-01-11
+</td>
+<td>
+wflow_publish(c("./analysis/<em>.Rmd", "./code/</em>", "./docs/*"))
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/KJPMolgenLab/scRNA_PA_QPRT/f206c289f1dda0185da1dcbfdc067a262aba4279/docs/index.html" target="_blank">f206c28</a>
+</td>
+<td>
+Andreas Chiocchetti
+</td>
+<td>
+2024-01-11
+</td>
+<td>
+wflow_publish(c("./analysis/<em>.Rmd", "./code/</em>", "./docs/*"))
+</td>
+</tr>
 <tr>
 <td>
 Rmd
