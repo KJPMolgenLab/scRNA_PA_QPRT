@@ -7,7 +7,7 @@ editor_options:
   chunk_output_type: console
 ---
 
-# Effects of QPRT inhibitor phtalic acid on development of cerebral organoids
+# Effects of QPRT inhibitor phthalic acid on development of cerebral organoids
 
 **Authors:**
 
@@ -15,7 +15,7 @@ Clara Droell\
 Afsheen Yousaf\
 ....\
 Andreas Chiocchetti\
-Denise Haslinger \
+Denise Haslinger\
 
 **Abstract:**
 

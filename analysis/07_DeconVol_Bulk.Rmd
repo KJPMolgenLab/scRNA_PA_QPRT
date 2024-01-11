@@ -1,0 +1,105 @@
+---
+title: "Deconvolution"
+author: "A Chiocchetti"
+date: "2024-01-11"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r}
+library(SingleR)
+library(DropletUtils)
+library(SingleCellExperiment)
+library(Seurat)
+library(slingshot)
+library(gprofiler2)
+library(tidyverse)
+library(MuSiC)
+```
+
+```{r}
+options(stringsAsFactors = F)
+set.seed(157434538)
+reanalyze=F
+cutoff = 0.05 # pavalue cutoff for DEG
+padj_cu=FALSE # use adjusted pvalue 
+Dark8 = RColorBrewer::brewer.pal(8, "Dark2")
+```
+
+```{r getdata}
+output= paste0("output/07_Bulk_Deconv/")
+dir.create(output, showWarnings = F)
+source("code/custom_functions.R")
+ddsMat <- readRDS("data/Bulk_dds_matrix.rds")
+SampleInfo = as.data.frame(colData(ddsMat))
+log_2cpm=log2(counts(ddsMat, normalize=T)+1)
+SamplePalette =  c("#000000","#3399FF")
+
+seurat_integrated <- readRDS("./data/QC_dataClustered.filtTypedTraj.rds")
+sce.RNA <- as.SingleCellExperiment(seurat_integrated)
+metadata<- seurat_integrated@meta.data
+```
+
+```{r}
+bulk.mtx = counts(ddsMat)
+bulk.meta = colData(ddsMat)
+bulk.gene = rowData(ddsMat)
+rownames(bulk.mtx) = bulk.gene$hgnc[match(rownames(bulk.mtx), bulk.gene$entrez_gene)]
+rownames(sce.RNA)
+
+genes = intersect(rownames(sce.RNA), bulk.gene$hgnc)
+
+bulk.mtx=bulk.mtx[genes, ]
+sce.RNA <- sce.RNA[genes,]
+
+Est.prop.bulk = music_prop(bulk.mtx = bulk.mtx, sc.sce = sce.RNA, 
+                           clusters = 'seurat_clusters',
+                           samples = 'orig.ident', verbose = F)
+
+
+
+prop.matrix = t(data.matrix(Est.prop.bulk$Est.prop.allgene) )
+```
+
+# proportion matrix orgnoid clusters 
+
+```{r, fig.height=10, fig.width=6}
+
+gplots::heatmap.2(prop.matrix, scale = "col", margins = c(12,5), main = "organoid clusters",
+                  Colv = F, trace = "none", density.info = "none")
+
+```
+
+
+```{r}
+sceRNAknoblich <- readRDS("data/Knoblich/CHOOSE_ASD_Modules.rds")
+Idents(sceRNAknoblich) <- "celltype_cl_coarse"
+sceRNAknoblich <- subset(sceRNAknoblich, cells = WhichCells(sceRNAknoblich, downsample = 200))
+sceRNAknoblich<- as.SingleCellExperiment(sceRNAknoblich)
+
+Est.prop.bulk.knblich = music_prop(bulk.mtx = bulk.mtx, sc.sce = sceRNAknoblich, 
+                           clusters = 'celltype_cl_coarse',
+                           samples = 'orig.ident', verbose = F)
+
+prop.matrix.knblich = t(data.matrix(Est.prop.bulk.knblich$Est.prop.allgene))
+
+```
+
+```{r, fig.height=10, fig.width=6}
+
+gplots::heatmap.2(prop.matrix.knblich, scale = "col", 
+                  margins = c(12,5), main = "knoblich clusters",
+                  Colv = F, trace = "none", density.info = "none")
+
+```
+
+
+
+
+
+
+
