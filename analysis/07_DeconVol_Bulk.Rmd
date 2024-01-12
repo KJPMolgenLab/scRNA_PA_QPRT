@@ -7,6 +7,7 @@ output: html_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+
 ```
 
 
@@ -19,6 +20,7 @@ library(slingshot)
 library(gprofiler2)
 library(tidyverse)
 library(MuSiC)
+library(ggstream)
 ```
 
 ```{r}
@@ -49,8 +51,6 @@ bulk.mtx = counts(ddsMat)
 bulk.meta = colData(ddsMat)
 bulk.gene = rowData(ddsMat)
 rownames(bulk.mtx) = bulk.gene$hgnc[match(rownames(bulk.mtx), bulk.gene$entrez_gene)]
-rownames(sce.RNA)
-
 genes = intersect(rownames(sce.RNA), bulk.gene$hgnc)
 
 bulk.mtx=bulk.mtx[genes, ]
@@ -62,18 +62,39 @@ Est.prop.bulk = music_prop(bulk.mtx = bulk.mtx, sc.sce = sce.RNA,
 
 
 
-prop.matrix = t(data.matrix(Est.prop.bulk$Est.prop.allgene) )
+prop.matrix = t(data.matrix(Est.prop.bulk$Est.prop.allgene))
+```
+
+
+```{r, fig.width=8, fig.height=8}
+long_prop_matrix <-reshape2::melt(prop.matrix)
+colnames(long_prop_matrix) <-c("Cluster", "Sample", "Proportion")
+metadata_bulk <- as.data.frame(colData(ddsMat))
+long_prop_matrix <- cbind(long_prop_matrix,metadata_bulk[long_prop_matrix$Sample,])
+
+p<-ggplot(long_prop_matrix, aes(x=Day, y=Proportion, col=PAmM, fill=PAmM))+
+         geom_smooth(method = "loess", alpha = 0.2)+facet_wrap(~Cluster)+theme_classic()
+p
+ggsave(paste0(output, "07_DeconVol_Bulk_timeplots_clusters.svg"), p)
 ```
 
 # proportion matrix orgnoid clusters 
 
-```{r, fig.height=10, fig.width=6}
+```{r, fig.height=8, fig.width=6}
 
-gplots::heatmap.2(prop.matrix, scale = "col", margins = c(12,5), main = "organoid clusters",
-                  Colv = F, trace = "none", density.info = "none")
+col=viridis::viridis(100)
+
+svg(paste0(output, "07_DeconVol_Bulk_propHeatmap_clusters.svg"))
+gplots::heatmap.2(prop.matrix, margins = c(12,5), main = "organoid clusters",
+                  Colv = F, trace = "none", density.info = "none", col = col, key.title = "prop", key.xlab = "proportion", key.par = list(mar=c(5,2,5,2)))
+
+dev.off()
+
+gplots::heatmap.2(prop.matrix, margins = c(12,5), main = "organoid clusters",
+                  Colv = F, trace = "none", density.info = "none", col = col, key.title = "prop", key.xlab = "proportion", key.par = list(mar=c(5,2,5,2)))
 
 ```
-
+# proportion matrix knoblich cell types 
 
 ```{r}
 sceRNAknoblich <- readRDS("data/Knoblich/CHOOSE_ASD_Modules.rds")
@@ -89,11 +110,29 @@ prop.matrix.knblich = t(data.matrix(Est.prop.bulk.knblich$Est.prop.allgene))
 
 ```
 
-```{r, fig.height=10, fig.width=6}
+```{r}
+long_prop_matrix <-reshape2::melt(prop.matrix.knblich)
+colnames(long_prop_matrix) <-c("Kn.Cluster", "Sample", "Proportion")
+metadata_bulk <- as.data.frame(colData(ddsMat))
+long_prop_matrix <- cbind(long_prop_matrix,metadata_bulk[long_prop_matrix$Sample,])
+
+p<-ggplot(long_prop_matrix, aes(x=Day, y=Proportion, col=PAmM, fill=PAmM))+
+         geom_smooth(method = "loess", alpha = 0.2)+facet_wrap(~Kn.Cluster)+theme_classic()
+p
+ggsave(paste0(output, "07_DeconVol_Bulk_timeplots_Knoblichclusters.svg"), p)
+```
+
+```{r, fig.height=8, fig.width=6}
+svg(paste0(output, "07_DeconVol_Bulk_propHeatmap_Knoblichclusters.svg"))
+gplots::heatmap.2(prop.matrix.knblich, scale = "col", 
+                  margins = c(12,5), main = "knoblich clusters",
+                  Colv = F, trace = "none", density.info = "none", col = col, key.title = "prop", key.xlab = "proportion", key.par = list(mar=c(5,2,5,2)))
+
+dev.off()
 
 gplots::heatmap.2(prop.matrix.knblich, scale = "col", 
                   margins = c(12,5), main = "knoblich clusters",
-                  Colv = F, trace = "none", density.info = "none")
+                  Colv = F, trace = "none", density.info = "none", col = col, key.title = "prop", key.xlab = "proportion", key.par = list(mar=c(5,2,5,2)))
 
 ```
 
