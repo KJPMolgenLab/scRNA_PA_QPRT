@@ -65,7 +65,9 @@ Est.prop.bulk = music_prop(bulk.mtx = bulk.mtx, sc.sce = sce.RNA,
 prop.matrix = t(data.matrix(Est.prop.bulk$Est.prop.allgene))
 ```
 
+# proportion organoid clusters (our experiment)
 
+## longitudinal trajectories of proportions
 ```{r, fig.width=8, fig.height=8}
 long_prop_matrix <-reshape2::melt(prop.matrix)
 colnames(long_prop_matrix) <-c("Cluster", "Sample", "Proportion")
@@ -73,12 +75,44 @@ metadata_bulk <- as.data.frame(colData(ddsMat))
 long_prop_matrix <- cbind(long_prop_matrix,metadata_bulk[long_prop_matrix$Sample,])
 
 p<-ggplot(long_prop_matrix, aes(x=Day, y=Proportion, col=PAmM, fill=PAmM))+
-         geom_smooth(method = "loess", alpha = 0.2)+facet_wrap(~Cluster)+theme_classic()
+  geom_smooth(method = "loess", alpha = 0.2)+facet_wrap(~Cluster)+theme_classic()
 p
 ggsave(paste0(output, "07_DeconVol_Bulk_timeplots_clusters.svg"), p)
 ```
 
-# proportion matrix orgnoid clusters 
+## testing of time differences per cluster 
+
+```{r}
+library(lme4)
+
+clustervar = "Cluster"
+lmatrix = long_prop_matrix
+
+test_time_by_PA = function(lmatrix, clustervar){
+  reslist=list()
+  for(cl in unique(lmatrix[,clustervar])){
+    dataset = lmatrix[lmatrix[,clustervar]==cl, ]
+    if(var(dataset$Proportion) != 0){
+      lmres=lmer(Proportion~poly(Day,2)*PAmM+(1|Batch), data = dataset)
+      res = car::Anova(lmres, type=3)%>% as.data.frame()
+      colnames(res) <- c("Chisq", "df", "pvalue")
+      reslist[[as.character(cl)]] <- res 
+    } else {
+      reslist[[as.character(cl)]] <- data.frame("pvalue"=rep("no var",4))
+    }
+  } 
+  return(reslist)
+}
+
+testres = test_time_by_PA(lmatrix = long_prop_matrix, clustervar = "Cluster")
+
+pvals=lapply(testres, function(x){x[4,"pvalue"]})
+Significances = data.frame(cluster = names(pvals), p.value = unlist(pvals,recursive = F))
+Significances
+
+openxlsx2::write_xlsx(Significances, paste0(output,"07_DeconVol_Bulk_StatTimecourseDiff_clusters.xslx"))
+```
+
 
 ```{r, fig.height=8, fig.width=6}
 
@@ -86,15 +120,15 @@ col=viridis::viridis(100)
 
 svg(paste0(output, "07_DeconVol_Bulk_propHeatmap_clusters.svg"))
 gplots::heatmap.2(prop.matrix, margins = c(12,5), main = "organoid clusters",
-                  Colv = F, trace = "none", density.info = "none", col = col, key.title = "prop", key.xlab = "proportion", key.par = list(mar=c(5,2,5,2)))
+Colv = F, trace = "none", density.info = "none", col = col, key.title = "prop", key.xlab = "proportion", key.par = list(mar=c(5,2,5,2)))
 
 dev.off()
 
 gplots::heatmap.2(prop.matrix, margins = c(12,5), main = "organoid clusters",
-                  Colv = F, trace = "none", density.info = "none", col = col, key.title = "prop", key.xlab = "proportion", key.par = list(mar=c(5,2,5,2)))
+Colv = F, trace = "none", density.info = "none", col = col, key.title = "prop", key.xlab = "proportion", key.par = list(mar=c(5,2,5,2)))
 
 ```
-# proportion matrix knoblich cell types 
+# proportion knoblich cell types 
 
 ```{r}
 sceRNAknoblich <- readRDS("data/Knoblich/CHOOSE_ASD_Modules.rds")
@@ -103,12 +137,14 @@ sceRNAknoblich <- subset(sceRNAknoblich, cells = WhichCells(sceRNAknoblich, down
 sceRNAknoblich<- as.SingleCellExperiment(sceRNAknoblich)
 
 Est.prop.bulk.knblich = music_prop(bulk.mtx = bulk.mtx, sc.sce = sceRNAknoblich, 
-                           clusters = 'celltype_cl_coarse',
-                           samples = 'orig.ident', verbose = F)
+clusters = 'celltype_cl_coarse',
+samples = 'orig.ident', verbose = F)
 
 prop.matrix.knblich = t(data.matrix(Est.prop.bulk.knblich$Est.prop.allgene))
 
 ```
+
+## trajectories of proportions 
 
 ```{r}
 long_prop_matrix <-reshape2::melt(prop.matrix.knblich)
@@ -117,24 +153,38 @@ metadata_bulk <- as.data.frame(colData(ddsMat))
 long_prop_matrix <- cbind(long_prop_matrix,metadata_bulk[long_prop_matrix$Sample,])
 
 p<-ggplot(long_prop_matrix, aes(x=Day, y=Proportion, col=PAmM, fill=PAmM))+
-         geom_smooth(method = "loess", alpha = 0.2)+facet_wrap(~Kn.Cluster)+theme_classic()
+geom_smooth(method = "loess", alpha = 0.2)+facet_wrap(~Kn.Cluster)+theme_classic()
 p
 ggsave(paste0(output, "07_DeconVol_Bulk_timeplots_Knoblichclusters.svg"), p)
 ```
+## testing of time differences per cluster 
+
+```{r}
+testres = test_time_by_PA(lmatrix = long_prop_matrix, clustervar = "Kn.Cluster")
+
+pvals=lapply(testres, function(x){x[4,"pvalue"]})
+Significances = data.frame(cluster = names(pvals), p.value = unlist(pvals,recursive = F))
+Significances
+
+openxlsx2::write_xlsx(Significances, paste0(output,"07_DeconVol_Bulk_StatTimecourseDiff_KnCelltypes.xslx"))
+
+```
+
 
 ```{r, fig.height=8, fig.width=6}
 svg(paste0(output, "07_DeconVol_Bulk_propHeatmap_Knoblichclusters.svg"))
 gplots::heatmap.2(prop.matrix.knblich, scale = "col", 
-                  margins = c(12,5), main = "knoblich clusters",
-                  Colv = F, trace = "none", density.info = "none", col = col, key.title = "prop", key.xlab = "proportion", key.par = list(mar=c(5,2,5,2)))
+margins = c(12,5), main = "knoblich clusters",
+Colv = F, trace = "none", density.info = "none", col = col, key.title = "prop", key.xlab = "proportion", key.par = list(mar=c(5,2,5,2)))
 
 dev.off()
 
 gplots::heatmap.2(prop.matrix.knblich, scale = "col", 
-                  margins = c(12,5), main = "knoblich clusters",
-                  Colv = F, trace = "none", density.info = "none", col = col, key.title = "prop", key.xlab = "proportion", key.par = list(mar=c(5,2,5,2)))
+margins = c(12,5), main = "knoblich clusters",
+Colv = F, trace = "none", density.info = "none", col = col, key.title = "prop", key.xlab = "proportion", key.par = list(mar=c(5,2,5,2)))
 
 ```
+
 
 
 
