@@ -550,15 +550,15 @@ output/01_QC/QC_clustering_PCAoptimized.svg
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomKJPMolgenLabscRNAPAQPRTtree65851904c0ab0d1986fe196203ce8a82a3f56b88targetblank6585190a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomKJPMolgenLabscRNAPAQPRTtreef7ee227768eadf71185ea14617a3ddf4ca392ee0targetblankf7ee227a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/KJPMolgenLab/scRNA_PA_QPRT/tree/65851904c0ab0d1986fe196203ce8a82a3f56b88" target="_blank">6585190</a>
+<a href="https://github.com/KJPMolgenLab/scRNA_PA_QPRT/tree/f7ee227768eadf71185ea14617a3ddf4ca392ee0" target="_blank">f7ee227</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomKJPMolgenLabscRNAPAQPRTtree65851904c0ab0d1986fe196203ce8a82a3f56b88targetblank6585190a"
+id="strongRepositoryversionstrongahrefhttpsgithubcomKJPMolgenLabscRNAPAQPRTtreef7ee227768eadf71185ea14617a3ddf4ca392ee0targetblankf7ee227a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -568,7 +568,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/KJPMolgenLab/scRNA_PA_QPRT/tree/65851904c0ab0d1986fe196203ce8a82a3f56b88" target="_blank">6585190</a>.
+<a href="https://github.com/KJPMolgenLab/scRNA_PA_QPRT/tree/f7ee227768eadf71185ea14617a3ddf4ca392ee0" target="_blank">f7ee227</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -586,7 +586,9 @@ Ignored files:
     Ignored:    .Rhistory
     Ignored:    .Rprofile
     Ignored:    .Rproj.user/
+    Ignored:    analysis/figure/
     Ignored:    output/05_Bulk_Preprocessing/
+    Ignored:    output/07_Bulk_Deconv/
 
 Untracked files:
     Untracked:  .bashrc
@@ -607,9 +609,6 @@ Untracked files:
 
 Unstaged changes:
     Modified:   .gitignore
-    Modified:   analysis/06_DEX_Bulk.Rmd
-    Modified:   analysis/about.Rmd
-    Modified:   analysis/index.Rmd
     Modified:   workflowHelper.R
 
 </code></pre>
@@ -656,6 +655,23 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/KJPMolgenLab/scRNA_PA_QPRT/f7ee227768eadf71185ea14617a3ddf4ca392ee0/docs/01_QC_Singleron.html" target="_blank">f7ee227</a>
+</td>
+<td>
+Andreas Chiocchetti
+</td>
+<td>
+2024-01-11
+</td>
+<td>
+wflow_publish(c("./analysis/<em>.Rmd", "./code/</em>", "./docs/*"))
+</td>
+</tr>
 <tr>
 <td>
 html
@@ -1031,24 +1047,24 @@ Negative:  DLX6-AS1, PLS3, SCGN, DLX2, DLX1, PLOD2, DLX5, SOX2-OT, STC2, ADM
 <pre><code>Warning: The default method for RunUMAP has changed from calling Python UMAP via reticulate to the R-native UWOT using the cosine metric
 To use Python UMAP via reticulate, set umap.method to &#39;umap-learn&#39; and metric to &#39;correlation&#39;
 This message will be shown once per session</code></pre>
-<pre><code>16:34:40 UMAP embedding parameters a = 0.9922 b = 1.112</code></pre>
+<pre><code>17:46:19 UMAP embedding parameters a = 0.9922 b = 1.112</code></pre>
 <pre><code>Found more than one class &quot;dist&quot; in cache; using the first, from namespace &#39;BiocGenerics&#39;</code></pre>
 <pre><code>Also defined by &#39;spam&#39;</code></pre>
-<pre><code>16:34:41 Read 9486 rows and found 20 numeric columns</code></pre>
-<pre><code>16:34:41 Using Annoy for neighbor search, n_neighbors = 30</code></pre>
+<pre><code>17:46:19 Read 9486 rows and found 20 numeric columns</code></pre>
+<pre><code>17:46:19 Using Annoy for neighbor search, n_neighbors = 30</code></pre>
 <pre><code>Found more than one class &quot;dist&quot; in cache; using the first, from namespace &#39;BiocGenerics&#39;</code></pre>
 <pre><code>Also defined by &#39;spam&#39;</code></pre>
-<pre><code>16:34:41 Building Annoy index with metric = cosine, n_trees = 50</code></pre>
+<pre><code>17:46:19 Building Annoy index with metric = cosine, n_trees = 50</code></pre>
 <pre><code>0%   10   20   30   40   50   60   70   80   90   100%</code></pre>
 <pre><code>[----|----|----|----|----|----|----|----|----|----|</code></pre>
 <pre><code>**************************************************|
-16:34:41 Writing NN index file to temp file /tmp/RtmpmPj5vn/file68ab23c30a5
-16:34:41 Searching Annoy index using 1 thread, search_k = 3000
-16:34:44 Annoy recall = 100%
-16:34:45 Commencing smooth kNN distance calibration using 1 thread with target n_neighbors = 30
-16:34:46 Initializing from normalized Laplacian + noise (using RSpectra)
-16:34:47 Commencing optimization for 500 epochs, with 416912 positive edges
-16:34:57 Optimization finished
+17:46:20 Writing NN index file to temp file /tmp/RtmpZOJiSl/file6ec47688145f
+17:46:20 Searching Annoy index using 1 thread, search_k = 3000
+17:46:22 Annoy recall = 100%
+17:46:23 Commencing smooth kNN distance calibration using 1 thread with target n_neighbors = 30
+17:46:24 Initializing from normalized Laplacian + noise (using RSpectra)
+17:46:25 Commencing optimization for 500 epochs, with 416912 positive edges
+17:46:35 Optimization finished
 Loading required package: fields
 Loading required package: spam
 Spam version 2.10-0 (2023-10-23) is loaded.
@@ -1152,24 +1168,24 @@ Running Louvain algorithm...
 Maximum modularity in 10 random starts: 0.8642
 Number of communities: 14
 Elapsed time: 0 seconds</code></pre>
-<pre><code>16:35:27 UMAP embedding parameters a = 0.9922 b = 1.112</code></pre>
+<pre><code>17:47:05 UMAP embedding parameters a = 0.9922 b = 1.112</code></pre>
 <pre><code>Found more than one class &quot;dist&quot; in cache; using the first, from namespace &#39;BiocGenerics&#39;</code></pre>
 <pre><code>Also defined by &#39;spam&#39;</code></pre>
-<pre><code>16:35:27 Read 9107 rows and found 30 numeric columns</code></pre>
-<pre><code>16:35:27 Using Annoy for neighbor search, n_neighbors = 30</code></pre>
+<pre><code>17:47:05 Read 9107 rows and found 30 numeric columns</code></pre>
+<pre><code>17:47:05 Using Annoy for neighbor search, n_neighbors = 30</code></pre>
 <pre><code>Found more than one class &quot;dist&quot; in cache; using the first, from namespace &#39;BiocGenerics&#39;</code></pre>
 <pre><code>Also defined by &#39;spam&#39;</code></pre>
-<pre><code>16:35:27 Building Annoy index with metric = cosine, n_trees = 50</code></pre>
+<pre><code>17:47:05 Building Annoy index with metric = cosine, n_trees = 50</code></pre>
 <pre><code>0%   10   20   30   40   50   60   70   80   90   100%</code></pre>
 <pre><code>[----|----|----|----|----|----|----|----|----|----|</code></pre>
 <pre><code>**************************************************|
-16:35:27 Writing NN index file to temp file /tmp/RtmpmPj5vn/file68abc19a08e
-16:35:27 Searching Annoy index using 1 thread, search_k = 3000
-16:35:30 Annoy recall = 100%
-16:35:30 Commencing smooth kNN distance calibration using 1 thread with target n_neighbors = 30
-16:35:32 Initializing from normalized Laplacian + noise (using RSpectra)
-16:35:32 Commencing optimization for 500 epochs, with 406948 positive edges
-16:35:42 Optimization finished</code></pre>
+17:47:06 Writing NN index file to temp file /tmp/RtmpZOJiSl/file6ec4637c62ff
+17:47:06 Searching Annoy index using 1 thread, search_k = 3000
+17:47:08 Annoy recall = 100%
+17:47:09 Commencing smooth kNN distance calibration using 1 thread with target n_neighbors = 30
+17:47:10 Initializing from normalized Laplacian + noise (using RSpectra)
+17:47:10 Commencing optimization for 500 epochs, with 406948 positive edges
+17:47:20 Optimization finished</code></pre>
 <p><img src="figure/01_QC_Singleron.Rmd/initial%20clustering-1.png" width="672" style="display: block; margin: auto;" /></p>
 <p>
 <button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-no-spaces-initial-clustering-1">
@@ -1495,24 +1511,24 @@ Andreas Chiocchetti
 </table>
 </div>
 </div>
-<pre><code>16:44:59 UMAP embedding parameters a = 0.9922 b = 1.112</code></pre>
+<pre><code>17:56:44 UMAP embedding parameters a = 0.9922 b = 1.112</code></pre>
 <pre><code>Found more than one class &quot;dist&quot; in cache; using the first, from namespace &#39;BiocGenerics&#39;</code></pre>
 <pre><code>Also defined by &#39;spam&#39;</code></pre>
-<pre><code>16:44:59 Read 9107 rows and found 30 numeric columns</code></pre>
-<pre><code>16:44:59 Using Annoy for neighbor search, n_neighbors = 30</code></pre>
+<pre><code>17:56:44 Read 9107 rows and found 30 numeric columns</code></pre>
+<pre><code>17:56:44 Using Annoy for neighbor search, n_neighbors = 30</code></pre>
 <pre><code>Found more than one class &quot;dist&quot; in cache; using the first, from namespace &#39;BiocGenerics&#39;</code></pre>
 <pre><code>Also defined by &#39;spam&#39;</code></pre>
-<pre><code>16:44:59 Building Annoy index with metric = cosine, n_trees = 50</code></pre>
+<pre><code>17:56:44 Building Annoy index with metric = cosine, n_trees = 50</code></pre>
 <pre><code>0%   10   20   30   40   50   60   70   80   90   100%</code></pre>
 <pre><code>[----|----|----|----|----|----|----|----|----|----|</code></pre>
 <pre><code>**************************************************|
-16:45:00 Writing NN index file to temp file /tmp/RtmpmPj5vn/file68ab3bacd9c9
-16:45:00 Searching Annoy index using 1 thread, search_k = 3000
-16:45:02 Annoy recall = 100%
-16:45:03 Commencing smooth kNN distance calibration using 1 thread with target n_neighbors = 30
-16:45:04 Initializing from normalized Laplacian + noise (using RSpectra)
-16:45:04 Commencing optimization for 500 epochs, with 408226 positive edges
-16:45:14 Optimization finished
+17:56:45 Writing NN index file to temp file /tmp/RtmpZOJiSl/file6ec4a09b97b
+17:56:45 Searching Annoy index using 1 thread, search_k = 3000
+17:56:47 Annoy recall = 100%
+17:56:48 Commencing smooth kNN distance calibration using 1 thread with target n_neighbors = 30
+17:56:49 Initializing from normalized Laplacian + noise (using RSpectra)
+17:56:49 Commencing optimization for 500 epochs, with 408226 positive edges
+17:57:00 Optimization finished
 Scale for colour is already present.
 Adding another scale for colour, which will replace the existing scale.</code></pre>
 <p><img src="figure/01_QC_Singleron.Rmd/Elbow%20-4.png" width="1728" style="display: block; margin: auto;" /></p>
@@ -1672,7 +1688,7 @@ loaded via a namespace (and not attached):
 [119] jsonlite_1.8.8                BiocParallel_1.34.2          
 [121] R.oo_1.25.0                   BiocSingular_1.16.0          
 [123] magrittr_2.0.3                GenomeInfoDbData_1.2.11      
-[125] dotCall64_1.1-1               patchwork_1.1.3              
+[125] dotCall64_1.1-1               patchwork_1.2.0              
 [127] Rhdf5lib_1.22.1               munsell_0.5.0                
 [129] viridis_0.6.4                 reticulate_1.34.0            
 [131] stringi_1.8.3                 zlibbioc_1.48.0              
