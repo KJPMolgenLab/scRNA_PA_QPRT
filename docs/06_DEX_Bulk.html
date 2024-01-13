@@ -516,15 +516,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomKJPMolgenLabscRNAPAQPRTtree5827dff088cf16cfc6208ffc470f6a60e4cb15ectargetblank5827dffa">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomKJPMolgenLabscRNAPAQPRTtree383dc410d24b7de26ab4482656aa9f2a0944c33btargetblank383dc41a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/KJPMolgenLab/scRNA_PA_QPRT/tree/5827dff088cf16cfc6208ffc470f6a60e4cb15ec" target="_blank">5827dff</a>
+<a href="https://github.com/KJPMolgenLab/scRNA_PA_QPRT/tree/383dc410d24b7de26ab4482656aa9f2a0944c33b" target="_blank">383dc41</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomKJPMolgenLabscRNAPAQPRTtree5827dff088cf16cfc6208ffc470f6a60e4cb15ectargetblank5827dffa"
+id="strongRepositoryversionstrongahrefhttpsgithubcomKJPMolgenLabscRNAPAQPRTtree383dc410d24b7de26ab4482656aa9f2a0944c33btargetblank383dc41a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -534,7 +534,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/KJPMolgenLab/scRNA_PA_QPRT/tree/5827dff088cf16cfc6208ffc470f6a60e4cb15ec" target="_blank">5827dff</a>.
+<a href="https://github.com/KJPMolgenLab/scRNA_PA_QPRT/tree/383dc410d24b7de26ab4482656aa9f2a0944c33b" target="_blank">383dc41</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -570,6 +570,7 @@ Untracked files:
     Untracked:  data/QC_dataFinal.rds
     Untracked:  data/Sample Allocation P2023-224-LEX-LB.txt
     Untracked:  data/alldata.rds
+    Untracked:  output/06_Bulk_DEX/06_Bulk_DEX_Siggenes_lineplots.svg
     Untracked:  output/07_Bulk_Deconv/
 
 Unstaged changes:
@@ -611,6 +612,9 @@ Unstaged changes:
     Modified:   output/06_Bulk_DEX/06_Bulk_DEX_GO_results.xlsx
     Modified:   output/06_Bulk_DEX/06_Bulk_DEX_LFC_results.xlsx
     Modified:   output/06_Bulk_DEX/06_Bulk_DEX_Siggenes_boxplots.pdf
+    Modified:   output/06_Bulk_DEX/06_Bulk_DEX_top10_BP_GOplot.svg
+    Modified:   output/06_Bulk_DEX/06_Bulk_DEX_top10_TF_GOplot.svg
+    Modified:   output/06_Bulk_DEX/06_Bulk_DEX_top10all_GOplot.svg
     Modified:   workflowHelper.R
 
 </code></pre>
@@ -657,6 +661,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/KJPMolgenLab/scRNA_PA_QPRT/blob/383dc410d24b7de26ab4482656aa9f2a0944c33b/analysis/06_DEX_Bulk.Rmd" target="_blank">383dc41</a>
+</td>
+<td>
+Andreas Chiocchetti
+</td>
+<td>
+2024-01-13
+</td>
+<td>
+wflow_publish("./analysis/06_DEX_Bulk.Rmd")
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/KJPMolgenLab/scRNA_PA_QPRT/b85292521d66279ef5f3d71c97d957c935518ec5/docs/06_DEX_Bulk.html" target="_blank">b852925</a>
+</td>
+<td>
+Andreas Chiocchetti
+</td>
+<td>
+2024-01-13
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 html
@@ -918,7 +956,12 @@ Attaching package: &#39;kableExtra&#39;</code></pre>
 <pre><code>Loading required package: compareGroups</code></pre>
 <pre class="r"><code>ddsMat &lt;- readRDS(&quot;data/Bulk_dds_matrix.rds&quot;)
 SampleInfo = as.data.frame(colData(ddsMat))
-log_2cpm=log2(counts(ddsMat, normalize=T)+1)</code></pre>
+log_2cpm=log2(counts(ddsMat, normalize=T)+1)
+
+hgnc=gconvert(query=as.numeric(rownames(ddsMat)), 
+              organism = &quot;hsapiens&quot;, 
+              numeric_ns = &quot;ENTREZGENE_ACC&quot;,
+              target = &quot;HGNC&quot;)</code></pre>
 <pre class="r"><code>## comparisons against 0MM PA
 PA=levels(SampleInfo$PAmM)
 Days=c(sort(unique(SampleInfo$Day)))
@@ -1037,6 +1080,17 @@ Date
 <tbody>
 <tr>
 <td>
+<a href="https://github.com/KJPMolgenLab/scRNA_PA_QPRT/blob/b85292521d66279ef5f3d71c97d957c935518ec5/docs/figure/06_DEX_Bulk.Rmd/unnamed-chunk-4-1.png" target="_blank">b852925</a>
+</td>
+<td>
+Andreas Chiocchetti
+</td>
+<td>
+2024-01-13
+</td>
+</tr>
+<tr>
+<td>
 <a href="https://github.com/KJPMolgenLab/scRNA_PA_QPRT/blob/9044a86b031be6dc5e252fe7adc80086d2294d09/docs/figure/06_DEX_Bulk.Rmd/unnamed-chunk-4-1.png" target="_blank">9044a86</a>
 </td>
 <td>
@@ -1089,6 +1143,17 @@ Date
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+<a href="https://github.com/KJPMolgenLab/scRNA_PA_QPRT/blob/b85292521d66279ef5f3d71c97d957c935518ec5/docs/figure/06_DEX_Bulk.Rmd/unnamed-chunk-5-1.png" target="_blank">b852925</a>
+</td>
+<td>
+Andreas Chiocchetti
+</td>
+<td>
+2024-01-13
+</td>
+</tr>
 <tr>
 <td>
 <a href="https://github.com/KJPMolgenLab/scRNA_PA_QPRT/blob/9044a86b031be6dc5e252fe7adc80086d2294d09/docs/figure/06_DEX_Bulk.Rmd/unnamed-chunk-5-1.png" target="_blank">9044a86</a>
@@ -1147,6 +1212,17 @@ Date
 <tbody>
 <tr>
 <td>
+<a href="https://github.com/KJPMolgenLab/scRNA_PA_QPRT/blob/b85292521d66279ef5f3d71c97d957c935518ec5/docs/figure/06_DEX_Bulk.Rmd/unnamed-chunk-6-1.png" target="_blank">b852925</a>
+</td>
+<td>
+Andreas Chiocchetti
+</td>
+<td>
+2024-01-13
+</td>
+</tr>
+<tr>
+<td>
 <a href="https://github.com/KJPMolgenLab/scRNA_PA_QPRT/blob/9044a86b031be6dc5e252fe7adc80086d2294d09/docs/figure/06_DEX_Bulk.Rmd/unnamed-chunk-6-1.png" target="_blank">9044a86</a>
 </td>
 <td>
@@ -1189,8 +1265,40 @@ for(g in topgenes){
 }
 
 pcomb = ggpubr::ggarrange(plotlist=plotlist, nrow = 5, ncol = 4, common.legend = T, heights = c(3,3,3,3,3), widths = c(3,3,3,3))
-ggpubr::ggexport(filename = paste0(output, &quot;/06_Bulk_DEX_Siggenes_boxplots.pdf&quot;), plotlist = pcomb, width = 14, height = 21, dpi = 300)</code></pre>
+pcomb</code></pre>
+<pre><code>$`1`</code></pre>
+<p><img src="figure/06_DEX_Bulk.Rmd/plot%20top%2010%20DEX%20genes-1.png" width="1344" style="display: block; margin: auto;" /></p>
+<pre><code>
+$`2`</code></pre>
+<p><img src="figure/06_DEX_Bulk.Rmd/plot%20top%2010%20DEX%20genes-2.png" width="1344" style="display: block; margin: auto;" /></p>
+<pre><code>
+$`3`</code></pre>
+<p><img src="figure/06_DEX_Bulk.Rmd/plot%20top%2010%20DEX%20genes-3.png" width="1344" style="display: block; margin: auto;" /></p>
+<pre><code>
+attr(,&quot;class&quot;)
+[1] &quot;list&quot;      &quot;ggarrange&quot;</code></pre>
+<pre class="r"><code>ggpubr::ggexport(filename = paste0(output, &quot;/06_Bulk_DEX_Siggenes_boxplots.pdf&quot;), plotlist = pcomb, width = 14, height = 21, dpi = 300)</code></pre>
 <pre><code>file saved to output/06_Bulk_DEX//06_Bulk_DEX_Siggenes_boxplots.pdf</code></pre>
+<pre class="r"><code>dataplot &lt;- log_2cpm[which(geneinfo$hgnc%in%topgenes),] %&gt;% reshape2::melt()
+colnames(dataplot) &lt;- c(&quot;gene&quot;,&quot;Sample&quot;, &quot;reads&quot;)  
+dataplot$PAmM = SampleInfo[dataplot$Sample, &quot;PAmM&quot;]
+dataplot$Day = SampleInfo[dataplot$Sample, &quot;Day&quot;]
+dataplot$hgnc = hgnc$target[match(dataplot$gene, hgnc$input)]
+idx=is.na(dataplot$hgnc)
+dataplot$hgnc[idx] = dataplot$gene[idx]
+
+ggplot(dataplot, aes(x = Day, y = reads,col=PAmM, fill = PAmM)) +
+    geom_smooth() +
+    theme_classic() + facet_wrap(~hgnc) +
+    theme(axis.text.x = element_text(angle = 90, hjust = 1))+
+    labs(x = &quot;Day&quot;, y = &quot;log2(CPM+1)&quot;) -&gt; p
+
+p</code></pre>
+<pre><code>`geom_smooth()` using method = &#39;loess&#39; and formula = &#39;y ~ x&#39;</code></pre>
+<p><img src="figure/06_DEX_Bulk.Rmd/plot%20top%2010%20DEX%20genes-4.png" width="1344" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>ggsave(file=paste0(output, &quot;/06_Bulk_DEX_Siggenes_lineplots.svg&quot;), p)</code></pre>
+<pre><code>Saving 14 x 21 in image</code></pre>
+<pre><code>`geom_smooth()` using method = &#39;loess&#39; and formula = &#39;y ~ x&#39;</code></pre>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
@@ -1262,31 +1370,32 @@ loaded via a namespace (and not attached):
  [52] foreach_1.5.2           tools_4.3.1             chron_2.3-61           
  [55] ragg_1.2.7              Rcpp_1.0.11             glue_1.6.2             
  [58] gridExtra_2.3           pan_1.9                 SparseArray_1.2.2      
- [61] xfun_0.41               withr_2.5.2             fastmap_1.1.1          
- [64] boot_1.3-28.1           fansi_1.0.6             openssl_2.1.1          
- [67] callr_3.7.3             digest_0.6.33           truncnorm_1.0-9        
- [70] timechange_0.2.0        R6_2.5.1                mime_0.12              
- [73] mice_3.16.0             textshaping_0.3.7       colorspace_2.1-0       
- [76] utf8_1.2.4              generics_0.1.3          fontLiberation_0.1.0   
- [79] data.table_1.14.10      httr_1.4.7              htmlwidgets_1.6.4      
- [82] S4Arrays_1.2.0          whisker_0.4.1           pkgconfig_2.0.3        
- [85] gtable_0.3.4            XVector_0.42.0          htmltools_0.5.7        
- [88] carData_3.0-5           fontBitstreamVera_0.1.1 scales_1.3.0           
- [91] rstudioapi_0.15.0       tzdb_0.4.0              uuid_1.1-1             
- [94] nlme_3.1-164            curl_5.2.0              nloptr_2.0.3           
- [97] cachem_1.0.8            flextable_0.9.4         parallel_4.3.1         
-[100] pillar_1.9.0            grid_4.3.1              vctrs_0.6.5            
-[103] ggpubr_0.6.0            promises_1.2.1          car_3.1-2              
-[106] jomo_2.7-6              xtable_1.8-4            evaluate_0.23          
-[109] cli_3.6.2               locfit_1.5-9.8          compiler_4.3.1         
-[112] rlang_1.1.2             crayon_1.5.2            ggsignif_0.6.4         
-[115] labeling_0.4.3          ps_1.7.5                getPass_0.2-4          
-[118] fs_1.6.3                writexl_1.4.2           stringi_1.8.3          
-[121] viridisLite_0.4.2       BiocParallel_1.34.2     munsell_0.5.0          
-[124] lazyeval_0.2.2          glmnet_4.1-8            fontquiver_0.2.1       
-[127] Matrix_1.6-4            hms_1.1.3               gfonts_0.2.0           
-[130] statmod_1.5.0           shiny_1.8.0             highr_0.10             
-[133] broom_1.0.5             bslib_0.6.1             officer_0.6.3          </code></pre>
+ [61] mgcv_1.9-1              xfun_0.41               withr_2.5.2            
+ [64] fastmap_1.1.1           boot_1.3-28.1           fansi_1.0.6            
+ [67] openssl_2.1.1           callr_3.7.3             digest_0.6.33          
+ [70] truncnorm_1.0-9         timechange_0.2.0        R6_2.5.1               
+ [73] mime_0.12               mice_3.16.0             textshaping_0.3.7      
+ [76] colorspace_2.1-0        utf8_1.2.4              generics_0.1.3         
+ [79] fontLiberation_0.1.0    data.table_1.14.10      httr_1.4.7             
+ [82] htmlwidgets_1.6.4       S4Arrays_1.2.0          whisker_0.4.1          
+ [85] pkgconfig_2.0.3         gtable_0.3.4            XVector_0.42.0         
+ [88] htmltools_0.5.7         carData_3.0-5           fontBitstreamVera_0.1.1
+ [91] scales_1.3.0            rstudioapi_0.15.0       reshape2_1.4.4         
+ [94] tzdb_0.4.0              uuid_1.1-1              nlme_3.1-164           
+ [97] curl_5.2.0              nloptr_2.0.3            cachem_1.0.8           
+[100] flextable_0.9.4         parallel_4.3.1          pillar_1.9.0           
+[103] grid_4.3.1              vctrs_0.6.5             ggpubr_0.6.0           
+[106] promises_1.2.1          car_3.1-2               jomo_2.7-6             
+[109] xtable_1.8-4            evaluate_0.23           cli_3.6.2              
+[112] locfit_1.5-9.8          compiler_4.3.1          rlang_1.1.2            
+[115] crayon_1.5.2            ggsignif_0.6.4          labeling_0.4.3         
+[118] ps_1.7.5                plyr_1.8.9              getPass_0.2-4          
+[121] fs_1.6.3                writexl_1.4.2           stringi_1.8.3          
+[124] viridisLite_0.4.2       BiocParallel_1.34.2     munsell_0.5.0          
+[127] lazyeval_0.2.2          glmnet_4.1-8            fontquiver_0.2.1       
+[130] Matrix_1.6-4            hms_1.1.3               gfonts_0.2.0           
+[133] statmod_1.5.0           shiny_1.8.0             highr_0.10             
+[136] broom_1.0.5             bslib_0.6.1             officer_0.6.3          </code></pre>
 </div>
 
 
