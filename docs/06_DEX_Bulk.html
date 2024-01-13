@@ -385,7 +385,7 @@ class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2024-01-12
+<strong>Last updated:</strong> 2024-01-13
 </p>
 <p>
 <strong>Checks:</strong> <span
@@ -516,15 +516,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomKJPMolgenLabscRNAPAQPRTtreef7ee227768eadf71185ea14617a3ddf4ca392ee0targetblankf7ee227a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomKJPMolgenLabscRNAPAQPRTtree5827dff088cf16cfc6208ffc470f6a60e4cb15ectargetblank5827dffa">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/KJPMolgenLab/scRNA_PA_QPRT/tree/f7ee227768eadf71185ea14617a3ddf4ca392ee0" target="_blank">f7ee227</a>
+<a href="https://github.com/KJPMolgenLab/scRNA_PA_QPRT/tree/5827dff088cf16cfc6208ffc470f6a60e4cb15ec" target="_blank">5827dff</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomKJPMolgenLabscRNAPAQPRTtreef7ee227768eadf71185ea14617a3ddf4ca392ee0targetblankf7ee227a"
+id="strongRepositoryversionstrongahrefhttpsgithubcomKJPMolgenLabscRNAPAQPRTtree5827dff088cf16cfc6208ffc470f6a60e4cb15ectargetblank5827dffa"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -534,7 +534,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/KJPMolgenLab/scRNA_PA_QPRT/tree/f7ee227768eadf71185ea14617a3ddf4ca392ee0" target="_blank">f7ee227</a>.
+<a href="https://github.com/KJPMolgenLab/scRNA_PA_QPRT/tree/5827dff088cf16cfc6208ffc470f6a60e4cb15ec" target="_blank">5827dff</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -553,7 +553,6 @@ Ignored files:
     Ignored:    .Rprofile
     Ignored:    .Rproj.user/
     Ignored:    output/05_Bulk_Preprocessing/
-    Ignored:    output/07_Bulk_Deconv/
 
 Untracked files:
     Untracked:  .bashrc
@@ -569,8 +568,9 @@ Untracked files:
     Untracked:  data/QC_dataClustered.filtTyped.rds
     Untracked:  data/QC_dataClustered.filtTypedTraj.rds
     Untracked:  data/QC_dataFinal.rds
-    Untracked:  data/Yoon/
+    Untracked:  data/Sample Allocation P2023-224-LEX-LB.txt
     Untracked:  data/alldata.rds
+    Untracked:  output/07_Bulk_Deconv/
 
 Unstaged changes:
     Modified:   .gitignore
@@ -608,6 +608,9 @@ Unstaged changes:
     Modified:   output/04_Biostat/Biostat_GO_termDEG_cluster_9.xlsx
     Modified:   output/04_Biostat/Biostat_HumdevCTFreq.xslsx
     Modified:   output/04_Biostat/Biostat_clusterFreq.xslsx
+    Modified:   output/06_Bulk_DEX/06_Bulk_DEX_GO_results.xlsx
+    Modified:   output/06_Bulk_DEX/06_Bulk_DEX_LFC_results.xlsx
+    Modified:   output/06_Bulk_DEX/06_Bulk_DEX_Siggenes_boxplots.pdf
     Modified:   workflowHelper.R
 
 </code></pre>
@@ -654,6 +657,23 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/KJPMolgenLab/scRNA_PA_QPRT/472919fe027ad08e7d833e062307a8919e6e4b29/docs/06_DEX_Bulk.html" target="_blank">472919f</a>
+</td>
+<td>
+Andreas Chiocchetti
+</td>
+<td>
+2024-01-12
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -989,7 +1009,8 @@ for (set in unique(resGO$result$query)){
 }
 
 p &lt;- ggpubr::ggarrange(plotlist = plotlist, common.legend = T, nrow = 5, ncol =3)</code></pre>
-<pre><code>Warning: Removed 1 rows containing missing values (`geom_point()`).</code></pre>
+<pre><code>Warning: Removed 6 rows containing missing values (`geom_point()`).</code></pre>
+<pre><code>Warning: Removed 2 rows containing missing values (`geom_point()`).</code></pre>
 <pre class="r"><code>p</code></pre>
 <p><img src="figure/06_DEX_Bulk.Rmd/unnamed-chunk-4-1.png" width="1440" style="display: block; margin: auto;" /></p>
 <p>
@@ -1097,8 +1118,10 @@ for (set in unique(resGO$result$query)){
   }
 }
 
-p &lt;- ggpubr::ggarrange(plotlist = plotlist, common.legend = T, nrow = 5, ncol =3)
-p</code></pre>
+p &lt;- ggpubr::ggarrange(plotlist = plotlist, common.legend = T, nrow = 5, ncol =3)</code></pre>
+<pre><code>Warning: Removed 6 rows containing missing values (`geom_point()`).</code></pre>
+<pre><code>Warning: Removed 2 rows containing missing values (`geom_point()`).</code></pre>
+<pre class="r"><code>p</code></pre>
 <p><img src="figure/06_DEX_Bulk.Rmd/unnamed-chunk-6-1.png" width="1440" style="display: block; margin: auto;" /></p>
 <p>
 <button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-6-1">
