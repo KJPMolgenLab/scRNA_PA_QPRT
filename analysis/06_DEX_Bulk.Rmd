@@ -37,6 +37,12 @@ source("code/custom_functions.R")
 ddsMat <- readRDS("data/Bulk_dds_matrix.rds")
 SampleInfo = as.data.frame(colData(ddsMat))
 log_2cpm=log2(counts(ddsMat, normalize=T)+1)
+
+hgnc=gconvert(query=as.numeric(rownames(ddsMat)), 
+              organism = "hsapiens", 
+              numeric_ns = "ENTREZGENE_ACC",
+              target = "HGNC")
+
 ```
 
 ```{r analyze DEX}
@@ -184,7 +190,26 @@ for(g in topgenes){
 }
 
 pcomb = ggpubr::ggarrange(plotlist=plotlist, nrow = 5, ncol = 4, common.legend = T, heights = c(3,3,3,3,3), widths = c(3,3,3,3))
+pcomb
 ggpubr::ggexport(filename = paste0(output, "/06_Bulk_DEX_Siggenes_boxplots.pdf"), plotlist = pcomb, width = 14, height = 21, dpi = 300)
+
+dataplot <- log_2cpm[which(geneinfo$hgnc%in%topgenes),] %>% reshape2::melt()
+colnames(dataplot) <- c("gene","Sample", "reads")  
+dataplot$PAmM = SampleInfo[dataplot$Sample, "PAmM"]
+dataplot$Day = SampleInfo[dataplot$Sample, "Day"]
+dataplot$hgnc = hgnc$target[match(dataplot$gene, hgnc$input)]
+idx=is.na(dataplot$hgnc)
+dataplot$hgnc[idx] = dataplot$gene[idx]
+
+ggplot(dataplot, aes(x = Day, y = reads,col=PAmM, fill = PAmM)) +
+    geom_smooth() +
+    theme_classic() + facet_wrap(~hgnc) +
+    theme(axis.text.x = element_text(angle = 90, hjust = 1))+
+    labs(x = "Day", y = "log2(CPM+1)") -> p
+
+p
+
+ggsave(file=paste0(output, "/06_Bulk_DEX_Siggenes_lineplots.svg"), p)
 ```
 
 
