@@ -387,7 +387,7 @@ class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2024-01-12
+<strong>Last updated:</strong> 2024-01-13
 </p>
 <p>
 <strong>Checks:</strong> <span
@@ -518,15 +518,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomKJPMolgenLabscRNAPAQPRTtreef7ee227768eadf71185ea14617a3ddf4ca392ee0targetblankf7ee227a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomKJPMolgenLabscRNAPAQPRTtree0c3216ea11036657cb509f3823cf981b465a6205targetblank0c3216ea">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/KJPMolgenLab/scRNA_PA_QPRT/tree/f7ee227768eadf71185ea14617a3ddf4ca392ee0" target="_blank">f7ee227</a>
+<a href="https://github.com/KJPMolgenLab/scRNA_PA_QPRT/tree/0c3216ea11036657cb509f3823cf981b465a6205" target="_blank">0c3216e</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomKJPMolgenLabscRNAPAQPRTtreef7ee227768eadf71185ea14617a3ddf4ca392ee0targetblankf7ee227a"
+id="strongRepositoryversionstrongahrefhttpsgithubcomKJPMolgenLabscRNAPAQPRTtree0c3216ea11036657cb509f3823cf981b465a6205targetblank0c3216ea"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -536,7 +536,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/KJPMolgenLab/scRNA_PA_QPRT/tree/f7ee227768eadf71185ea14617a3ddf4ca392ee0" target="_blank">f7ee227</a>.
+<a href="https://github.com/KJPMolgenLab/scRNA_PA_QPRT/tree/0c3216ea11036657cb509f3823cf981b465a6205" target="_blank">0c3216e</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -555,7 +555,6 @@ Ignored files:
     Ignored:    .Rprofile
     Ignored:    .Rproj.user/
     Ignored:    output/05_Bulk_Preprocessing/
-    Ignored:    output/07_Bulk_Deconv/
 
 Untracked files:
     Untracked:  .bashrc
@@ -571,8 +570,9 @@ Untracked files:
     Untracked:  data/QC_dataClustered.filtTyped.rds
     Untracked:  data/QC_dataClustered.filtTypedTraj.rds
     Untracked:  data/QC_dataFinal.rds
-    Untracked:  data/Yoon/
+    Untracked:  data/Sample Allocation P2023-224-LEX-LB.txt
     Untracked:  data/alldata.rds
+    Untracked:  output/07_Bulk_Deconv/
 
 Unstaged changes:
     Modified:   .gitignore
@@ -610,6 +610,9 @@ Unstaged changes:
     Modified:   output/04_Biostat/Biostat_GO_termDEG_cluster_9.xlsx
     Modified:   output/04_Biostat/Biostat_HumdevCTFreq.xslsx
     Modified:   output/04_Biostat/Biostat_clusterFreq.xslsx
+    Modified:   output/06_Bulk_DEX/06_Bulk_DEX_GO_results.xlsx
+    Modified:   output/06_Bulk_DEX/06_Bulk_DEX_LFC_results.xlsx
+    Modified:   output/06_Bulk_DEX/06_Bulk_DEX_Siggenes_boxplots.pdf
     Modified:   workflowHelper.R
 
 </code></pre>
@@ -656,6 +659,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/KJPMolgenLab/scRNA_PA_QPRT/blob/0c3216ea11036657cb509f3823cf981b465a6205/analysis/05_Preprocessing_Bulk.Rmd" target="_blank">0c3216e</a>
+</td>
+<td>
+Andreas Chiocchetti
+</td>
+<td>
+2024-01-13
+</td>
+<td>
+wflow_publish("./analysis/05_Preprocessing_Bulk.Rmd")
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/KJPMolgenLab/scRNA_PA_QPRT/472919fe027ad08e7d833e062307a8919e6e4b29/docs/05_Preprocessing_Bulk.html" target="_blank">472919f</a>
+</td>
+<td>
+Andreas Chiocchetti
+</td>
+<td>
+2024-01-12
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 html
@@ -874,7 +911,11 @@ rowdescription = rowdescription[match(row.names(Countdata), rowdescription$entre
 rownames(rowdescription)=row.names(Countdata)
 
 # load and parse sample information 
-SampleInfo &lt;- data.frame(Fullname = make.names(colnames(Countdata)))
+SampleInfo &lt;- data.frame(Sentrixname = gsub(&quot;_1&quot;, &quot;&quot;, make.names(colnames(Countdata))))
+
+SampleAlloc &lt;- read.table(&quot;./data/Sample Allocation P2023-224-LEX-LB.txt&quot;, header=F)
+
+SampleInfo$Fullname = make.names(SampleAlloc$V2[match(SampleInfo$Sentrixname, SampleAlloc$V1)])
 
 strsplit(SampleInfo$Fullname, split = &quot;\\.&quot;) %&gt;% 
   lapply(function(x) x[1]) %&gt;% unlist -&gt; SampleInfo$Position
@@ -894,7 +935,7 @@ strsplit(infos, split = &quot;_&quot;) %&gt;%
 strsplit(infos, split = &quot;_&quot;) %&gt;%  
   lapply(function(x) factor(gsub(&quot;mM&quot;,&quot;&quot;,x[4]), levels=c(0,5)))%&gt;% unlist -&gt; SampleInfo$PAmM
 rownames(SampleInfo) &lt;- SampleInfo$Fullname
-colnames(Countdata) &lt;- make.names(colnames(Countdata))
+colnames(Countdata) &lt;- SampleInfo$Fullname[match(gsub(&quot;_1&quot;, &quot;&quot;, colnames(Countdata)),SampleInfo$Sentrixname)]
 
 # align datasets
 checkfiles = all(rownames(SampleInfo) %in% colnames(Countdata))
@@ -1125,7 +1166,7 @@ H05.H9_B14_d80_5mM_PA.2
 0
 </td>
 <td style="text-align:left;">
-0
+27
 </td>
 <td style="text-align:left;">
 0
@@ -1163,7 +1204,13 @@ H05.H9_B14_d80_5mM_PA.2
 653635
 </td>
 <td style="text-align:left;">
-0
+9
+</td>
+<td style="text-align:left;">
+15
+</td>
+<td style="text-align:left;">
+56
 </td>
 <td style="text-align:left;">
 0
@@ -1172,7 +1219,13 @@ H05.H9_B14_d80_5mM_PA.2
 0
 </td>
 <td style="text-align:left;">
+4
+</td>
+<td style="text-align:left;">
 0
+</td>
+<td style="text-align:left;">
+52
 </td>
 <td style="text-align:left;">
 0
@@ -1181,7 +1234,10 @@ H05.H9_B14_d80_5mM_PA.2
 0
 </td>
 <td style="text-align:left;">
-0
+4
+</td>
+<td style="text-align:left;">
+49
 </td>
 <td style="text-align:left;">
 0
@@ -1190,97 +1246,82 @@ H05.H9_B14_d80_5mM_PA.2
 0
 </td>
 <td style="text-align:left;">
-0
+1
 </td>
 <td style="text-align:left;">
-0
+90
 </td>
 <td style="text-align:left;">
-0
+166
 </td>
 <td style="text-align:left;">
-0
+47
 </td>
 <td style="text-align:left;">
-0
+50
 </td>
 <td style="text-align:left;">
-0
+34
+</td>
+<td style="text-align:left;">
+121
 </td>
 <td style="text-align:left;">
 2
 </td>
 <td style="text-align:left;">
-0
+3
 </td>
 <td style="text-align:left;">
-0
+53
 </td>
 <td style="text-align:left;">
-1
+44
 </td>
 <td style="text-align:left;">
-0
+43
 </td>
 <td style="text-align:left;">
-0
+17
 </td>
 <td style="text-align:left;">
-0
+109
 </td>
 <td style="text-align:left;">
-0
+150
 </td>
 <td style="text-align:left;">
-0
+14
 </td>
 <td style="text-align:left;">
-0
+42
 </td>
 <td style="text-align:left;">
-0
+131
 </td>
 <td style="text-align:left;">
-0
+18
 </td>
 <td style="text-align:left;">
-0
+108
 </td>
 <td style="text-align:left;">
-0
+86
 </td>
 <td style="text-align:left;">
-0
+142
 </td>
 <td style="text-align:left;">
-1
+35
 </td>
 <td style="text-align:left;">
-0
+36
 </td>
 <td style="text-align:left;">
-0
+169
 </td>
 <td style="text-align:left;">
-0
-</td>
-<td style="text-align:left;">
-1
-</td>
-<td style="text-align:left;">
-0
-</td>
-<td style="text-align:left;">
-0
-</td>
-<td style="text-align:left;">
-0
-</td>
-<td style="text-align:left;">
-1
-</td>
-<td style="text-align:left;">
-0
+132
 </td>
 </tr>
 <tr>
@@ -1643,7 +1684,7 @@ H05.H9_B14_d80_5mM_PA.2
 0
 </td>
 <td style="text-align:left;">
-0
+62
 </td>
 <td style="text-align:left;">
 0
@@ -1795,6 +1836,9 @@ style="border: 1px solid #ddd; padding: 0px; overflow-y: scroll; height:500px; o
 <th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
 </th>
 <th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
+Sentrixname
+</th>
+<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
 Fullname
 </th>
 <th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
@@ -1832,6 +1876,9 @@ reads_per_sample
 A01.H9_B13_d5_0mM_PA.1
 </td>
 <td style="text-align:left;">
+DE41NGSLABD102149
+</td>
+<td style="text-align:left;">
 A01.H9_B13_d5_0mM_PA.1
 </td>
 <td style="text-align:left;">
@@ -1859,12 +1906,15 @@ B13
 0
 </td>
 <td style="text-align:left;">
-28448
+5840709
 </td>
 </tr>
 <tr>
 <td style="text-align:left;">
 B01.H9_B13_d5_0mM_PA.2
+</td>
+<td style="text-align:left;">
+DE41NGSLABD102150
 </td>
 <td style="text-align:left;">
 B01.H9_B13_d5_0mM_PA.2
@@ -1894,12 +1944,15 @@ B13
 0
 </td>
 <td style="text-align:left;">
-27777
+5029282
 </td>
 </tr>
 <tr>
 <td style="text-align:left;">
 C01.H9_B13_d5_5mM_PA.1
+</td>
+<td style="text-align:left;">
+DE41NGSLABD102151
 </td>
 <td style="text-align:left;">
 C01.H9_B13_d5_5mM_PA.1
@@ -1929,12 +1982,15 @@ B13
 5
 </td>
 <td style="text-align:left;">
-27741
+7131515
 </td>
 </tr>
 <tr>
 <td style="text-align:left;">
 D01.H9_B13_d5_5mM_PA.2
+</td>
+<td style="text-align:left;">
+DE41NGSLABD102152
 </td>
 <td style="text-align:left;">
 D01.H9_B13_d5_5mM_PA.2
@@ -1964,12 +2020,15 @@ B13
 5
 </td>
 <td style="text-align:left;">
-24783
+10278286
 </td>
 </tr>
 <tr>
 <td style="text-align:left;">
 E01.H9_B14_d5_0mM_PA.1
+</td>
+<td style="text-align:left;">
+DE41NGSLABD102153
 </td>
 <td style="text-align:left;">
 E01.H9_B14_d5_0mM_PA.1
@@ -1999,12 +2058,15 @@ B14
 0
 </td>
 <td style="text-align:left;">
-25660
+6576114
 </td>
 </tr>
 <tr>
 <td style="text-align:left;">
 F01.H9_B14_d5_0mM_PA.2
+</td>
+<td style="text-align:left;">
+DE41NGSLABD102154
 </td>
 <td style="text-align:left;">
 F01.H9_B14_d5_0mM_PA.2
@@ -2034,12 +2096,15 @@ B14
 0
 </td>
 <td style="text-align:left;">
-25605
+5453781
 </td>
 </tr>
 <tr>
 <td style="text-align:left;">
 G01.H9_B14_d5_5mM_PA.1
+</td>
+<td style="text-align:left;">
+DE41NGSLABD102155
 </td>
 <td style="text-align:left;">
 G01.H9_B14_d5_5mM_PA.1
@@ -2069,12 +2134,15 @@ B14
 5
 </td>
 <td style="text-align:left;">
-25134
+7100665
 </td>
 </tr>
 <tr>
 <td style="text-align:left;">
 H01.H9_B14_d5_5mM_PA.2
+</td>
+<td style="text-align:left;">
+DE41NGSLABD102156
 </td>
 <td style="text-align:left;">
 H01.H9_B14_d5_5mM_PA.2
@@ -2104,12 +2172,15 @@ B14
 5
 </td>
 <td style="text-align:left;">
-25016
+6296121
 </td>
 </tr>
 <tr>
 <td style="text-align:left;">
 A02.H9_B13_d10_0mM_PA.1
+</td>
+<td style="text-align:left;">
+DE41NGSLABD102157
 </td>
 <td style="text-align:left;">
 A02.H9_B13_d10_0mM_PA.1
@@ -2139,12 +2210,15 @@ B13
 0
 </td>
 <td style="text-align:left;">
-25830
+6437150
 </td>
 </tr>
 <tr>
 <td style="text-align:left;">
 B02.H9_B13_d10_0mM_PA.2
+</td>
+<td style="text-align:left;">
+DE41NGSLABD102158
 </td>
 <td style="text-align:left;">
 B02.H9_B13_d10_0mM_PA.2
@@ -2174,12 +2248,15 @@ B13
 0
 </td>
 <td style="text-align:left;">
-25399
+7796517
 </td>
 </tr>
 <tr>
 <td style="text-align:left;">
 C02.H9_B13_d10_5mM_PA.1
+</td>
+<td style="text-align:left;">
+DE41NGSLABD102159
 </td>
 <td style="text-align:left;">
 C02.H9_B13_d10_5mM_PA.1
@@ -2209,12 +2286,15 @@ B13
 5
 </td>
 <td style="text-align:left;">
-25773
+6281421
 </td>
 </tr>
 <tr>
 <td style="text-align:left;">
 D02.H9_B13_d10_5mM_PA.2
+</td>
+<td style="text-align:left;">
+DE41NGSLABD102160
 </td>
 <td style="text-align:left;">
 D02.H9_B13_d10_5mM_PA.2
@@ -2244,12 +2324,15 @@ B13
 5
 </td>
 <td style="text-align:left;">
-24920
+6841318
 </td>
 </tr>
 <tr>
 <td style="text-align:left;">
 E02.H9_B14_d10_0mM_PA.1
+</td>
+<td style="text-align:left;">
+DE41NGSLABD102161
 </td>
 <td style="text-align:left;">
 E02.H9_B14_d10_0mM_PA.1
@@ -2279,12 +2362,15 @@ B14
 0
 </td>
 <td style="text-align:left;">
-23846
+5751267
 </td>
 </tr>
 <tr>
 <td style="text-align:left;">
 F02.H9_B14_d10_0mM_PA.2
+</td>
+<td style="text-align:left;">
+DE41NGSLABD102162
 </td>
 <td style="text-align:left;">
 F02.H9_B14_d10_0mM_PA.2
@@ -2314,12 +2400,15 @@ B14
 0
 </td>
 <td style="text-align:left;">
-24990
+5124675
 </td>
 </tr>
 <tr>
 <td style="text-align:left;">
 G02.H9_B14_d10_5mM_PA.1
+</td>
+<td style="text-align:left;">
+DE41NGSLABD102163
 </td>
 <td style="text-align:left;">
 G02.H9_B14_d10_5mM_PA.1
@@ -2349,12 +2438,15 @@ B14
 5
 </td>
 <td style="text-align:left;">
-25055
+6767393
 </td>
 </tr>
 <tr>
 <td style="text-align:left;">
 H02.H9_B14_d10_5mM_PA.2
+</td>
+<td style="text-align:left;">
+DE41NGSLABD102164
 </td>
 <td style="text-align:left;">
 H02.H9_B14_d10_5mM_PA.2
@@ -2384,12 +2476,15 @@ B14
 5
 </td>
 <td style="text-align:left;">
-25271
+5946249
 </td>
 </tr>
 <tr>
 <td style="text-align:left;">
 A03.H9_B13_d17_0mM_PA.1
+</td>
+<td style="text-align:left;">
+DE41NGSLABD102165
 </td>
 <td style="text-align:left;">
 A03.H9_B13_d17_0mM_PA.1
@@ -2419,12 +2514,15 @@ B13
 0
 </td>
 <td style="text-align:left;">
-20256
+4668677
 </td>
 </tr>
 <tr>
 <td style="text-align:left;">
 B03.H9_B13_d17_0mM_PA.2
+</td>
+<td style="text-align:left;">
+DE41NGSLABD102166
 </td>
 <td style="text-align:left;">
 B03.H9_B13_d17_0mM_PA.2
@@ -2454,12 +2552,15 @@ B13
 0
 </td>
 <td style="text-align:left;">
-21335
+4806101
 </td>
 </tr>
 <tr>
 <td style="text-align:left;">
 C03.H9_B13_d17_5mM_PA.1
+</td>
+<td style="text-align:left;">
+DE41NGSLABD102167
 </td>
 <td style="text-align:left;">
 C03.H9_B13_d17_5mM_PA.1
@@ -2489,12 +2590,15 @@ B13
 5
 </td>
 <td style="text-align:left;">
-22987
+5185372
 </td>
 </tr>
 <tr>
 <td style="text-align:left;">
 D03.H9_B13_d17_5mM_PA.2
+</td>
+<td style="text-align:left;">
+DE41NGSLABD102168
 </td>
 <td style="text-align:left;">
 D03.H9_B13_d17_5mM_PA.2
@@ -2524,12 +2628,15 @@ B13
 5
 </td>
 <td style="text-align:left;">
-22413
+5310064
 </td>
 </tr>
 <tr>
 <td style="text-align:left;">
 E03.H9_B14_d17_0mM_PA.1
+</td>
+<td style="text-align:left;">
+DE41NGSLABD102169
 </td>
 <td style="text-align:left;">
 E03.H9_B14_d17_0mM_PA.1
@@ -2559,12 +2666,15 @@ B14
 0
 </td>
 <td style="text-align:left;">
-20186
+5377638
 </td>
 </tr>
 <tr>
 <td style="text-align:left;">
 F03.H9_B14_d17_0mM_PA.2
+</td>
+<td style="text-align:left;">
+DE41NGSLABD102170
 </td>
 <td style="text-align:left;">
 F03.H9_B14_d17_0mM_PA.2
@@ -2594,12 +2704,15 @@ B14
 0
 </td>
 <td style="text-align:left;">
-18237
+4941718
 </td>
 </tr>
 <tr>
 <td style="text-align:left;">
 G03.H9_B14_d17_5mM_PA.1
+</td>
+<td style="text-align:left;">
+DE41NGSLABD102171
 </td>
 <td style="text-align:left;">
 G03.H9_B14_d17_5mM_PA.1
@@ -2629,12 +2742,15 @@ B14
 5
 </td>
 <td style="text-align:left;">
-19155
+5169247
 </td>
 </tr>
 <tr>
 <td style="text-align:left;">
 H03.H9_B14_d17_5mM_PA.2
+</td>
+<td style="text-align:left;">
+DE41NGSLABD102172
 </td>
 <td style="text-align:left;">
 H03.H9_B14_d17_5mM_PA.2
@@ -2664,12 +2780,15 @@ B14
 5
 </td>
 <td style="text-align:left;">
-18808
+5411353
 </td>
 </tr>
 <tr>
 <td style="text-align:left;">
 A04.H9_B13_d40_0mM_PA.1
+</td>
+<td style="text-align:left;">
+DE41NGSLABD102173
 </td>
 <td style="text-align:left;">
 A04.H9_B13_d40_0mM_PA.1
@@ -2699,12 +2818,15 @@ B13
 0
 </td>
 <td style="text-align:left;">
-25961
+5805699
 </td>
 </tr>
 <tr>
 <td style="text-align:left;">
 B04.H9_B13_d40_0mM_PA.2
+</td>
+<td style="text-align:left;">
+DE41NGSLABD102174
 </td>
 <td style="text-align:left;">
 B04.H9_B13_d40_0mM_PA.2
@@ -2734,12 +2856,15 @@ B13
 0
 </td>
 <td style="text-align:left;">
-24617
+6495683
 </td>
 </tr>
 <tr>
 <td style="text-align:left;">
 C04.H9_B13_d40_5mM_PA.1
+</td>
+<td style="text-align:left;">
+DE41NGSLABD102175
 </td>
 <td style="text-align:left;">
 C04.H9_B13_d40_5mM_PA.1
@@ -2769,12 +2894,15 @@ B13
 5
 </td>
 <td style="text-align:left;">
-24663
+6333601
 </td>
 </tr>
 <tr>
 <td style="text-align:left;">
 D04.H9_B13_d40_5mM_PA.2
+</td>
+<td style="text-align:left;">
+DE41NGSLABD102176
 </td>
 <td style="text-align:left;">
 D04.H9_B13_d40_5mM_PA.2
@@ -2804,12 +2932,15 @@ B13
 5
 </td>
 <td style="text-align:left;">
-23748
+5209532
 </td>
 </tr>
 <tr>
 <td style="text-align:left;">
 E04.H9_B14_d40_0mM_PA.1
+</td>
+<td style="text-align:left;">
+DE41NGSLABD102177
 </td>
 <td style="text-align:left;">
 E04.H9_B14_d40_0mM_PA.1
@@ -2839,12 +2970,15 @@ B14
 0
 </td>
 <td style="text-align:left;">
-22779
+7584114
 </td>
 </tr>
 <tr>
 <td style="text-align:left;">
 F04.H9_B14_d40_0mM_PA.2
+</td>
+<td style="text-align:left;">
+DE41NGSLABD102178
 </td>
 <td style="text-align:left;">
 F04.H9_B14_d40_0mM_PA.2
@@ -2874,12 +3008,15 @@ B14
 0
 </td>
 <td style="text-align:left;">
-24614
+5346054
 </td>
 </tr>
 <tr>
 <td style="text-align:left;">
 G04.H9_B14_d40_5mM_PA.1
+</td>
+<td style="text-align:left;">
+DE41NGSLABD102179
 </td>
 <td style="text-align:left;">
 G04.H9_B14_d40_5mM_PA.1
@@ -2909,12 +3046,15 @@ B14
 5
 </td>
 <td style="text-align:left;">
-24834
+5346950
 </td>
 </tr>
 <tr>
 <td style="text-align:left;">
 H04.H9_B14_d40_5mM_PA.2
+</td>
+<td style="text-align:left;">
+DE41NGSLABD102180
 </td>
 <td style="text-align:left;">
 H04.H9_B14_d40_5mM_PA.2
@@ -2944,12 +3084,15 @@ B14
 5
 </td>
 <td style="text-align:left;">
-25446
+8880530
 </td>
 </tr>
 <tr>
 <td style="text-align:left;">
 A05.H9_B13_d80_0mM_PA.1
+</td>
+<td style="text-align:left;">
+DE41NGSLABD102181
 </td>
 <td style="text-align:left;">
 A05.H9_B13_d80_0mM_PA.1
@@ -2979,12 +3122,15 @@ B13
 0
 </td>
 <td style="text-align:left;">
-25687
+7956121
 </td>
 </tr>
 <tr>
 <td style="text-align:left;">
 B05.H9_B13_d80_0mM_PA.2
+</td>
+<td style="text-align:left;">
+DE41NGSLABD102182
 </td>
 <td style="text-align:left;">
 B05.H9_B13_d80_0mM_PA.2
@@ -3014,12 +3160,15 @@ B13
 0
 </td>
 <td style="text-align:left;">
-23246
+6561657
 </td>
 </tr>
 <tr>
 <td style="text-align:left;">
 C05.H9_B13_d80_5mM_PA.1
+</td>
+<td style="text-align:left;">
+DE41NGSLABD102183
 </td>
 <td style="text-align:left;">
 C05.H9_B13_d80_5mM_PA.1
@@ -3049,12 +3198,15 @@ B13
 5
 </td>
 <td style="text-align:left;">
-23903
+6753965
 </td>
 </tr>
 <tr>
 <td style="text-align:left;">
 D05.H9_B13_d80_5mM_PA.2
+</td>
+<td style="text-align:left;">
+DE41NGSLABD102184
 </td>
 <td style="text-align:left;">
 D05.H9_B13_d80_5mM_PA.2
@@ -3084,12 +3236,15 @@ B13
 5
 </td>
 <td style="text-align:left;">
-23983
+5607214
 </td>
 </tr>
 <tr>
 <td style="text-align:left;">
 E05.H9_B14_d80_0mM_PA.1
+</td>
+<td style="text-align:left;">
+DE41NGSLABD102185
 </td>
 <td style="text-align:left;">
 E05.H9_B14_d80_0mM_PA.1
@@ -3119,12 +3274,15 @@ B14
 0
 </td>
 <td style="text-align:left;">
-21159
+5259067
 </td>
 </tr>
 <tr>
 <td style="text-align:left;">
 F05.H9_B14_d80_0mM_PA.2
+</td>
+<td style="text-align:left;">
+DE41NGSLABD102186
 </td>
 <td style="text-align:left;">
 F05.H9_B14_d80_0mM_PA.2
@@ -3154,12 +3312,15 @@ B14
 0
 </td>
 <td style="text-align:left;">
-23648
+6258149
 </td>
 </tr>
 <tr>
 <td style="text-align:left;">
 G05.H9_B14_d80_5mM_PA.1
+</td>
+<td style="text-align:left;">
+DE41NGSLABD102187
 </td>
 <td style="text-align:left;">
 G05.H9_B14_d80_5mM_PA.1
@@ -3189,12 +3350,15 @@ B14
 5
 </td>
 <td style="text-align:left;">
-21528
+6338567
 </td>
 </tr>
 <tr>
 <td style="text-align:left;">
 H05.H9_B14_d80_5mM_PA.2
+</td>
+<td style="text-align:left;">
+DE41NGSLABD102188
 </td>
 <td style="text-align:left;">
 H05.H9_B14_d80_5mM_PA.2
@@ -3224,7 +3388,7 @@ B14
 5
 </td>
 <td style="text-align:left;">
-22292
+6628003
 </td>
 </tr>
 </tbody>
@@ -3533,18 +3697,18 @@ Andreas Chiocchetti
 <div id="before-cleaning" class="section level3">
 <h3>before cleaning</h3>
 <ul>
-<li>Average reads per samples: 23 918.33</li>
-<li>Standard deviation reads per samples: 2 385.614</li>
+<li>Average reads per samples: 6 197 188</li>
+<li>Standard deviation reads per samples: 1 155 838</li>
 <li>Total genes mapped: 28 395</li>
 </ul>
 </div>
 <div id="after-cleaning" class="section level3">
 <h3>after cleaning</h3>
 <ul>
-<li>Average reads per samples: 19 494.67</li>
-<li>Standard deviation reads per samples: 1 616.038</li>
-<li>Genes removed due to low reads: 24 321</li>
-<li>Total genes included after filtering: 4 074</li>
+<li>Average reads per samples: 5 693 841</li>
+<li>Standard deviation reads per samples: 143 294.9</li>
+<li>Genes removed due to low reads: 15 210</li>
+<li>Total genes included after filtering: 13 185</li>
 </ul>
 </div>
 <div id="clustering" class="section level2">
