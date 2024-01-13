@@ -62,7 +62,11 @@ rowdescription = rowdescription[match(row.names(Countdata), rowdescription$entre
 rownames(rowdescription)=row.names(Countdata)
 
 # load and parse sample information 
-SampleInfo <- data.frame(Fullname = make.names(colnames(Countdata)))
+SampleInfo <- data.frame(Sentrixname = gsub("_1", "", make.names(colnames(Countdata))))
+
+SampleAlloc <- read.table("./data/Sample Allocation P2023-224-LEX-LB.txt", header=F)
+
+SampleInfo$Fullname = make.names(SampleAlloc$V2[match(SampleInfo$Sentrixname, SampleAlloc$V1)])
 
 strsplit(SampleInfo$Fullname, split = "\\.") %>% 
   lapply(function(x) x[1]) %>% unlist -> SampleInfo$Position
@@ -82,7 +86,7 @@ strsplit(infos, split = "_") %>%
 strsplit(infos, split = "_") %>%  
   lapply(function(x) factor(gsub("mM","",x[4]), levels=c(0,5)))%>% unlist -> SampleInfo$PAmM
 rownames(SampleInfo) <- SampleInfo$Fullname
-colnames(Countdata) <- make.names(colnames(Countdata))
+colnames(Countdata) <- SampleInfo$Fullname[match(gsub("_1", "", colnames(Countdata)),SampleInfo$Sentrixname)]
 
 # align datasets
 checkfiles = all(rownames(SampleInfo) %in% colnames(Countdata))
@@ -96,7 +100,6 @@ SampleInfo$reads_per_sample = colSums(Countdata)
 
 display_tab(head(Countdata))
 display_tab(SampleInfo)
-
 ```
 
 
