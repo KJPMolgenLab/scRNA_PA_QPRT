@@ -385,7 +385,7 @@ class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2024-01-12
+<strong>Last updated:</strong> 2024-01-13
 </p>
 <p>
 <strong>Checks:</strong> <span
@@ -516,15 +516,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomKJPMolgenLabscRNAPAQPRTtreefffce5728ec5eae82cabac96691a2e99edaacb5etargetblankfffce57a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomKJPMolgenLabscRNAPAQPRTtreeb85292521d66279ef5f3d71c97d957c935518ec5targetblankb852925a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/KJPMolgenLab/scRNA_PA_QPRT/tree/fffce5728ec5eae82cabac96691a2e99edaacb5e" target="_blank">fffce57</a>
+<a href="https://github.com/KJPMolgenLab/scRNA_PA_QPRT/tree/b85292521d66279ef5f3d71c97d957c935518ec5" target="_blank">b852925</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomKJPMolgenLabscRNAPAQPRTtreefffce5728ec5eae82cabac96691a2e99edaacb5etargetblankfffce57a"
+id="strongRepositoryversionstrongahrefhttpsgithubcomKJPMolgenLabscRNAPAQPRTtreeb85292521d66279ef5f3d71c97d957c935518ec5targetblankb852925a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -534,7 +534,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/KJPMolgenLab/scRNA_PA_QPRT/tree/fffce5728ec5eae82cabac96691a2e99edaacb5e" target="_blank">fffce57</a>.
+<a href="https://github.com/KJPMolgenLab/scRNA_PA_QPRT/tree/b85292521d66279ef5f3d71c97d957c935518ec5" target="_blank">b852925</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -568,13 +568,12 @@ Untracked files:
     Untracked:  data/QC_dataClustered.filtTyped.rds
     Untracked:  data/QC_dataClustered.filtTypedTraj.rds
     Untracked:  data/QC_dataFinal.rds
-    Untracked:  data/Yoon/
+    Untracked:  data/Sample Allocation P2023-224-LEX-LB.txt
     Untracked:  data/alldata.rds
     Untracked:  output/07_Bulk_Deconv/
 
 Unstaged changes:
     Modified:   .gitignore
-    Modified:   analysis/05_Preprocessing_Bulk.Rmd
     Modified:   output/02_Clustering/Cluster_markers.xls
     Modified:   output/02_Clustering/Clusters_GO_termsCluster.xlsx
     Modified:   output/04_Biostat/Biostat_DEG_allcells.xlsx
@@ -612,6 +611,9 @@ Unstaged changes:
     Modified:   output/06_Bulk_DEX/06_Bulk_DEX_GO_results.xlsx
     Modified:   output/06_Bulk_DEX/06_Bulk_DEX_LFC_results.xlsx
     Modified:   output/06_Bulk_DEX/06_Bulk_DEX_Siggenes_boxplots.pdf
+    Modified:   output/06_Bulk_DEX/06_Bulk_DEX_top10_BP_GOplot.svg
+    Modified:   output/06_Bulk_DEX/06_Bulk_DEX_top10_TF_GOplot.svg
+    Modified:   output/06_Bulk_DEX/06_Bulk_DEX_top10all_GOplot.svg
     Modified:   workflowHelper.R
 
 </code></pre>
@@ -658,6 +660,23 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/KJPMolgenLab/scRNA_PA_QPRT/e02ebd0ddcf19a27d4dec1dc58f59cd734560a5e/docs/07_DeconVol_Bulk.html" target="_blank">e02ebd0</a>
+</td>
+<td>
+Andreas Chiocchetti
+</td>
+<td>
+2024-01-12
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -1054,26 +1073,25 @@ test_time_by_PA = function(lmatrix, clustervar){
 
 testres = test_time_by_PA(lmatrix = long_prop_matrix, clustervar = &quot;Cluster&quot;)</code></pre>
 <pre><code>boundary (singular) fit: see help(&#39;isSingular&#39;)</code></pre>
-<pre><code>boundary (singular) fit: see help(&#39;isSingular&#39;)
-boundary (singular) fit: see help(&#39;isSingular&#39;)</code></pre>
+<pre><code>boundary (singular) fit: see help(&#39;isSingular&#39;)</code></pre>
 <pre class="r"><code>pvals=lapply(testres, function(x){x[4,&quot;pvalue&quot;]})
 Significances = data.frame(cluster = names(pvals), p.value = unlist(pvals,recursive = F))
 Significances</code></pre>
-<pre><code>   cluster            p.value
-5        5   0.81157846805976
-9        9  0.205056184288347
-8        8             no var
-1        1             no var
-0        0             no var
-3        3  0.827518461811875
-4        4  0.784802180841154
-7        7  0.104760347157305
-6        6  0.637523534486176
-2        2 0.0317204906304008
-12      12  0.676167660185283
-11      11  0.822157205928926
-10      10   0.88225559856036
-13      13 0.0115553161413814</code></pre>
+<pre><code>   cluster              p.value
+5        5    0.443625374639893
+9        9   0.0472236983847623
+8        8               no var
+1        1               no var
+0        0               no var
+3        3    0.875283132166054
+4        4    0.737247216506133
+7        7               no var
+6        6    0.400655510295367
+2        2   0.0010919890872763
+12      12    0.865579580390124
+11      11               no var
+10      10    0.861744364765872
+13      13 5.23788758476045e-06</code></pre>
 <pre class="r"><code>openxlsx2::write_xlsx(Significances, paste0(output,&quot;07_DeconVol_Bulk_StatTimecourseDiff_clusters.xslx&quot;))</code></pre>
 <pre class="r"><code>col=viridis::viridis(100)
 
@@ -1114,6 +1132,17 @@ Date
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+<a href="https://github.com/KJPMolgenLab/scRNA_PA_QPRT/blob/e02ebd0ddcf19a27d4dec1dc58f59cd734560a5e/docs/figure/07_DeconVol_Bulk.Rmd/unnamed-chunk-6-1.png" target="_blank">e02ebd0</a>
+</td>
+<td>
+Andreas Chiocchetti
+</td>
+<td>
+2024-01-12
+</td>
+</tr>
 <tr>
 <td>
 <a href="https://github.com/KJPMolgenLab/scRNA_PA_QPRT/blob/7fc08ed424a3c84a1c0872aed6d4acda1cecfb7a/docs/figure/07_DeconVol_Bulk.Rmd/unnamed-chunk-6-1.png" target="_blank">7fc08ed</a>
@@ -1190,6 +1219,17 @@ Date
 <tbody>
 <tr>
 <td>
+<a href="https://github.com/KJPMolgenLab/scRNA_PA_QPRT/blob/e02ebd0ddcf19a27d4dec1dc58f59cd734560a5e/docs/figure/07_DeconVol_Bulk.Rmd/unnamed-chunk-8-1.png" target="_blank">e02ebd0</a>
+</td>
+<td>
+Andreas Chiocchetti
+</td>
+<td>
+2024-01-12
+</td>
+</tr>
+<tr>
+<td>
 <a href="https://github.com/KJPMolgenLab/scRNA_PA_QPRT/blob/7fc08ed424a3c84a1c0872aed6d4acda1cecfb7a/docs/figure/07_DeconVol_Bulk.Rmd/unnamed-chunk-8-1.png" target="_blank">7fc08ed</a>
 </td>
 <td>
@@ -1212,28 +1252,27 @@ class="section level2">
 <h2>testing of time differences per cluster</h2>
 <pre class="r"><code>testres = test_time_by_PA(lmatrix = long_prop_matrix, clustervar = &quot;Kn.Cluster&quot;)</code></pre>
 <pre><code>boundary (singular) fit: see help(&#39;isSingular&#39;)
-boundary (singular) fit: see help(&#39;isSingular&#39;)
 boundary (singular) fit: see help(&#39;isSingular&#39;)</code></pre>
 <pre class="r"><code>pvals=lapply(testres, function(x){x[4,&quot;pvalue&quot;]})
 Significances = data.frame(cluster = names(pvals), p.value = unlist(pvals,recursive = F))
 Significances</code></pre>
-<pre><code>              cluster            p.value
-oRG               oRG  0.104760347157229
-L23               L23             no var
-INP               INP             no var
-CGE_LGE_IN CGE_LGE_IN             no var
-LGE_IN         LGE_IN             no var
-L6_CThPN     L6_CThPN  0.980490539524949
-ccRG             ccRG  0.709112408918209
-IP                 IP  0.984668137977308
-RG                 RG  0.185853271644573
-ccvRG           ccvRG  0.165327881255527
-Astrocytes Astrocytes  0.327704613662938
-L56               L56 0.0767270518672607
-vRG               vRG             no var
-CGE_IN         CGE_IN  0.719537052612447
-L4                 L4             no var
-mesenchyme mesenchyme  0.829581351678757</code></pre>
+<pre><code>              cluster           p.value
+oRG               oRG            no var
+L23               L23            no var
+INP               INP            no var
+CGE_LGE_IN CGE_LGE_IN            no var
+LGE_IN         LGE_IN            no var
+L6_CThPN     L6_CThPN 0.578010574658149
+ccRG             ccRG 0.893438324788172
+IP                 IP 0.892557972215078
+RG                 RG            no var
+ccvRG           ccvRG 0.621800990553103
+Astrocytes Astrocytes 0.270534861998907
+L56               L56 0.130146259243014
+vRG               vRG            no var
+CGE_IN         CGE_IN 0.924070944586973
+L4                 L4            no var
+mesenchyme mesenchyme 0.458066792449976</code></pre>
 <pre class="r"><code>openxlsx2::write_xlsx(Significances, paste0(output,&quot;07_DeconVol_Bulk_StatTimecourseDiff_KnCelltypes.xslx&quot;))</code></pre>
 <pre class="r"><code>svg(paste0(output, &quot;07_DeconVol_Bulk_propHeatmap_Knoblichclusters.svg&quot;))
 gplots::heatmap.2(prop.matrix.knblich, scale = &quot;col&quot;, 
@@ -1252,6 +1291,43 @@ Colv = F, trace = &quot;none&quot;, density.info = &quot;none&quot;, col = col, 
 c(12, : Discrepancy: Colv is FALSE, while dendrogram is `both&#39;. Omitting column
 dendogram.</code></pre>
 <p><img src="figure/07_DeconVol_Bulk.Rmd/unnamed-chunk-10-1.png" width="576" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-10-1">
+Past versions of unnamed-chunk-10-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-10-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/KJPMolgenLab/scRNA_PA_QPRT/blob/e02ebd0ddcf19a27d4dec1dc58f59cd734560a5e/docs/figure/07_DeconVol_Bulk.Rmd/unnamed-chunk-10-1.png" target="_blank">e02ebd0</a>
+</td>
+<td>
+Andreas Chiocchetti
+</td>
+<td>
+2024-01-12
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
