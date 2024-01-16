@@ -115,7 +115,7 @@ for (set in unique(resGO$result$query)){
   if(nrow(dat)>0){
     plotlist[[set]]<-GOplot(dat, N = 10, Title = set)
   }else{
-    text="no signifiance"
+    text="no significance"
     plotlist[[set]]<-ggplot() + annotate("text", x = 4, y = 25, label = text) + 
       ggtitle(set) + theme_void()
   }
