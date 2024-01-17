@@ -113,18 +113,25 @@ for(md in min.dist){
   for(s in spread){
     title=paste0("dist_",md, "_spread_", s)
     plotlist[[title]]<-tryCatch({
-      RunUMAP(seurat_integrated, reduction = "harmony", min.dist=md, spread=s, dims = 1:40) %>%  
-      DimPlot(group.by = "seurat_clusters")+theme_classic()+ggtitle(title)+ NoAxes() +NoLegend()
-      },
-      error = function(e){
-        print(e)
-        plotlist[[title]]<-ggplot() + annotate("text", x = 4, y = 25, size=1, label = e) + 
-  theme_void()
-      }, warning = function(w){
-        print(w)
-        plotlist[[title]]<-ggplot() + annotate("text", x = 4, y = 25, size=1, label = w) + 
-  theme_void()
-      })
+      RunUMAP(seurat_integrated, 
+              reduction = "harmony", 
+              min.dist=md, 
+              spread=s, 
+              umap.method="uwot", 
+              metric="cosine",
+              verbose = F,
+              dims = 1:40) %>%  
+        DimPlot(group.by = "seurat_clusters")+theme_classic()+ggtitle(title)+ NoAxes() +NoLegend()
+    },
+    error = function(e){
+      print(e)
+      plotlist[[title]]<-ggplot() + annotate("text", x = 4, y = 25, size=1, label = e) + 
+        theme_void()
+    }, warning = function(w){
+      print(w)
+      plotlist[[title]]<-ggplot() + annotate("text", x = 4, y = 25, size=1, label = w) + 
+        theme_void()
+    })
   }
 }
 ```
@@ -158,10 +165,10 @@ ggsave("./output/02_Clustering/Clustering_UmapByType.svg")
 
 ```{r, Cell cycle scoring, echo=FALSE, fig.width=12, fig.height=6}
 seurat_integrated <- CellCycleScoring(object = seurat_integrated, g2m.features = cc.genes$g2m.genes,
-    s.features = cc.genes$s.genes)
+                                      s.features = cc.genes$s.genes)
 
 p1<-VlnPlot(seurat_integrated, features = c("S.Score", "G2M.Score"), group.by = "type",
-    ncol = 2, pt.size = 0.1)
+            ncol = 2, pt.size = 0.1)
 
 p2 = DimPlot(seurat_integrated, group.by = "Phase")
 
@@ -205,16 +212,16 @@ a<-ggplot(long, aes(x=type, y=cluster, size=ncells, color=type))+
   theme(axis.text.x = element_text(angle = 90, vjust = 1, hjust=1))
 
 b<-DimPlot(seurat_integrated,
-        reduction = "umap",
-        label = TRUE,
-        group.by = "seurat_clusters")+
+           reduction = "umap",
+           label = TRUE,
+           group.by = "seurat_clusters")+
   theme(legend.position = "none")+ggtitle("Seurat cluster")
 
 c<-DimPlot(seurat_integrated,
-        reduction = "umap",
-        label = TRUE,
-        group.by = "seurat_clusters",
-        split.by = "type")+
+           reduction = "umap",
+           label = TRUE,
+           group.by = "seurat_clusters",
+           split.by = "type")+
   theme(legend.position = "none")+ggtitle("Seurat cluster")
 
 
@@ -229,11 +236,11 @@ metrics <-  c("nCount_RNA", "nFeature_RNA", "S.Score", "G2M.Score",
 
 
 qcplot<- FeaturePlot(seurat_integrated, 
-            reduction = "umap", 
-            features = metrics,
-            pt.size = 0.3, 
-            order = TRUE,
-            min.cutoff = 'q10')
+                     reduction = "umap", 
+                     features = metrics,
+                     pt.size = 0.3, 
+                     order = TRUE,
+                     min.cutoff = 'q10')
 qcplot
 ggsave("./output/02_Clustering/Clustering_FeatPlot_QCMeasures.svg", qcplot)
 ```
@@ -289,8 +296,8 @@ markers <- FindAllMarkers(object = seurat_integrated,
 openxlsx2::write_xlsx(markers,"./output/02_Clustering/Cluster_markers.xls")
 
 markers %>%
-    group_by(cluster) %>%
-    top_n(n = 10, wt = avg_log2FC) -> top10
+  group_by(cluster) %>%
+  top_n(n = 10, wt = avg_log2FC) -> top10
 
 p1<-DoHeatmap(seurat_integrated, features = top10$gene, slot = "scale.data")
 p1
@@ -302,65 +309,191 @@ ggsave("./output/02_Clustering/Clustering_Heatmap_Markers.svg")
 ```{r}
 ## marker genelist 
 Markers = list(
-NE=c("NES", "SOX2", "NOTCH1", "OCT4"),
-RG=c("GFAP", "PAX6", "SLC1A3", "HES1"),
-IPC=c("TBR2", "ASCL1"),
-Neuim=c("DCX", "TUBB3", "NEUROD1", "STMN1"),
-Neumat=c("MAP2", "DLG4", "NEFM"),
-NeuGlut=c("SLC17A7", "SLC17A6", "GRIN2B", "GLUD1"),
-NeuGABA=c("SLC6A1", "SLC17A6", "GABBR1", "GAD67"),
-NeuDopa=c("GIRK2", "TH", "DAT1", "DRD2"),
-NeuSert=c("SLC6A4", "TPH1", "HTR2A"),
-NeuChoilin=c("CHAT", "SLC18A3", "ACHE"),
-ODpre=c("PDGFRA", "CSPG4"),
-ODmat=c("OLIG1", "MBP", "SOX10", "LRP5"),
-SC=c("NCAM", "MPZ", "S100", "MOG"),
-AC=c("GFAP", "SLC1A3", "SLC1A2", "SOX10"),
-MG=c("ITGAM", "PTPRC", "SCARD1", "TNFRSF5")
+  NE=c("NES", "SOX2", "NOTCH1", "OCT4"),
+  RG=c("GFAP", "PAX6", "SLC1A3", "HES1"),
+  IPC=c("TBR2", "ASCL1"),
+  Neuim=c("DCX", "TUBB3", "NEUROD1", "STMN1"),
+  Neumat=c("MAP2", "DLG4", "NEFM"),
+  NeuGlut=c("SLC17A7", "SLC17A6", "GRIN2B", "GLUD1"),
+  NeuGABA=c("SLC6A1", "SLC17A6", "GABBR1", "GAD67"),
+  NeuDopa=c("GIRK2", "TH", "DAT1", "DRD2"),
+  NeuSert=c("SLC6A4", "TPH1", "HTR2A"),
+  NeuChoilin=c("CHAT", "SLC18A3", "ACHE"),
+  ODpre=c("PDGFRA", "CSPG4"),
+  ODmat=c("OLIG1", "MBP", "SOX10", "LRP5"),
+  SC=c("NCAM", "MPZ", "S100", "MOG"),
+  AC=c("GFAP", "SLC1A3", "SLC1A2", "SOX10"),
+  MG=c("ITGAM", "PTPRC", "SCARD1", "TNFRSF5")
 )
 
 
-reads = seurat_integrated@assays$RNA@counts
-uMarker=unique(unlist(Markers))
-datmat=matrix(0, nrow=length(uMarker), ncol=ncol(reads))
-rownames(datmat)=uMarker
-colnames(datmat)=colnames(reads)
 
-for(M in uMarker){
-  try(datmat[M,]<-reads[M,])
-}
 
-datmat<- as.data.frame(datmat)
-datatoplot_mean = aggregate(t(datmat), 
-                            list(seurat_integrated$seurat_clusters), 
-                            mean, na.rm=T) %>% 
-  as.data.frame() %>% mutate_at("Group.1",function(x){paste0("cluster_",x)}) %>% column_to_rownames("Group.1")
-
-datatoplot_mean <- datatoplot_mean %>% scale()
-
-clustersim=hclust(dist(datatoplot_mean))
-clustersorder=clustersim$labels[clustersim$order]
-
-datatoplot_mean=melt(datatoplot_mean)
-colnames(datatoplot_mean) = c("Cluster", "Gene", "Scaled_mean")
-
-datatoplot_perc = aggregate(t(datmat), list(seurat_integrated$seurat_clusters), 
-                            function(x){length(which(x>0))/length(x)})
-
-datatoplot_perc=melt(datatoplot_perc, value.name = "perc")
-
-datatoplot = cbind(datatoplot_mean, perc=datatoplot_perc$perc)
-
-datatoplot$Gene = factor(datatoplot$Gene, levels = uMarker)
-datatoplot$Cluster = factor(datatoplot$Cluster, levels = clustersorder)
-p <- ggplot(datatoplot, aes(y=Gene, x=Cluster, col=Scaled_mean, size=perc))+geom_point()+
+genbased_dotplot = function(Markers, seurat_integrated, sortlist=NULL){
+  reads = seurat_integrated@assays$RNA@counts
+  uMarker=unique(unlist(Markers))
+  datmat=matrix(0, nrow=length(uMarker), ncol=ncol(reads))
+  rownames(datmat)=uMarker
+  colnames(datmat)=colnames(reads)
+  
+  for(M in uMarker){
+    try(datmat[M,]<-reads[M,])
+  }
+  
+  datmat<- as.data.frame(datmat)
+  datatoplot_mean = aggregate(t(datmat), 
+                              list(seurat_integrated$seurat_clusters), 
+                              mean, na.rm=T) %>% 
+    as.data.frame() %>% mutate_at("Group.1",function(x){paste0("cluster_",x)}) %>% column_to_rownames("Group.1")
+  datatoplot_mean <- datatoplot_mean %>% scale()
+  if(length(sortlist)==0){
+    clustersim=hclust(dist(datatoplot_mean))
+    clustersorder=clustersim$labels[clustersim$order]
+  } else {
+    clustersorder = sortlist  
+  }
+  datatoplot_mean=melt(datatoplot_mean)
+  colnames(datatoplot_mean) = c("Cluster", "Gene", "Scaled_mean")
+  datatoplot_perc = aggregate(t(datmat), list(seurat_integrated$seurat_clusters), 
+                              function(x){length(which(x>0))/length(x)})
+  datatoplot_perc=melt(datatoplot_perc, value.name = "perc")
+  datatoplot = cbind(datatoplot_mean, perc=datatoplot_perc$perc)
+  datatoplot$Gene = factor(datatoplot$Gene, levels = uMarker)
+  datatoplot$Cluster = factor(datatoplot$Cluster, levels = clustersorder)
+  p <- ggplot(datatoplot, aes(y=Gene, x=Cluster, col=Scaled_mean, size=perc))+geom_point()+
     theme_classic()+theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+  return(list(plot=p, orderlist=clustersorder))
+}
 
 ```
 
 ```{r, fig.width=6, fig.height=9}
+p<-genbased_dotplot(Markers, seurat_integrated)
+p[["plot"]]
+ggsave("./output/02_Clustering/Clustering_NeuronalMarkers.svg", p[["plot"]])
+orderlist=p$orderlist
+```
+
+## chr 16p11 genes expression by cluster 
+
+```{r 16p11}
+
+read_url_xlsx <- function(url, dest.file="data/tmp.xlsx", ...){
+  download.file(url, destfile = dest.file)
+  url_csv <- openxlsx::read.xlsx(dest.file, ...)
+  return(url_csv)
+}
+
+url <- "https://onedrive.live.com/download?id=1CE096496C465FF3!879&resid=1CE096496C465FF3!879&ithint=file%2cxlsx&authkey=!AEkKHImEdX9UvHA&wdo=2&cid=1ce096496c465ff3"
+
+chr16p11_genes<-tryCatch(
+  {chr16p11_genes <- read_url_xlsx(url, dest.file = "data/chr16p11.xlsx")
+  return(chr16p11_genes)}, 
+  error = function(cond) {
+    message("url cout not be opended")
+    message(conditionMessage(cond))
+    message ("trying local instead")
+    chr16p11_genes <- openxlsx::read.xlsx("data/chr16p11_orig.xlsx")
+    return(chr16p11_genes)
+  },  
+  warning = function(cond) {
+    message("url could not be opended")
+    message(conditionMessage(cond))
+    message ("trying local instead")
+    chr16p11_genes <- openxlsx::read.xlsx("data/chr16p11_orig.xlsx")
+    return(chr16p11_genes)
+  }
+)
+```
+
+```{r, fig.width=6, fig.height=8}
+p<-genbased_dotplot(chr16p11_genes$Gene_symbol, seurat_integrated, orderlist)
+p$plot
+ggsave("./output/02_Clustering/ClusteringAll_Chr16p11.svg", p$plot)
+```
+
+## 16p11 genes PA condition 
+
+
+```{r, fig.width=12, fig.height=8}
+p0<-genbased_dotplot(chr16p11_genes$Gene_symbol, seurat_integrated[,seurat_integrated$type=="0mM"], orderlist)
+p5<-genbased_dotplot(chr16p11_genes$Gene_symbol, seurat_integrated[,seurat_integrated$type=="5mM"], orderlist)
+
+pcomb =ggarrange(p0$plot,p5$plot, labels = c("0mM PA", "5mM PA"), common.legend = T)
+pcomb
+ggsave("./output/02_Clustering/ClusteringSplitPA_Chr16p11.svg", pcomb)
+```
+
+## chr16p11 violin plots 
+
+```{r, fig.width=20, fig.height=10}
+p<-VlnPlot(seurat_integrated, 
+           features=chr16p11_genes$Gene_symbol, 
+           split.by="type",
+           group.by="seurat_clusters", 
+           log = T, 
+           layer="counts",
+           stack=T)
+
 p
-ggsave("./output/02_Clustering/Clustering_NeuronalMarkers.svg", p)
+ggsave("./output/02_Clustering/Clustering_ClusterbyPA_Violin_Chr16p11.svg", p)
+```
+
+## Kynurenine genes expression by cluster 
+
+```{r Kynurenine}
+url <- "https://onedrive.live.com/download?id=1CE096496C465FF3!878&resid=1CE096496C465FF3!878&ithint=file%2cxlsx&authkey=!AMv00cMy5Pg7LLA&wdo=2&cid=1ce096496c465ff3"
+
+Kynurenine_genes<-tryCatch(
+  {Kynurenine_genes <- read_url_xlsx(url, dest.file = "data/Kynurenine_genes.xlsx")
+  return(Kynurenine_genes)}, 
+  error = function(cond) {
+    message("url could not be opended")
+    message(conditionMessage(cond))
+    message ("trying local instead")
+    Kynurenine_genes <- openxlsx::read.xlsx("data/Kynurenine_genes_orig.xlsx")
+    return(Kynurenine_genes)
+  }, 
+  warning = function(cond) {
+    message("url could not be opended")
+    message(conditionMessage(cond))
+    message ("trying local instead")
+    Kynurenine_genes <- openxlsx::read.xlsx("data/Kynurenine_genes_orig.xlsx")
+    return(Kynurenine_genes)
+  }
+)
+
+```
+
+```{r, fig.width=6, fig.height=6}
+p<-genbased_dotplot(Kynurenine_genes$Gene_symbol, seurat_integrated, orderlist)
+p$plot
+ggsave("./output/02_Clustering/ClusteringAll_Kynurenine.svg", p$plot)
+```
+
+## Kynurenine genes PA condition 
+
+```{r, fig.width=10, fig.height=6}
+p0<-genbased_dotplot(Kynurenine_genes$Gene_symbol, seurat_integrated[,seurat_integrated$type=="0mM"], orderlist)
+p5<-genbased_dotplot(Kynurenine_genes$Gene_symbol, seurat_integrated[,seurat_integrated$type=="5mM"], orderlist)
+
+pcomb =ggarrange(p0$plot,p5$plot, labels = c("0mM PA", "5mM PA"), common.legend = T)
+pcomb
+ggsave("./output/02_Clustering/ClusteringSplitPA_Kynurenine.svg", pcomb)
+```
+
+## Kynurenine violin plots 
+
+```{r, fig.width=20, fig.height=10}
+p<-VlnPlot(seurat_integrated, 
+           features=Kynurenine_genes$Gene_symbol, 
+           split.by="type",
+           group.by="seurat_clusters", 
+           log = T, 
+           stack=T, layer="counts")
+
+p
+ggsave("./output/02_Clustering/Clustering_ClusterbyPA_Violin_Kynurenine.svg", p)
 ```
 
 ## GO terms of clusters
@@ -377,20 +510,79 @@ gostres = gost(query = genelist, evcodes = T, custom_bg = genebackground)
 
 names(gostres)
 
-tablegostres = gostres$result[grepl("GO:", gostres$result$source), c("query", "source", "term_name","p_value", "intersection")]
+tablegostres = gostres$result[grepl("GO:", gostres$result$source), c("query", "source", "term_name","p_value", "intersection"
+)]
 
 DT::datatable(tablegostres, extensions = "Buttons",
-                    filter="top",
-                    options = list(
-                      pageLength = 15,
-                      info = FALSE,
-                      lengthMenu = list(c(15,50, 100, -1),
-                                        c("15","50", "100" ,"All")
-                      ),dom = 'Blfrtip',
-                      buttons = c('copy', 'csv', 'excel', 'pdf')
-                    ))
+              filter="top",
+              options = list(
+                pageLength = 15,
+                info = FALSE,
+                lengthMenu = list(c(15,50, 100, -1),
+                                  c("15","50", "100" ,"All")
+                ),dom = 'Blfrtip',
+                buttons = c('copy', 'csv', 'excel', 'pdf')
+              ))
 
 openxlsx2::write_xlsx(tablegostres, "./output/02_Clustering/Clusters_GO_termsCluster.xlsx")
+```
+
+
+```{r, fig.width=15, fig.height=20}
+source("code/custom_functions.R")
+
+plotlist = list()
+for (set in unique(gostres$result$query)){
+  dat=gostres$result[which(gostres$result$query == set),]
+  if(nrow(dat)>0){
+    plotlist[[set]]<-GOplot(dat, N = 10, Title = set, xlim=NA)
+  }else{
+    text="no significance"
+    plotlist[[set]]<-ggplot() + annotate("text", x = 4, y = 25, label = text) + 
+      ggtitle(set) + theme_void()
+  }
+}
+
+p <- ggpubr::ggarrange(plotlist = plotlist, common.legend = T, nrow = 5, ncol =3)
+p
+ggsave(file="output/02_Clustering/Clustering_Clusters_GOplot_all.svg", plot = p)
+```
+
+```{r, fig.width=15, fig.height=20}
+
+plotlist = list()
+for (set in unique(gostres$result$query)){
+  dat=gostres$result[which(gostres$result$query == set & gostres$result$source == "GO:BP"),]
+  if(nrow(dat)>0){
+    plotlist[[set]]<-GOplot(dat, N = 10, Title = set)
+  }else{
+    text="no significance"
+    plotlist[[set]]<-ggplot() + annotate("text", x = 4, y = 25, label = text) + 
+      ggtitle(set) + theme_void()
+  }
+}
+
+p <- ggpubr::ggarrange(plotlist = plotlist, common.legend = T, nrow = 5, ncol =3)
+p
+ggsave(file="output/02_Clustering/Clustering_Clusters_GOplot_BP.svg", plot = p)
+```
+
+```{r fig.width=15, fig.height=20}
+plotlist = list()
+for (set in unique(gostres$result$query)){
+  dat=gostres$result[which(gostres$result$query == set & gostres$result$source == "TF"),]
+  if(nrow(dat)>0){
+    plotlist[[set]]<-GOplot(dat, N = 10, Title = set)
+  }else{
+    text="no significance"
+    plotlist[[set]]<-ggplot() + annotate("text", x = 4, y = 25, label = text) + 
+      ggtitle(set) + theme_void()
+  }
+}
+
+p <- ggpubr::ggarrange(plotlist = plotlist, common.legend = T, nrow = 5, ncol =3)
+p
+ggsave(file="output/02_Clustering/Clustering_Clusters_GOplot_TF.svg", plot = p)
 ```
 
 ```{r save}
