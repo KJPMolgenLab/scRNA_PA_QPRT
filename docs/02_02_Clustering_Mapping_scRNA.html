@@ -383,7 +383,7 @@ class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2024-01-13
+<strong>Last updated:</strong> 2024-01-18
 </p>
 <p>
 <strong>Checks:</strong> <span
@@ -514,15 +514,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomKJPMolgenLabscRNAPAQPRTtree65a97d33477c4f582687e45b7f6ba29125ce7733targetblank65a97d3a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomKJPMolgenLabscRNAPAQPRTtreeb307d0988eb354574385755c5e96d41d4b573a0btargetblankb307d09a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/KJPMolgenLab/scRNA_PA_QPRT/tree/65a97d33477c4f582687e45b7f6ba29125ce7733" target="_blank">65a97d3</a>
+<a href="https://github.com/KJPMolgenLab/scRNA_PA_QPRT/tree/b307d0988eb354574385755c5e96d41d4b573a0b" target="_blank">b307d09</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomKJPMolgenLabscRNAPAQPRTtree65a97d33477c4f582687e45b7f6ba29125ce7733targetblank65a97d3a"
+id="strongRepositoryversionstrongahrefhttpsgithubcomKJPMolgenLabscRNAPAQPRTtreeb307d0988eb354574385755c5e96d41d4b573a0btargetblankb307d09a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -532,7 +532,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/KJPMolgenLab/scRNA_PA_QPRT/tree/65a97d33477c4f582687e45b7f6ba29125ce7733" target="_blank">65a97d3</a>.
+<a href="https://github.com/KJPMolgenLab/scRNA_PA_QPRT/tree/b307d0988eb354574385755c5e96d41d4b573a0b" target="_blank">b307d09</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -550,6 +550,7 @@ Ignored files:
     Ignored:    .Rhistory
     Ignored:    .Rprofile
     Ignored:    .Rproj.user/
+    Ignored:    analysis/figure/
     Ignored:    output/05_Bulk_Preprocessing/
 
 Untracked files:
@@ -561,6 +562,8 @@ Untracked files:
     Untracked:  data/Kanton/
     Untracked:  data/KantonGeneList/
     Untracked:  data/Knoblich/
+    Untracked:  data/Kynurenine_genes.xlsx
+    Untracked:  data/Kynurenine_genes_orig.xlsx
     Untracked:  data/QC_data.filt.rds
     Untracked:  data/QC_dataClustered.filt.rds
     Untracked:  data/QC_dataClustered.filtTyped.rds
@@ -568,51 +571,37 @@ Untracked files:
     Untracked:  data/QC_dataFinal.rds
     Untracked:  data/Sample Allocation P2023-224-LEX-LB.txt
     Untracked:  data/alldata.rds
-    Untracked:  output/06_Bulk_DEX/06_Bulk_DEX_Siggenes_lineplots.svg
-    Untracked:  output/07_Bulk_Deconv/
+    Untracked:  data/chr16p11.xlsx
+    Untracked:  data/chr16p11_orig.xlsx
+    Untracked:  data/tmp.xlsx
+    Untracked:  output/02_Clustering/ClusteringAll_Chr16p11.svg
+    Untracked:  output/02_Clustering/ClusteringAll_Kynurenine.svg
+    Untracked:  output/02_Clustering/ClusteringSplitPA_Chr16p11.svg
+    Untracked:  output/02_Clustering/ClusteringSplitPA_Kynurenine.svg
+    Untracked:  output/02_Clustering/Clustering_ClusterbyPA_Violin_Chr16p11.svg
+    Untracked:  output/02_Clustering/Clustering_ClusterbyPA_Violin_Kynurenine.svg
+    Untracked:  output/02_Clustering/Clustering_Clusters_GOplot_BP.svg
+    Untracked:  output/02_Clustering/Clustering_Clusters_GOplot_TF.svg
+    Untracked:  output/02_Clustering/Clustering_Clusters_GOplot_all.svg
+    Untracked:  output/06_Bulk_DEX/07_DeconVol_Bulk_propHeatmap_clusters.svg
 
 Unstaged changes:
     Modified:   .gitignore
+    Modified:   analysis/03_TrajectoryAnalysis_scRNA.Rmd
+    Modified:   analysis/04_GroupAnalysis_scRNA.Rmd
+    Modified:   analysis/05_Preprocessing_Bulk.Rmd
+    Modified:   analysis/06_DEX_Bulk.Rmd
+    Modified:   analysis/07_DeconVol_Bulk.Rmd
+    Modified:   code/custom_functions.R
     Modified:   output/02_Clustering/Cluster_markers.xls
     Modified:   output/02_Clustering/Clusters_GO_termsCluster.xlsx
-    Modified:   output/04_Biostat/Biostat_DEG_allcells.xlsx
-    Modified:   output/04_Biostat/Biostat_DEG_cluster_0cells.xlsx
-    Modified:   output/04_Biostat/Biostat_DEG_cluster_10cells.xlsx
-    Modified:   output/04_Biostat/Biostat_DEG_cluster_11cells.xlsx
-    Modified:   output/04_Biostat/Biostat_DEG_cluster_12cells.xlsx
-    Modified:   output/04_Biostat/Biostat_DEG_cluster_13cells.xlsx
-    Modified:   output/04_Biostat/Biostat_DEG_cluster_1cells.xlsx
-    Modified:   output/04_Biostat/Biostat_DEG_cluster_2cells.xlsx
-    Modified:   output/04_Biostat/Biostat_DEG_cluster_3cells.xlsx
-    Modified:   output/04_Biostat/Biostat_DEG_cluster_4cells.xlsx
-    Modified:   output/04_Biostat/Biostat_DEG_cluster_5cells.xlsx
-    Modified:   output/04_Biostat/Biostat_DEG_cluster_6cells.xlsx
-    Modified:   output/04_Biostat/Biostat_DEG_cluster_7cells.xlsx
-    Modified:   output/04_Biostat/Biostat_DEG_cluster_8cells.xlsx
-    Modified:   output/04_Biostat/Biostat_DEG_cluster_9cells.xlsx
-    Modified:   output/04_Biostat/Biostat_GO_termDEG_all.xlsx
-    Modified:   output/04_Biostat/Biostat_GO_termDEG_cluster_0.xlsx
-    Modified:   output/04_Biostat/Biostat_GO_termDEG_cluster_1.xlsx
-    Modified:   output/04_Biostat/Biostat_GO_termDEG_cluster_10.xlsx
-    Modified:   output/04_Biostat/Biostat_GO_termDEG_cluster_11.xlsx
-    Modified:   output/04_Biostat/Biostat_GO_termDEG_cluster_12.xlsx
-    Modified:   output/04_Biostat/Biostat_GO_termDEG_cluster_13.xlsx
-    Modified:   output/04_Biostat/Biostat_GO_termDEG_cluster_2.xlsx
-    Modified:   output/04_Biostat/Biostat_GO_termDEG_cluster_3.xlsx
-    Modified:   output/04_Biostat/Biostat_GO_termDEG_cluster_4.xlsx
-    Modified:   output/04_Biostat/Biostat_GO_termDEG_cluster_5.xlsx
-    Modified:   output/04_Biostat/Biostat_GO_termDEG_cluster_6.xlsx
-    Modified:   output/04_Biostat/Biostat_GO_termDEG_cluster_7.xlsx
-    Modified:   output/04_Biostat/Biostat_GO_termDEG_cluster_8.xlsx
-    Modified:   output/04_Biostat/Biostat_GO_termDEG_cluster_9.xlsx
-    Modified:   output/04_Biostat/Biostat_HumdevCTFreq.xslsx
-    Modified:   output/04_Biostat/Biostat_clusterFreq.xslsx
     Modified:   output/06_Bulk_DEX/06_Bulk_DEX_GO_results.xlsx
     Modified:   output/06_Bulk_DEX/06_Bulk_DEX_LFC_results.xlsx
     Modified:   output/06_Bulk_DEX/06_Bulk_DEX_Siggenes_boxplots.pdf
-    Modified:   output/06_Bulk_DEX/06_Bulk_DEX_top10_BP_GOplot.svg
-    Modified:   output/06_Bulk_DEX/06_Bulk_DEX_top10_TF_GOplot.svg
-    Modified:   output/06_Bulk_DEX/06_Bulk_DEX_top10all_GOplot.svg
+    Modified:   output/07_Bulk_Deconv/07_DeconVol_Bulk_StatTimecourseDiff_clusters.xslx
+    Modified:   output/07_Bulk_Deconv/07_DeconVol_Bulk_propHeatmap_clusters.svg
+    Modified:   output/07_Bulk_Deconv/07_DeconVol_Bulk_timeplots_Knoblichclusters.svg
+    Modified:   output/07_Bulk_Deconv/07_DeconVol_Bulk_timeplots_clusters.svg
     Modified:   workflowHelper.R
 
 </code></pre>
@@ -660,6 +649,23 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/KJPMolgenLab/scRNA_PA_QPRT/59bee55d3de39470e828899c8a621492a38ef394/docs/02_02_Clustering_Mapping_scRNA.html" target="_blank">59bee55</a>
+</td>
+<td>
+Andreas Chiocchetti
+</td>
+<td>
+2024-01-14
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 html
@@ -806,6 +812,28 @@ Date
 <tbody>
 <tr>
 <td>
+<a href="https://github.com/KJPMolgenLab/scRNA_PA_QPRT/blob/a13f9ecc34444b2c79c1a4d1ac87d1204eff2192/docs/figure/02_02_Clustering_Mapping_scRNA.Rmd/unnamed-chunk-2-1.png" target="_blank">a13f9ec</a>
+</td>
+<td>
+Andreas Chiocchetti
+</td>
+<td>
+2024-01-18
+</td>
+</tr>
+<tr>
+<td>
+<a href="https://github.com/KJPMolgenLab/scRNA_PA_QPRT/blob/59bee55d3de39470e828899c8a621492a38ef394/docs/figure/02_02_Clustering_Mapping_scRNA.Rmd/unnamed-chunk-2-1.png" target="_blank">59bee55</a>
+</td>
+<td>
+Andreas Chiocchetti
+</td>
+<td>
+2024-01-14
+</td>
+</tr>
+<tr>
+<td>
 <a href="https://github.com/KJPMolgenLab/scRNA_PA_QPRT/blob/65a97d33477c4f582687e45b7f6ba29125ce7733/docs/figure/02_02_Clustering_Mapping_scRNA.Rmd/unnamed-chunk-2-1.png" target="_blank">65a97d3</a>
 </td>
 <td>
@@ -856,6 +884,28 @@ Date
 <tbody>
 <tr>
 <td>
+<a href="https://github.com/KJPMolgenLab/scRNA_PA_QPRT/blob/a13f9ecc34444b2c79c1a4d1ac87d1204eff2192/docs/figure/02_02_Clustering_Mapping_scRNA.Rmd/unnamed-chunk-3-1.png" target="_blank">a13f9ec</a>
+</td>
+<td>
+Andreas Chiocchetti
+</td>
+<td>
+2024-01-18
+</td>
+</tr>
+<tr>
+<td>
+<a href="https://github.com/KJPMolgenLab/scRNA_PA_QPRT/blob/59bee55d3de39470e828899c8a621492a38ef394/docs/figure/02_02_Clustering_Mapping_scRNA.Rmd/unnamed-chunk-3-1.png" target="_blank">59bee55</a>
+</td>
+<td>
+Andreas Chiocchetti
+</td>
+<td>
+2024-01-14
+</td>
+</tr>
+<tr>
+<td>
 <a href="https://github.com/KJPMolgenLab/scRNA_PA_QPRT/blob/65a97d33477c4f582687e45b7f6ba29125ce7733/docs/figure/02_02_Clustering_Mapping_scRNA.Rmd/unnamed-chunk-3-1.png" target="_blank">65a97d3</a>
 </td>
 <td>
@@ -904,8 +954,8 @@ KnoblichType   0  1  2  3  4  5  6  7  8  9 10 11 12 13
 data:  crosstab
 X-squared = 2429.9, df = 182, p-value &lt; 2.2e-16</code></pre>
 <pre><code>           used  (Mb) gc trigger   (Mb)  max used   (Mb)
-Ncells 10189877 544.2   17878753  954.9  17878753  954.9
-Vcells 78399827 598.2  258595419 1973.0 323244273 2466.2</code></pre>
+Ncells 10189904 544.2   17877556  954.8  17877556  954.8
+Vcells 78399859 598.2  268091642 2045.4 335114552 2556.8</code></pre>
 </div>
 <div id="knoblich-map-to-annotation" class="section level2">
 <h2>Knoblich Map to annotation</h2>
@@ -934,6 +984,28 @@ Date
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+<a href="https://github.com/KJPMolgenLab/scRNA_PA_QPRT/blob/a13f9ecc34444b2c79c1a4d1ac87d1204eff2192/docs/figure/02_02_Clustering_Mapping_scRNA.Rmd/unnamed-chunk-5-1.png" target="_blank">a13f9ec</a>
+</td>
+<td>
+Andreas Chiocchetti
+</td>
+<td>
+2024-01-18
+</td>
+</tr>
+<tr>
+<td>
+<a href="https://github.com/KJPMolgenLab/scRNA_PA_QPRT/blob/59bee55d3de39470e828899c8a621492a38ef394/docs/figure/02_02_Clustering_Mapping_scRNA.Rmd/unnamed-chunk-5-1.png" target="_blank">59bee55</a>
+</td>
+<td>
+Andreas Chiocchetti
+</td>
+<td>
+2024-01-14
+</td>
+</tr>
 <tr>
 <td>
 <a href="https://github.com/KJPMolgenLab/scRNA_PA_QPRT/blob/65a97d33477c4f582687e45b7f6ba29125ce7733/docs/figure/02_02_Clustering_Mapping_scRNA.Rmd/unnamed-chunk-5-1.png" target="_blank">65a97d3</a>
@@ -1018,6 +1090,28 @@ Date
 <tbody>
 <tr>
 <td>
+<a href="https://github.com/KJPMolgenLab/scRNA_PA_QPRT/blob/a13f9ecc34444b2c79c1a4d1ac87d1204eff2192/docs/figure/02_02_Clustering_Mapping_scRNA.Rmd/unnamed-chunk-6-1.png" target="_blank">a13f9ec</a>
+</td>
+<td>
+Andreas Chiocchetti
+</td>
+<td>
+2024-01-18
+</td>
+</tr>
+<tr>
+<td>
+<a href="https://github.com/KJPMolgenLab/scRNA_PA_QPRT/blob/59bee55d3de39470e828899c8a621492a38ef394/docs/figure/02_02_Clustering_Mapping_scRNA.Rmd/unnamed-chunk-6-1.png" target="_blank">59bee55</a>
+</td>
+<td>
+Andreas Chiocchetti
+</td>
+<td>
+2024-01-14
+</td>
+</tr>
+<tr>
+<td>
 <a href="https://github.com/KJPMolgenLab/scRNA_PA_QPRT/blob/65a97d33477c4f582687e45b7f6ba29125ce7733/docs/figure/02_02_Clustering_Mapping_scRNA.Rmd/unnamed-chunk-6-1.png" target="_blank">65a97d3</a>
 </td>
 <td>
@@ -1044,8 +1138,8 @@ Andreas Chiocchetti
 </div>
 <pre><code>Saving 12 x 12 in image</code></pre>
 <pre><code>           used  (Mb) gc trigger   (Mb)  max used   (Mb)
-Ncells 10275641 548.8   17878753  954.9  17878753  954.9
-Vcells 79027167 603.0  412434008 3146.7 805535156 6145.8</code></pre>
+Ncells 10275638 548.8   17877556  954.8  17877556  954.8
+Vcells 79027285 603.0  515542485 3933.3 805535124 6145.8</code></pre>
 </div>
 <div id="kanton-et-al-table-4-celltypes" class="section level2">
 <h2>Kanton et al Table 4 Celltypes</h2>
@@ -1114,6 +1208,28 @@ Date
 <tbody>
 <tr>
 <td>
+<a href="https://github.com/KJPMolgenLab/scRNA_PA_QPRT/blob/a13f9ecc34444b2c79c1a4d1ac87d1204eff2192/docs/figure/02_02_Clustering_Mapping_scRNA.Rmd/unnamed-chunk-9-1.png" target="_blank">a13f9ec</a>
+</td>
+<td>
+Andreas Chiocchetti
+</td>
+<td>
+2024-01-18
+</td>
+</tr>
+<tr>
+<td>
+<a href="https://github.com/KJPMolgenLab/scRNA_PA_QPRT/blob/59bee55d3de39470e828899c8a621492a38ef394/docs/figure/02_02_Clustering_Mapping_scRNA.Rmd/unnamed-chunk-9-1.png" target="_blank">59bee55</a>
+</td>
+<td>
+Andreas Chiocchetti
+</td>
+<td>
+2024-01-14
+</td>
+</tr>
+<tr>
+<td>
 <a href="https://github.com/KJPMolgenLab/scRNA_PA_QPRT/blob/65a97d33477c4f582687e45b7f6ba29125ce7733/docs/figure/02_02_Clustering_Mapping_scRNA.Rmd/unnamed-chunk-9-1.png" target="_blank">65a97d3</a>
 </td>
 <td>
@@ -1164,6 +1280,28 @@ Date
 <tbody>
 <tr>
 <td>
+<a href="https://github.com/KJPMolgenLab/scRNA_PA_QPRT/blob/a13f9ecc34444b2c79c1a4d1ac87d1204eff2192/docs/figure/02_02_Clustering_Mapping_scRNA.Rmd/unnamed-chunk-9-2.png" target="_blank">a13f9ec</a>
+</td>
+<td>
+Andreas Chiocchetti
+</td>
+<td>
+2024-01-18
+</td>
+</tr>
+<tr>
+<td>
+<a href="https://github.com/KJPMolgenLab/scRNA_PA_QPRT/blob/59bee55d3de39470e828899c8a621492a38ef394/docs/figure/02_02_Clustering_Mapping_scRNA.Rmd/unnamed-chunk-9-2.png" target="_blank">59bee55</a>
+</td>
+<td>
+Andreas Chiocchetti
+</td>
+<td>
+2024-01-14
+</td>
+</tr>
+<tr>
+<td>
 <a href="https://github.com/KJPMolgenLab/scRNA_PA_QPRT/blob/65a97d33477c4f582687e45b7f6ba29125ce7733/docs/figure/02_02_Clustering_Mapping_scRNA.Rmd/unnamed-chunk-9-2.png" target="_blank">65a97d3</a>
 </td>
 <td>
@@ -1212,6 +1350,28 @@ Date
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+<a href="https://github.com/KJPMolgenLab/scRNA_PA_QPRT/blob/a13f9ecc34444b2c79c1a4d1ac87d1204eff2192/docs/figure/02_02_Clustering_Mapping_scRNA.Rmd/unnamed-chunk-10-1.png" target="_blank">a13f9ec</a>
+</td>
+<td>
+Andreas Chiocchetti
+</td>
+<td>
+2024-01-18
+</td>
+</tr>
+<tr>
+<td>
+<a href="https://github.com/KJPMolgenLab/scRNA_PA_QPRT/blob/59bee55d3de39470e828899c8a621492a38ef394/docs/figure/02_02_Clustering_Mapping_scRNA.Rmd/unnamed-chunk-10-1.png" target="_blank">59bee55</a>
+</td>
+<td>
+Andreas Chiocchetti
+</td>
+<td>
+2024-01-14
+</td>
+</tr>
 <tr>
 <td>
 <a href="https://github.com/KJPMolgenLab/scRNA_PA_QPRT/blob/65a97d33477c4f582687e45b7f6ba29125ce7733/docs/figure/02_02_Clustering_Mapping_scRNA.Rmd/unnamed-chunk-10-1.png" target="_blank">65a97d3</a>
@@ -1310,6 +1470,28 @@ Date
 <tbody>
 <tr>
 <td>
+<a href="https://github.com/KJPMolgenLab/scRNA_PA_QPRT/blob/a13f9ecc34444b2c79c1a4d1ac87d1204eff2192/docs/figure/02_02_Clustering_Mapping_scRNA.Rmd/unnamed-chunk-11-1.png" target="_blank">a13f9ec</a>
+</td>
+<td>
+Andreas Chiocchetti
+</td>
+<td>
+2024-01-18
+</td>
+</tr>
+<tr>
+<td>
+<a href="https://github.com/KJPMolgenLab/scRNA_PA_QPRT/blob/59bee55d3de39470e828899c8a621492a38ef394/docs/figure/02_02_Clustering_Mapping_scRNA.Rmd/unnamed-chunk-11-1.png" target="_blank">59bee55</a>
+</td>
+<td>
+Andreas Chiocchetti
+</td>
+<td>
+2024-01-14
+</td>
+</tr>
+<tr>
+<td>
 <a href="https://github.com/KJPMolgenLab/scRNA_PA_QPRT/blob/65a97d33477c4f582687e45b7f6ba29125ce7733/docs/figure/02_02_Clustering_Mapping_scRNA.Rmd/unnamed-chunk-11-1.png" target="_blank">65a97d3</a>
 </td>
 <td>
@@ -1359,6 +1541,28 @@ Date
 <tbody>
 <tr>
 <td>
+<a href="https://github.com/KJPMolgenLab/scRNA_PA_QPRT/blob/a13f9ecc34444b2c79c1a4d1ac87d1204eff2192/docs/figure/02_02_Clustering_Mapping_scRNA.Rmd/unnamed-chunk-11-2.png" target="_blank">a13f9ec</a>
+</td>
+<td>
+Andreas Chiocchetti
+</td>
+<td>
+2024-01-18
+</td>
+</tr>
+<tr>
+<td>
+<a href="https://github.com/KJPMolgenLab/scRNA_PA_QPRT/blob/59bee55d3de39470e828899c8a621492a38ef394/docs/figure/02_02_Clustering_Mapping_scRNA.Rmd/unnamed-chunk-11-2.png" target="_blank">59bee55</a>
+</td>
+<td>
+Andreas Chiocchetti
+</td>
+<td>
+2024-01-14
+</td>
+</tr>
+<tr>
+<td>
 <a href="https://github.com/KJPMolgenLab/scRNA_PA_QPRT/blob/65a97d33477c4f582687e45b7f6ba29125ce7733/docs/figure/02_02_Clustering_Mapping_scRNA.Rmd/unnamed-chunk-11-2.png" target="_blank">65a97d3</a>
 </td>
 <td>
@@ -1399,8 +1603,8 @@ Kanton14Type  0  1  2  3  4  5  6  7  8  9 10 11 12 13
 data:  crosstab
 X-squared = 1093.7, df = 78, p-value &lt; 2.2e-16</code></pre>
 <pre><code>           used  (Mb) gc trigger   (Mb)  max used   (Mb)
-Ncells 10245910 547.2   17878757  954.9  17878757  954.9
-Vcells 78811094 601.3  329951309 2517.4 805535156 6145.8</code></pre>
+Ncells 10245901 547.2   17877562  954.8  17877562  954.8
+Vcells 78811550 601.3  329954222 2517.4 805535124 6145.8</code></pre>
 </div>
 <div id="humandevdata-map-to-annotation" class="section level2">
 <h2>HumanDevData Map to annotation</h2>
@@ -1536,8 +1740,8 @@ Attaching package: &#39;AnnotationDbi&#39;</code></pre>
 <pre><code></code></pre>
 <pre><code>&#39;select()&#39; returned 1:many mapping between keys and columns</code></pre>
 <pre><code>            used   (Mb) gc trigger    (Mb)   max used    (Mb)
-Ncells  11347988  606.1   17878757   954.9   17878757   954.9
-Vcells 156496693 1194.0 5398856369 41190.1 6214204009 47410.7</code></pre>
+Ncells  11347978  606.1   17877562   954.8   17877562   954.8
+Vcells 156497148 1194.0 5398856806 41190.1 6214204237 47410.7</code></pre>
 <pre><code>Normalizing layer: counts</code></pre>
 <pre><code>Centering and scaling data matrix</code></pre>
 <pre><code>Finding variable features for layer counts</code></pre>
@@ -1579,25 +1783,25 @@ Negative:  AHSP, HBA1, ALAS2, HBA2, HBM, SLC25A37, ENSG00000284931, HBG1, GYPB, 
 <pre><code>Warning: The default method for RunUMAP has changed from calling Python UMAP via reticulate to the R-native UWOT using the cosine metric
 To use Python UMAP via reticulate, set umap.method to &#39;umap-learn&#39; and metric to &#39;correlation&#39;
 This message will be shown once per session</code></pre>
-<pre><code>04:31:58 UMAP embedding parameters a = 0.9922 b = 1.112</code></pre>
+<pre><code>14:29:56 UMAP embedding parameters a = 0.9922 b = 1.112</code></pre>
 <pre><code>Found more than one class &quot;dist&quot; in cache; using the first, from namespace &#39;BiocGenerics&#39;</code></pre>
 <pre><code>Also defined by &#39;spam&#39;</code></pre>
-<pre><code>04:31:58 Read 17262 rows and found 30 numeric columns</code></pre>
-<pre><code>04:31:58 Using Annoy for neighbor search, n_neighbors = 30</code></pre>
+<pre><code>14:29:56 Read 17262 rows and found 30 numeric columns</code></pre>
+<pre><code>14:29:56 Using Annoy for neighbor search, n_neighbors = 30</code></pre>
 <pre><code>Found more than one class &quot;dist&quot; in cache; using the first, from namespace &#39;BiocGenerics&#39;</code></pre>
 <pre><code>Also defined by &#39;spam&#39;</code></pre>
-<pre><code>04:31:58 Building Annoy index with metric = cosine, n_trees = 50</code></pre>
+<pre><code>14:29:56 Building Annoy index with metric = cosine, n_trees = 50</code></pre>
 <pre><code>0%   10   20   30   40   50   60   70   80   90   100%</code></pre>
 <pre><code>[----|----|----|----|----|----|----|----|----|----|</code></pre>
 <pre><code>**************************************************|
-04:32:01 Writing NN index file to temp file /tmp/RtmpsN82ea/file8ad2f391582
-04:32:01 Searching Annoy index using 1 thread, search_k = 3000
-04:32:08 Annoy recall = 99.79%
-04:32:09 Commencing smooth kNN distance calibration using 1 thread with target n_neighbors = 30
-04:32:09 69 smooth knn distance failures
-04:32:11 Initializing from normalized Laplacian + noise (using RSpectra)
-04:32:15 Commencing optimization for 200 epochs, with 703070 positive edges
-04:32:22 Optimization finished
+14:29:58 Writing NN index file to temp file /tmp/RtmpqcmVfH/file196240935671
+14:29:58 Searching Annoy index using 1 thread, search_k = 3000
+14:30:03 Annoy recall = 99.79%
+14:30:03 Commencing smooth kNN distance calibration using 1 thread with target n_neighbors = 30
+14:30:03 69 smooth knn distance failures
+14:30:05 Initializing from normalized Laplacian + noise (using RSpectra)
+14:30:07 Commencing optimization for 200 epochs, with 703070 positive edges
+14:30:15 Optimization finished
 Computing nearest neighbor graph
 Computing SNN</code></pre>
 <pre><code>Modularity Optimizer version 1.3.0 by Ludo Waltman and Nees Jan van Eck
@@ -1610,8 +1814,8 @@ Maximum modularity in 10 random starts: 0.9375
 Number of communities: 31
 Elapsed time: 1 seconds</code></pre>
 <pre><code>            used   (Mb) gc trigger    (Mb)   max used    (Mb)
-Ncells  11448752  611.5   17878757   954.9   17878757   954.9
-Vcells 814072656 6210.9 2211371570 16871.5 6214204009 47410.7</code></pre>
+Ncells  11448739  611.5   17877562   954.8   17877562   954.8
+Vcells 814073107 6210.9 2211371748 16871.5 6214204237 47410.7</code></pre>
 <p><img src="figure/02_02_Clustering_Mapping_scRNA.Rmd/maphumdev%20plot%20humdev%20ref%20cluster-1.png" width="576" style="display: block; margin: auto;" /></p>
 <p>
 <button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-no-spaces-maphumdev-plot-humdev-ref-cluster-1">
@@ -1636,6 +1840,28 @@ Date
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+<a href="https://github.com/KJPMolgenLab/scRNA_PA_QPRT/blob/a13f9ecc34444b2c79c1a4d1ac87d1204eff2192/docs/figure/02_02_Clustering_Mapping_scRNA.Rmd/maphumdev plot humdev ref cluster-1.png" target="_blank">a13f9ec</a>
+</td>
+<td>
+Andreas Chiocchetti
+</td>
+<td>
+2024-01-18
+</td>
+</tr>
+<tr>
+<td>
+<a href="https://github.com/KJPMolgenLab/scRNA_PA_QPRT/blob/59bee55d3de39470e828899c8a621492a38ef394/docs/figure/02_02_Clustering_Mapping_scRNA.Rmd/maphumdev plot humdev ref cluster-1.png" target="_blank">59bee55</a>
+</td>
+<td>
+Andreas Chiocchetti
+</td>
+<td>
+2024-01-14
+</td>
+</tr>
 <tr>
 <td>
 <a href="https://github.com/KJPMolgenLab/scRNA_PA_QPRT/blob/65a97d33477c4f582687e45b7f6ba29125ce7733/docs/figure/02_02_Clustering_Mapping_scRNA.Rmd/maphumdev plot humdev ref cluster-1.png" target="_blank">65a97d3</a>
@@ -1689,6 +1915,28 @@ Date
 <tbody>
 <tr>
 <td>
+<a href="https://github.com/KJPMolgenLab/scRNA_PA_QPRT/blob/a13f9ecc34444b2c79c1a4d1ac87d1204eff2192/docs/figure/02_02_Clustering_Mapping_scRNA.Rmd/maphumdevplot details-1.png" target="_blank">a13f9ec</a>
+</td>
+<td>
+Andreas Chiocchetti
+</td>
+<td>
+2024-01-18
+</td>
+</tr>
+<tr>
+<td>
+<a href="https://github.com/KJPMolgenLab/scRNA_PA_QPRT/blob/59bee55d3de39470e828899c8a621492a38ef394/docs/figure/02_02_Clustering_Mapping_scRNA.Rmd/maphumdevplot details-1.png" target="_blank">59bee55</a>
+</td>
+<td>
+Andreas Chiocchetti
+</td>
+<td>
+2024-01-14
+</td>
+</tr>
+<tr>
+<td>
 <a href="https://github.com/KJPMolgenLab/scRNA_PA_QPRT/blob/65a97d33477c4f582687e45b7f6ba29125ce7733/docs/figure/02_02_Clustering_Mapping_scRNA.Rmd/maphumdevplot details-1.png" target="_blank">65a97d3</a>
 </td>
 <td>
@@ -1737,6 +1985,28 @@ Date
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+<a href="https://github.com/KJPMolgenLab/scRNA_PA_QPRT/blob/a13f9ecc34444b2c79c1a4d1ac87d1204eff2192/docs/figure/02_02_Clustering_Mapping_scRNA.Rmd/unnamed-chunk-12-1.png" target="_blank">a13f9ec</a>
+</td>
+<td>
+Andreas Chiocchetti
+</td>
+<td>
+2024-01-18
+</td>
+</tr>
+<tr>
+<td>
+<a href="https://github.com/KJPMolgenLab/scRNA_PA_QPRT/blob/59bee55d3de39470e828899c8a621492a38ef394/docs/figure/02_02_Clustering_Mapping_scRNA.Rmd/unnamed-chunk-12-1.png" target="_blank">59bee55</a>
+</td>
+<td>
+Andreas Chiocchetti
+</td>
+<td>
+2024-01-14
+</td>
+</tr>
 <tr>
 <td>
 <a href="https://github.com/KJPMolgenLab/scRNA_PA_QPRT/blob/65a97d33477c4f582687e45b7f6ba29125ce7733/docs/figure/02_02_Clustering_Mapping_scRNA.Rmd/unnamed-chunk-12-1.png" target="_blank">65a97d3</a>
@@ -1789,6 +2059,28 @@ Date
 <tbody>
 <tr>
 <td>
+<a href="https://github.com/KJPMolgenLab/scRNA_PA_QPRT/blob/a13f9ecc34444b2c79c1a4d1ac87d1204eff2192/docs/figure/02_02_Clustering_Mapping_scRNA.Rmd/maphumdev plot counts-1.png" target="_blank">a13f9ec</a>
+</td>
+<td>
+Andreas Chiocchetti
+</td>
+<td>
+2024-01-18
+</td>
+</tr>
+<tr>
+<td>
+<a href="https://github.com/KJPMolgenLab/scRNA_PA_QPRT/blob/59bee55d3de39470e828899c8a621492a38ef394/docs/figure/02_02_Clustering_Mapping_scRNA.Rmd/maphumdev plot counts-1.png" target="_blank">59bee55</a>
+</td>
+<td>
+Andreas Chiocchetti
+</td>
+<td>
+2024-01-14
+</td>
+</tr>
+<tr>
+<td>
 <a href="https://github.com/KJPMolgenLab/scRNA_PA_QPRT/blob/65a97d33477c4f582687e45b7f6ba29125ce7733/docs/figure/02_02_Clustering_Mapping_scRNA.Rmd/maphumdev plot counts-1.png" target="_blank">65a97d3</a>
 </td>
 <td>
@@ -1837,6 +2129,28 @@ Date
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+<a href="https://github.com/KJPMolgenLab/scRNA_PA_QPRT/blob/a13f9ecc34444b2c79c1a4d1ac87d1204eff2192/docs/figure/02_02_Clustering_Mapping_scRNA.Rmd/maphumdev plot bars-1.png" target="_blank">a13f9ec</a>
+</td>
+<td>
+Andreas Chiocchetti
+</td>
+<td>
+2024-01-18
+</td>
+</tr>
+<tr>
+<td>
+<a href="https://github.com/KJPMolgenLab/scRNA_PA_QPRT/blob/59bee55d3de39470e828899c8a621492a38ef394/docs/figure/02_02_Clustering_Mapping_scRNA.Rmd/maphumdev plot bars-1.png" target="_blank">59bee55</a>
+</td>
+<td>
+Andreas Chiocchetti
+</td>
+<td>
+2024-01-14
+</td>
+</tr>
 <tr>
 <td>
 <a href="https://github.com/KJPMolgenLab/scRNA_PA_QPRT/blob/65a97d33477c4f582687e45b7f6ba29125ce7733/docs/figure/02_02_Clustering_Mapping_scRNA.Rmd/maphumdev plot bars-1.png" target="_blank">65a97d3</a>
@@ -2000,6 +2314,28 @@ Date
 <tbody>
 <tr>
 <td>
+<a href="https://github.com/KJPMolgenLab/scRNA_PA_QPRT/blob/a13f9ecc34444b2c79c1a4d1ac87d1204eff2192/docs/figure/02_02_Clustering_Mapping_scRNA.Rmd/plot all scores-1.png" target="_blank">a13f9ec</a>
+</td>
+<td>
+Andreas Chiocchetti
+</td>
+<td>
+2024-01-18
+</td>
+</tr>
+<tr>
+<td>
+<a href="https://github.com/KJPMolgenLab/scRNA_PA_QPRT/blob/59bee55d3de39470e828899c8a621492a38ef394/docs/figure/02_02_Clustering_Mapping_scRNA.Rmd/plot all scores-1.png" target="_blank">59bee55</a>
+</td>
+<td>
+Andreas Chiocchetti
+</td>
+<td>
+2024-01-14
+</td>
+</tr>
+<tr>
+<td>
 <a href="https://github.com/KJPMolgenLab/scRNA_PA_QPRT/blob/65a97d33477c4f582687e45b7f6ba29125ce7733/docs/figure/02_02_Clustering_Mapping_scRNA.Rmd/plot all scores-1.png" target="_blank">65a97d3</a>
 </td>
 <td>
@@ -2049,6 +2385,28 @@ Date
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+<a href="https://github.com/KJPMolgenLab/scRNA_PA_QPRT/blob/a13f9ecc34444b2c79c1a4d1ac87d1204eff2192/docs/figure/02_02_Clustering_Mapping_scRNA.Rmd/plot all scores-2.png" target="_blank">a13f9ec</a>
+</td>
+<td>
+Andreas Chiocchetti
+</td>
+<td>
+2024-01-18
+</td>
+</tr>
+<tr>
+<td>
+<a href="https://github.com/KJPMolgenLab/scRNA_PA_QPRT/blob/59bee55d3de39470e828899c8a621492a38ef394/docs/figure/02_02_Clustering_Mapping_scRNA.Rmd/plot all scores-2.png" target="_blank">59bee55</a>
+</td>
+<td>
+Andreas Chiocchetti
+</td>
+<td>
+2024-01-14
+</td>
+</tr>
 <tr>
 <td>
 <a href="https://github.com/KJPMolgenLab/scRNA_PA_QPRT/blob/65a97d33477c4f582687e45b7f6ba29125ce7733/docs/figure/02_02_Clustering_Mapping_scRNA.Rmd/plot all scores-2.png" target="_blank">65a97d3</a>
@@ -2102,6 +2460,28 @@ Date
 <tbody>
 <tr>
 <td>
+<a href="https://github.com/KJPMolgenLab/scRNA_PA_QPRT/blob/a13f9ecc34444b2c79c1a4d1ac87d1204eff2192/docs/figure/02_02_Clustering_Mapping_scRNA.Rmd/plot all scores-3.png" target="_blank">a13f9ec</a>
+</td>
+<td>
+Andreas Chiocchetti
+</td>
+<td>
+2024-01-18
+</td>
+</tr>
+<tr>
+<td>
+<a href="https://github.com/KJPMolgenLab/scRNA_PA_QPRT/blob/59bee55d3de39470e828899c8a621492a38ef394/docs/figure/02_02_Clustering_Mapping_scRNA.Rmd/plot all scores-3.png" target="_blank">59bee55</a>
+</td>
+<td>
+Andreas Chiocchetti
+</td>
+<td>
+2024-01-14
+</td>
+</tr>
+<tr>
+<td>
 <a href="https://github.com/KJPMolgenLab/scRNA_PA_QPRT/blob/65a97d33477c4f582687e45b7f6ba29125ce7733/docs/figure/02_02_Clustering_Mapping_scRNA.Rmd/plot all scores-3.png" target="_blank">65a97d3</a>
 </td>
 <td>
@@ -2151,6 +2531,28 @@ Date
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+<a href="https://github.com/KJPMolgenLab/scRNA_PA_QPRT/blob/a13f9ecc34444b2c79c1a4d1ac87d1204eff2192/docs/figure/02_02_Clustering_Mapping_scRNA.Rmd/plot all scores-4.png" target="_blank">a13f9ec</a>
+</td>
+<td>
+Andreas Chiocchetti
+</td>
+<td>
+2024-01-18
+</td>
+</tr>
+<tr>
+<td>
+<a href="https://github.com/KJPMolgenLab/scRNA_PA_QPRT/blob/59bee55d3de39470e828899c8a621492a38ef394/docs/figure/02_02_Clustering_Mapping_scRNA.Rmd/plot all scores-4.png" target="_blank">59bee55</a>
+</td>
+<td>
+Andreas Chiocchetti
+</td>
+<td>
+2024-01-14
+</td>
+</tr>
 <tr>
 <td>
 <a href="https://github.com/KJPMolgenLab/scRNA_PA_QPRT/blob/65a97d33477c4f582687e45b7f6ba29125ce7733/docs/figure/02_02_Clustering_Mapping_scRNA.Rmd/plot all scores-4.png" target="_blank">65a97d3</a>
@@ -2204,6 +2606,28 @@ Date
 <tbody>
 <tr>
 <td>
+<a href="https://github.com/KJPMolgenLab/scRNA_PA_QPRT/blob/a13f9ecc34444b2c79c1a4d1ac87d1204eff2192/docs/figure/02_02_Clustering_Mapping_scRNA.Rmd/plot all scores-5.png" target="_blank">a13f9ec</a>
+</td>
+<td>
+Andreas Chiocchetti
+</td>
+<td>
+2024-01-18
+</td>
+</tr>
+<tr>
+<td>
+<a href="https://github.com/KJPMolgenLab/scRNA_PA_QPRT/blob/59bee55d3de39470e828899c8a621492a38ef394/docs/figure/02_02_Clustering_Mapping_scRNA.Rmd/plot all scores-5.png" target="_blank">59bee55</a>
+</td>
+<td>
+Andreas Chiocchetti
+</td>
+<td>
+2024-01-14
+</td>
+</tr>
+<tr>
+<td>
 <a href="https://github.com/KJPMolgenLab/scRNA_PA_QPRT/blob/65a97d33477c4f582687e45b7f6ba29125ce7733/docs/figure/02_02_Clustering_Mapping_scRNA.Rmd/plot all scores-5.png" target="_blank">65a97d3</a>
 </td>
 <td>
@@ -2253,6 +2677,28 @@ Date
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+<a href="https://github.com/KJPMolgenLab/scRNA_PA_QPRT/blob/a13f9ecc34444b2c79c1a4d1ac87d1204eff2192/docs/figure/02_02_Clustering_Mapping_scRNA.Rmd/plot all scores-6.png" target="_blank">a13f9ec</a>
+</td>
+<td>
+Andreas Chiocchetti
+</td>
+<td>
+2024-01-18
+</td>
+</tr>
+<tr>
+<td>
+<a href="https://github.com/KJPMolgenLab/scRNA_PA_QPRT/blob/59bee55d3de39470e828899c8a621492a38ef394/docs/figure/02_02_Clustering_Mapping_scRNA.Rmd/plot all scores-6.png" target="_blank">59bee55</a>
+</td>
+<td>
+Andreas Chiocchetti
+</td>
+<td>
+2024-01-14
+</td>
+</tr>
 <tr>
 <td>
 <a href="https://github.com/KJPMolgenLab/scRNA_PA_QPRT/blob/65a97d33477c4f582687e45b7f6ba29125ce7733/docs/figure/02_02_Clustering_Mapping_scRNA.Rmd/plot all scores-6.png" target="_blank">65a97d3</a>
@@ -2306,6 +2752,28 @@ Date
 <tbody>
 <tr>
 <td>
+<a href="https://github.com/KJPMolgenLab/scRNA_PA_QPRT/blob/a13f9ecc34444b2c79c1a4d1ac87d1204eff2192/docs/figure/02_02_Clustering_Mapping_scRNA.Rmd/plot all scores-7.png" target="_blank">a13f9ec</a>
+</td>
+<td>
+Andreas Chiocchetti
+</td>
+<td>
+2024-01-18
+</td>
+</tr>
+<tr>
+<td>
+<a href="https://github.com/KJPMolgenLab/scRNA_PA_QPRT/blob/59bee55d3de39470e828899c8a621492a38ef394/docs/figure/02_02_Clustering_Mapping_scRNA.Rmd/plot all scores-7.png" target="_blank">59bee55</a>
+</td>
+<td>
+Andreas Chiocchetti
+</td>
+<td>
+2024-01-14
+</td>
+</tr>
+<tr>
+<td>
 <a href="https://github.com/KJPMolgenLab/scRNA_PA_QPRT/blob/65a97d33477c4f582687e45b7f6ba29125ce7733/docs/figure/02_02_Clustering_Mapping_scRNA.Rmd/plot all scores-7.png" target="_blank">65a97d3</a>
 </td>
 <td>
@@ -2334,8 +2802,8 @@ Andreas Chiocchetti
 attr(,&quot;class&quot;)
 [1] &quot;list&quot;      &quot;ggarrange&quot;</code></pre>
 <pre><code>           used  (Mb) gc trigger    (Mb)   max used    (Mb)
-Ncells 11918595 636.6   25500871  1361.9   25500871  1361.9
-Vcells 94376327 720.1 2122980708 16197.1 6214204009 47410.7</code></pre>
+Ncells 11918585 636.6   22631540  1208.7   22631540  1208.7
+Vcells 94377627 720.1 2122980878 16197.1 6214204237 47410.7</code></pre>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
