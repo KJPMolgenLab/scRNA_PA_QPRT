@@ -9,7 +9,7 @@ html_document:
       collapsed: true
 ---
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
 ```
 
 ```{r Calling libraries, echo=FALSE, include=FALSE}
