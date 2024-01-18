@@ -385,7 +385,7 @@ class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2024-01-14
+<strong>Last updated:</strong> 2024-01-18
 </p>
 <p>
 <strong>Checks:</strong> <span
@@ -516,15 +516,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomKJPMolgenLabscRNAPAQPRTtree65a97d33477c4f582687e45b7f6ba29125ce7733targetblank65a97d3a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomKJPMolgenLabscRNAPAQPRTtreebdb9cc213a224d1af4888cff60c1f86a8718bd0dtargetblankbdb9cc2a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/KJPMolgenLab/scRNA_PA_QPRT/tree/65a97d33477c4f582687e45b7f6ba29125ce7733" target="_blank">65a97d3</a>
+<a href="https://github.com/KJPMolgenLab/scRNA_PA_QPRT/tree/bdb9cc213a224d1af4888cff60c1f86a8718bd0d" target="_blank">bdb9cc2</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomKJPMolgenLabscRNAPAQPRTtree65a97d33477c4f582687e45b7f6ba29125ce7733targetblank65a97d3a"
+id="strongRepositoryversionstrongahrefhttpsgithubcomKJPMolgenLabscRNAPAQPRTtreebdb9cc213a224d1af4888cff60c1f86a8718bd0dtargetblankbdb9cc2a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -534,7 +534,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/KJPMolgenLab/scRNA_PA_QPRT/tree/65a97d33477c4f582687e45b7f6ba29125ce7733" target="_blank">65a97d3</a>.
+<a href="https://github.com/KJPMolgenLab/scRNA_PA_QPRT/tree/bdb9cc213a224d1af4888cff60c1f86a8718bd0d" target="_blank">bdb9cc2</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -563,6 +563,8 @@ Untracked files:
     Untracked:  data/Kanton/
     Untracked:  data/KantonGeneList/
     Untracked:  data/Knoblich/
+    Untracked:  data/Kynurenine_genes.xlsx
+    Untracked:  data/Kynurenine_genes_orig.xlsx
     Untracked:  data/QC_data.filt.rds
     Untracked:  data/QC_dataClustered.filt.rds
     Untracked:  data/QC_dataClustered.filtTyped.rds
@@ -570,13 +572,16 @@ Untracked files:
     Untracked:  data/QC_dataFinal.rds
     Untracked:  data/Sample Allocation P2023-224-LEX-LB.txt
     Untracked:  data/alldata.rds
-    Untracked:  output/06_Bulk_DEX/06_Bulk_DEX_Siggenes_lineplots.svg
-    Untracked:  output/07_Bulk_Deconv/
+    Untracked:  data/chr16p11.xlsx
+    Untracked:  data/chr16p11_orig.xlsx
+    Untracked:  data/tmp.xlsx
 
 Unstaged changes:
     Modified:   .gitignore
-    Modified:   output/02_Clustering/Cluster_markers.xls
-    Modified:   output/02_Clustering/Clusters_GO_termsCluster.xlsx
+    Modified:   analysis/01_QC_Singleron.Rmd
+    Modified:   analysis/02_01_Clustering_scRNA.Rmd
+    Modified:   analysis/02_02_Clustering_Mapping_scRNA.Rmd
+    Modified:   code/custom_functions.R
     Modified:   output/04_Biostat/Biostat_DEG_allcells.xlsx
     Modified:   output/04_Biostat/Biostat_DEG_cluster_0cells.xlsx
     Modified:   output/04_Biostat/Biostat_DEG_cluster_10cells.xlsx
@@ -661,6 +666,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/KJPMolgenLab/scRNA_PA_QPRT/blob/bdb9cc213a224d1af4888cff60c1f86a8718bd0d/analysis/07_DeconVol_Bulk.Rmd" target="_blank">bdb9cc2</a>
+</td>
+<td>
+Andreas Chiocchetti
+</td>
+<td>
+2024-01-18
+</td>
+<td>
+wflow_publish("./analysis/07_DeconVol_Bulk.Rmd")
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/KJPMolgenLab/scRNA_PA_QPRT/59bee55d3de39470e828899c8a621492a38ef394/docs/07_DeconVol_Bulk.html" target="_blank">59bee55</a>
+</td>
+<td>
+Andreas Chiocchetti
+</td>
+<td>
+2024-01-14
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 html
@@ -804,223 +843,12 @@ wflow_publish(c("./analysis/<em>.Rmd", "./code/</em>", "./docs/*"))
 </div>
 </div>
 </div>
-<pre class="r"><code>library(SingleR)</code></pre>
-<pre><code>Loading required package: SummarizedExperiment</code></pre>
-<pre><code>Loading required package: MatrixGenerics</code></pre>
-<pre><code>Loading required package: matrixStats</code></pre>
-<pre><code>
-Attaching package: &#39;MatrixGenerics&#39;</code></pre>
-<pre><code>The following objects are masked from &#39;package:matrixStats&#39;:
-
-    colAlls, colAnyNAs, colAnys, colAvgsPerRowSet, colCollapse,
-    colCounts, colCummaxs, colCummins, colCumprods, colCumsums,
-    colDiffs, colIQRDiffs, colIQRs, colLogSumExps, colMadDiffs,
-    colMads, colMaxs, colMeans2, colMedians, colMins, colOrderStats,
-    colProds, colQuantiles, colRanges, colRanks, colSdDiffs, colSds,
-    colSums2, colTabulates, colVarDiffs, colVars, colWeightedMads,
-    colWeightedMeans, colWeightedMedians, colWeightedSds,
-    colWeightedVars, rowAlls, rowAnyNAs, rowAnys, rowAvgsPerColSet,
-    rowCollapse, rowCounts, rowCummaxs, rowCummins, rowCumprods,
-    rowCumsums, rowDiffs, rowIQRDiffs, rowIQRs, rowLogSumExps,
-    rowMadDiffs, rowMads, rowMaxs, rowMeans2, rowMedians, rowMins,
-    rowOrderStats, rowProds, rowQuantiles, rowRanges, rowRanks,
-    rowSdDiffs, rowSds, rowSums2, rowTabulates, rowVarDiffs, rowVars,
-    rowWeightedMads, rowWeightedMeans, rowWeightedMedians,
-    rowWeightedSds, rowWeightedVars</code></pre>
-<pre><code>Loading required package: GenomicRanges</code></pre>
-<pre><code>Loading required package: stats4</code></pre>
-<pre><code>Loading required package: BiocGenerics</code></pre>
-<pre><code>
-Attaching package: &#39;BiocGenerics&#39;</code></pre>
-<pre><code>The following objects are masked from &#39;package:stats&#39;:
-
-    IQR, mad, sd, var, xtabs</code></pre>
-<pre><code>The following objects are masked from &#39;package:base&#39;:
-
-    anyDuplicated, aperm, append, as.data.frame, basename, cbind,
-    colnames, dirname, do.call, duplicated, eval, evalq, Filter, Find,
-    get, grep, grepl, intersect, is.unsorted, lapply, Map, mapply,
-    match, mget, order, paste, pmax, pmax.int, pmin, pmin.int,
-    Position, rank, rbind, Reduce, rownames, sapply, setdiff, sort,
-    table, tapply, union, unique, unsplit, which.max, which.min</code></pre>
-<pre><code>Loading required package: S4Vectors</code></pre>
-<pre><code>
-Attaching package: &#39;S4Vectors&#39;</code></pre>
-<pre><code>The following object is masked from &#39;package:utils&#39;:
-
-    findMatches</code></pre>
-<pre><code>The following objects are masked from &#39;package:base&#39;:
-
-    expand.grid, I, unname</code></pre>
-<pre><code>Loading required package: IRanges</code></pre>
-<pre><code>Loading required package: GenomeInfoDb</code></pre>
-<pre><code>Loading required package: Biobase</code></pre>
-<pre><code>Welcome to Bioconductor
-
-    Vignettes contain introductory material; view with
-    &#39;browseVignettes()&#39;. To cite Bioconductor, see
-    &#39;citation(&quot;Biobase&quot;)&#39;, and for packages &#39;citation(&quot;pkgname&quot;)&#39;.</code></pre>
-<pre><code>
-Attaching package: &#39;Biobase&#39;</code></pre>
-<pre><code>The following object is masked from &#39;package:MatrixGenerics&#39;:
-
-    rowMedians</code></pre>
-<pre><code>The following objects are masked from &#39;package:matrixStats&#39;:
-
-    anyMissing, rowMedians</code></pre>
-<pre class="r"><code>library(DropletUtils)</code></pre>
-<pre><code>Loading required package: SingleCellExperiment</code></pre>
-<pre><code>Warning: no function found corresponding to methods exports from &#39;HDF5Array&#39;
-for: &#39;extract_sparse_array&#39;</code></pre>
-<pre><code>Warning: multiple methods tables found for &#39;sparsity&#39;</code></pre>
-<pre class="r"><code>library(SingleCellExperiment)
-library(Seurat)</code></pre>
-<pre><code>Loading required package: SeuratObject</code></pre>
-<pre><code>Loading required package: sp</code></pre>
-<pre><code>
-Attaching package: &#39;sp&#39;</code></pre>
-<pre><code>The following object is masked from &#39;package:IRanges&#39;:
-
-    %over%</code></pre>
-<pre><code>&#39;SeuratObject&#39; was built under R 4.3.0 but the current version is
-4.3.1; it is recomended that you reinstall &#39;SeuratObject&#39; as the ABI
-for R may have changed</code></pre>
-<pre><code>&#39;SeuratObject&#39; was built with package &#39;Matrix&#39; 1.6.3 but the current
-version is 1.6.4; it is recomended that you reinstall &#39;SeuratObject&#39; as
-the ABI for &#39;Matrix&#39; may have changed</code></pre>
-<pre><code>
-Attaching package: &#39;SeuratObject&#39;</code></pre>
-<pre><code>The following object is masked from &#39;package:SummarizedExperiment&#39;:
-
-    Assays</code></pre>
-<pre><code>The following object is masked from &#39;package:GenomicRanges&#39;:
-
-    intersect</code></pre>
-<pre><code>The following object is masked from &#39;package:GenomeInfoDb&#39;:
-
-    intersect</code></pre>
-<pre><code>The following object is masked from &#39;package:IRanges&#39;:
-
-    intersect</code></pre>
-<pre><code>The following object is masked from &#39;package:S4Vectors&#39;:
-
-    intersect</code></pre>
-<pre><code>The following object is masked from &#39;package:BiocGenerics&#39;:
-
-    intersect</code></pre>
-<pre><code>The following object is masked from &#39;package:base&#39;:
-
-    intersect</code></pre>
-<pre><code>
-Attaching package: &#39;Seurat&#39;</code></pre>
-<pre><code>The following object is masked from &#39;package:SummarizedExperiment&#39;:
-
-    Assays</code></pre>
-<pre class="r"><code>library(slingshot)</code></pre>
-<pre><code>Loading required package: princurve</code></pre>
-<pre><code>Loading required package: TrajectoryUtils</code></pre>
-<pre class="r"><code>library(gprofiler2)
-library(tidyverse)</code></pre>
-<pre><code>── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
-✔ dplyr     1.1.4     ✔ readr     2.1.4
-✔ forcats   1.0.0     ✔ stringr   1.5.1
-✔ ggplot2   3.4.4     ✔ tibble    3.2.1
-✔ lubridate 1.9.3     ✔ tidyr     1.3.0
-✔ purrr     1.0.2     </code></pre>
-<pre><code>── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
-✖ lubridate::%within%() masks IRanges::%within%()
-✖ dplyr::collapse()     masks IRanges::collapse()
-✖ dplyr::combine()      masks Biobase::combine(), BiocGenerics::combine()
-✖ dplyr::count()        masks matrixStats::count()
-✖ dplyr::desc()         masks IRanges::desc()
-✖ tidyr::expand()       masks S4Vectors::expand()
-✖ dplyr::filter()       masks stats::filter()
-✖ dplyr::first()        masks S4Vectors::first()
-✖ dplyr::lag()          masks stats::lag()
-✖ ggplot2::Position()   masks BiocGenerics::Position(), base::Position()
-✖ purrr::reduce()       masks GenomicRanges::reduce(), IRanges::reduce()
-✖ dplyr::rename()       masks S4Vectors::rename()
-✖ lubridate::second()   masks S4Vectors::second()
-✖ lubridate::second&lt;-() masks S4Vectors::second&lt;-()
-✖ dplyr::slice()        masks IRanges::slice()
-ℹ Use the conflicted package (&lt;http://conflicted.r-lib.org/&gt;) to force all conflicts to become errors</code></pre>
-<pre class="r"><code>library(MuSiC)</code></pre>
-<pre><code>Loading required package: nnls
-Loading required package: TOAST
-Loading required package: EpiDISH
-Loading required package: limma
-
-Attaching package: &#39;limma&#39;
-
-The following object is masked from &#39;package:BiocGenerics&#39;:
-
-    plotMA
-
-Loading required package: quadprog
-Registered S3 method overwritten by &#39;GGally&#39;:
-  method from   
-  +.gg   ggplot2
-MuSiC v1.0.0 support SingleCellExperiment! See Tutorial: https://xuranw.github.io/MuSiC/articles/MuSiC.html
-MuSiC2 for multi-condition bulk RNA-seq data is also available!</code></pre>
-<pre class="r"><code>library(ggstream)</code></pre>
-<pre class="r"><code>options(stringsAsFactors = F)
-set.seed(157434538)
-reanalyze=F
-cutoff = 0.05 # pavalue cutoff for DEG
-padj_cu=FALSE # use adjusted pvalue 
-Dark8 = RColorBrewer::brewer.pal(8, &quot;Dark2&quot;)</code></pre>
-<pre class="r"><code>output= paste0(&quot;output/07_Bulk_Deconv/&quot;)
-dir.create(output, showWarnings = F)
-source(&quot;code/custom_functions.R&quot;)</code></pre>
-<pre><code>Loading required package: kableExtra</code></pre>
-<pre><code>
-Attaching package: &#39;kableExtra&#39;</code></pre>
-<pre><code>The following object is masked from &#39;package:dplyr&#39;:
-
-    group_rows</code></pre>
-<pre><code>Loading required package: compareGroups</code></pre>
-<pre><code>Loading required package: RColorBrewer</code></pre>
-<pre><code>Loading required package: pheatmap</code></pre>
-<pre><code>Loading required package: DESeq2</code></pre>
-<pre class="r"><code>ddsMat &lt;- readRDS(&quot;data/Bulk_dds_matrix.rds&quot;)
-SampleInfo = as.data.frame(colData(ddsMat))
-log_2cpm=log2(counts(ddsMat, normalize=T)+1)
-SamplePalette =  c(&quot;#000000&quot;,&quot;#3399FF&quot;)
-
-seurat_integrated &lt;- readRDS(&quot;./data/QC_dataClustered.filtTypedTraj.rds&quot;)
-sce.RNA &lt;- as.SingleCellExperiment(seurat_integrated)
-metadata&lt;- seurat_integrated@meta.data</code></pre>
-<pre class="r"><code>bulk.mtx = counts(ddsMat)
-bulk.meta = colData(ddsMat)
-bulk.gene = rowData(ddsMat)
-rownames(bulk.mtx) = bulk.gene$hgnc[match(rownames(bulk.mtx), bulk.gene$entrez_gene)]
-genes = intersect(rownames(sce.RNA), bulk.gene$hgnc)
-
-bulk.mtx=bulk.mtx[genes, ]
-sce.RNA &lt;- sce.RNA[genes,]
-
-Est.prop.bulk = music_prop(bulk.mtx = bulk.mtx, sc.sce = sce.RNA, 
-                           clusters = &#39;seurat_clusters&#39;,
-                           samples = &#39;orig.ident&#39;, verbose = F)
-
-
-
-prop.matrix = t(data.matrix(Est.prop.bulk$Est.prop.allgene))</code></pre>
 <div id="proportion-organoid-clusters-our-experiment"
 class="section level1">
 <h1>proportion organoid clusters (our experiment)</h1>
 <div id="longitudinal-trajectories-of-proportions"
 class="section level2">
 <h2>longitudinal trajectories of proportions</h2>
-<pre class="r"><code>long_prop_matrix &lt;-reshape2::melt(prop.matrix)
-colnames(long_prop_matrix) &lt;-c(&quot;Cluster&quot;, &quot;Sample&quot;, &quot;Proportion&quot;)
-metadata_bulk &lt;- as.data.frame(colData(ddsMat))
-long_prop_matrix &lt;- cbind(long_prop_matrix,metadata_bulk[long_prop_matrix$Sample,])
-
-p&lt;-ggplot(long_prop_matrix, aes(x=Day, y=Proportion, col=PAmM, fill=PAmM))+
-  geom_smooth(method = &quot;loess&quot;, alpha = 0.2)+facet_wrap(~Cluster)+theme_classic()
-p</code></pre>
-<pre><code>`geom_smooth()` using formula = &#39;y ~ x&#39;</code></pre>
 <p><img src="figure/07_DeconVol_Bulk.Rmd/unnamed-chunk-4-1.png" width="768" style="display: block; margin: auto;" /></p>
 <p>
 <button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-4-1">
@@ -1081,80 +909,33 @@ Andreas Chiocchetti
 </table>
 </div>
 </div>
-<pre class="r"><code>ggsave(paste0(output, &quot;07_DeconVol_Bulk_timeplots_clusters.svg&quot;), p)</code></pre>
-<pre><code>Saving 8 x 8 in image
-`geom_smooth()` using formula = &#39;y ~ x&#39;</code></pre>
 </div>
-<div id="testing-of-time-differences-per-cluster"
+<div id="testing-time-differences-per-cluster" class="section level2">
+<h2>testing time differences per cluster</h2>
+<p>Model: Proportion ~ Day x PamM, corrected for random Batch
+effects,including Main effects</p>
+<pre><code>   cluster      p.value
+5        5 6.969246e-01
+9        9 4.995992e-01
+8        8 1.232625e-06
+1        1 1.473062e-01
+0        0 4.408933e-01
+3        3 8.325512e-01
+4        4 8.835161e-01
+7        7 6.763952e-02
+6        6 4.230409e-01
+2        2 1.330274e-02
+12      12 7.759198e-01
+11      11 4.395575e-01
+10      10 6.754050e-01
+13      13 1.579848e-04</code></pre>
+</div>
+<div id="heatmap-proportions-across-sampels-and-clusters"
 class="section level2">
-<h2>testing of time differences per cluster</h2>
-<pre class="r"><code>library(lme4)</code></pre>
-<pre><code>Loading required package: Matrix</code></pre>
-<pre><code>
-Attaching package: &#39;Matrix&#39;</code></pre>
-<pre><code>The following objects are masked from &#39;package:tidyr&#39;:
-
-    expand, pack, unpack</code></pre>
-<pre><code>The following object is masked from &#39;package:S4Vectors&#39;:
-
-    expand</code></pre>
-<pre class="r"><code>clustervar = &quot;Cluster&quot;
-lmatrix = long_prop_matrix
-
-test_time_by_PA = function(lmatrix, clustervar){
-  reslist=list()
-  for(cl in unique(lmatrix[,clustervar])){
-    dataset = lmatrix[lmatrix[,clustervar]==cl, ]
-    if(var(dataset$Proportion) != 0){
-      lmres=lmer(Proportion~poly(Day,2)*PAmM+(1|Batch), data = dataset)
-      res = car::Anova(lmres, type=3)%&gt;% as.data.frame()
-      colnames(res) &lt;- c(&quot;Chisq&quot;, &quot;df&quot;, &quot;pvalue&quot;)
-      reslist[[as.character(cl)]] &lt;- res 
-    } else {
-      reslist[[as.character(cl)]] &lt;- data.frame(&quot;pvalue&quot;=rep(&quot;no var&quot;,4))
-    }
-  } 
-  return(reslist)
-}
-
-testres = test_time_by_PA(lmatrix = long_prop_matrix, clustervar = &quot;Cluster&quot;)</code></pre>
-<pre><code>boundary (singular) fit: see help(&#39;isSingular&#39;)</code></pre>
-<pre><code>boundary (singular) fit: see help(&#39;isSingular&#39;)</code></pre>
-<pre class="r"><code>pvals=lapply(testres, function(x){x[4,&quot;pvalue&quot;]})
-Significances = data.frame(cluster = names(pvals), p.value = unlist(pvals,recursive = F))
-Significances</code></pre>
-<pre><code>   cluster              p.value
-5        5    0.443625374639893
-9        9   0.0472236983847623
-8        8               no var
-1        1               no var
-0        0               no var
-3        3    0.875283132166054
-4        4    0.737247216506133
-7        7               no var
-6        6    0.400655510295367
-2        2   0.0010919890872763
-12      12    0.865579580390124
-11      11               no var
-10      10    0.861744364765872
-13      13 5.23788758476045e-06</code></pre>
-<pre class="r"><code>openxlsx2::write_xlsx(Significances, paste0(output,&quot;07_DeconVol_Bulk_StatTimecourseDiff_clusters.xslx&quot;))</code></pre>
-<pre class="r"><code>col=viridis::viridis(100)
-
-svg(paste0(output, &quot;07_DeconVol_Bulk_propHeatmap_clusters.svg&quot;))
-gplots::heatmap.2(prop.matrix, margins = c(12,5), main = &quot;organoid clusters&quot;,
-Colv = F, trace = &quot;none&quot;, density.info = &quot;none&quot;, col = col, key.title = &quot;prop&quot;, key.xlab = &quot;proportion&quot;, key.par = list(mar=c(5,2,5,2)))</code></pre>
-<pre><code>Warning in gplots::heatmap.2(prop.matrix, margins = c(12, 5), main = &quot;organoid
-clusters&quot;, : Discrepancy: Colv is FALSE, while dendrogram is `both&#39;. Omitting
-column dendogram.</code></pre>
-<pre class="r"><code>dev.off()</code></pre>
+<h2>Heatmap proportions across sampels and clusters</h2>
+<p>Columns add up to 1 i.e. 100% of cells</p>
 <pre><code>png 
   2 </code></pre>
-<pre class="r"><code>gplots::heatmap.2(prop.matrix, margins = c(12,5), main = &quot;organoid clusters&quot;,
-Colv = F, trace = &quot;none&quot;, density.info = &quot;none&quot;, col = col, key.title = &quot;prop&quot;, key.xlab = &quot;proportion&quot;, key.par = list(mar=c(5,2,5,2)))</code></pre>
-<pre><code>Warning in gplots::heatmap.2(prop.matrix, margins = c(12, 5), main = &quot;organoid
-clusters&quot;, : Discrepancy: Colv is FALSE, while dendrogram is `both&#39;. Omitting
-column dendogram.</code></pre>
 <p><img src="figure/07_DeconVol_Bulk.Rmd/unnamed-chunk-6-1.png" width="576" style="display: block; margin: auto;" /></p>
 <p>
 <button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-6-1">
@@ -1230,27 +1011,9 @@ Andreas Chiocchetti
 </div>
 <div id="proportion-knoblich-cell-types" class="section level1">
 <h1>proportion knoblich cell types</h1>
-<pre class="r"><code>sceRNAknoblich &lt;- readRDS(&quot;data/Knoblich/CHOOSE_ASD_Modules.rds&quot;)
-Idents(sceRNAknoblich) &lt;- &quot;celltype_cl_coarse&quot;
-sceRNAknoblich &lt;- subset(sceRNAknoblich, cells = WhichCells(sceRNAknoblich, downsample = 200))
-sceRNAknoblich&lt;- as.SingleCellExperiment(sceRNAknoblich)
-
-Est.prop.bulk.knblich = music_prop(bulk.mtx = bulk.mtx, sc.sce = sceRNAknoblich, 
-clusters = &#39;celltype_cl_coarse&#39;,
-samples = &#39;orig.ident&#39;, verbose = F)
-
-prop.matrix.knblich = t(data.matrix(Est.prop.bulk.knblich$Est.prop.allgene))</code></pre>
-<div id="trajectories-of-proportions" class="section level2">
-<h2>trajectories of proportions</h2>
-<pre class="r"><code>long_prop_matrix &lt;-reshape2::melt(prop.matrix.knblich)
-colnames(long_prop_matrix) &lt;-c(&quot;Kn.Cluster&quot;, &quot;Sample&quot;, &quot;Proportion&quot;)
-metadata_bulk &lt;- as.data.frame(colData(ddsMat))
-long_prop_matrix &lt;- cbind(long_prop_matrix,metadata_bulk[long_prop_matrix$Sample,])
-
-p&lt;-ggplot(long_prop_matrix, aes(x=Day, y=Proportion, col=PAmM, fill=PAmM))+
-geom_smooth(method = &quot;loess&quot;, alpha = 0.2)+facet_wrap(~Kn.Cluster)+theme_classic()
-p</code></pre>
-<pre><code>`geom_smooth()` using formula = &#39;y ~ x&#39;</code></pre>
+<div id="longitudinal-trajectories-of-proportions-1"
+class="section level2">
+<h2>longitudinal trajectories of proportions</h2>
 <p><img src="figure/07_DeconVol_Bulk.Rmd/unnamed-chunk-8-1.png" width="672" style="display: block; margin: auto;" /></p>
 <p>
 <button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-8-1">
@@ -1311,53 +1074,32 @@ Andreas Chiocchetti
 </table>
 </div>
 </div>
-<pre class="r"><code>ggsave(paste0(output, &quot;07_DeconVol_Bulk_timeplots_Knoblichclusters.svg&quot;), p)</code></pre>
-<pre><code>Saving 7 x 5 in image
-`geom_smooth()` using formula = &#39;y ~ x&#39;</code></pre>
 </div>
-<div id="testing-of-time-differences-per-cluster-1"
-class="section level2">
-<h2>testing of time differences per cluster</h2>
-<pre class="r"><code>testres = test_time_by_PA(lmatrix = long_prop_matrix, clustervar = &quot;Kn.Cluster&quot;)</code></pre>
-<pre><code>boundary (singular) fit: see help(&#39;isSingular&#39;)
-boundary (singular) fit: see help(&#39;isSingular&#39;)</code></pre>
-<pre class="r"><code>pvals=lapply(testres, function(x){x[4,&quot;pvalue&quot;]})
-Significances = data.frame(cluster = names(pvals), p.value = unlist(pvals,recursive = F))
-Significances</code></pre>
+<div id="testing-time-differences-per-cell-type" class="section level2">
+<h2>testing time differences per cell type</h2>
 <pre><code>              cluster           p.value
-oRG               oRG            no var
-L23               L23            no var
-INP               INP            no var
-CGE_LGE_IN CGE_LGE_IN            no var
 LGE_IN         LGE_IN            no var
-L6_CThPN     L6_CThPN 0.578010574658149
-ccRG             ccRG 0.893438324788172
-IP                 IP 0.892557972215078
+CGE_LGE_IN CGE_LGE_IN            no var
+L56               L56 0.483429505851505
+L23               L23            no var
+L6_CThPN     L6_CThPN 0.889026648918864
 RG                 RG            no var
-ccvRG           ccvRG 0.621800990553103
-Astrocytes Astrocytes 0.270534861998907
-L56               L56 0.130146259243014
+INP               INP            no var
+ccvRG           ccvRG 0.866052780742045
+IP                 IP 0.437919423334641
+Astrocytes Astrocytes 0.506986650779625
+CGE_IN         CGE_IN 0.536115311934474
+ccRG             ccRG  0.75609452265005
+oRG               oRG            no var
 vRG               vRG            no var
-CGE_IN         CGE_IN 0.924070944586973
 L4                 L4            no var
-mesenchyme mesenchyme 0.458066792449976</code></pre>
-<pre class="r"><code>openxlsx2::write_xlsx(Significances, paste0(output,&quot;07_DeconVol_Bulk_StatTimecourseDiff_KnCelltypes.xslx&quot;))</code></pre>
-<pre class="r"><code>svg(paste0(output, &quot;07_DeconVol_Bulk_propHeatmap_Knoblichclusters.svg&quot;))
-gplots::heatmap.2(prop.matrix.knblich, scale = &quot;col&quot;, 
-margins = c(12,5), main = &quot;knoblich clusters&quot;,
-Colv = F, trace = &quot;none&quot;, density.info = &quot;none&quot;, col = col, key.title = &quot;prop&quot;, key.xlab = &quot;proportion&quot;, key.par = list(mar=c(5,2,5,2)))</code></pre>
-<pre><code>Warning in gplots::heatmap.2(prop.matrix.knblich, scale = &quot;col&quot;, margins =
-c(12, : Discrepancy: Colv is FALSE, while dendrogram is `both&#39;. Omitting column
-dendogram.</code></pre>
-<pre class="r"><code>dev.off()</code></pre>
+mesenchyme mesenchyme 0.994732842442993</code></pre>
+</div>
+<div id="heatmap-proportions-across-sampels-and-clusters-1"
+class="section level2">
+<h2>Heatmap proportions across sampels and clusters</h2>
 <pre><code>png 
   2 </code></pre>
-<pre class="r"><code>gplots::heatmap.2(prop.matrix.knblich, scale = &quot;col&quot;, 
-margins = c(12,5), main = &quot;knoblich clusters&quot;,
-Colv = F, trace = &quot;none&quot;, density.info = &quot;none&quot;, col = col, key.title = &quot;prop&quot;, key.xlab = &quot;proportion&quot;, key.par = list(mar=c(5,2,5,2)))</code></pre>
-<pre><code>Warning in gplots::heatmap.2(prop.matrix.knblich, scale = &quot;col&quot;, margins =
-c(12, : Discrepancy: Colv is FALSE, while dendrogram is `both&#39;. Omitting column
-dendogram.</code></pre>
 <p><img src="figure/07_DeconVol_Bulk.Rmd/unnamed-chunk-10-1.png" width="576" style="display: block; margin: auto;" /></p>
 <p>
 <button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-10-1">
@@ -1415,7 +1157,6 @@ Session information
 </button>
 </p>
 <div id="workflowr-sessioninfo" class="collapse">
-<pre class="r"><code>sessionInfo()</code></pre>
 <pre><code>R version 4.3.1 (2023-06-16)
 Platform: x86_64-pc-linux-gnu (64-bit)
 Running under: Ubuntu 22.04.2 LTS
