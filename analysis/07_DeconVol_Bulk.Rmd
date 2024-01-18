@@ -6,10 +6,8 @@ output: html_document
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
 ```
-
 
 ```{r}
 library(SingleR)
@@ -62,12 +60,14 @@ Est.prop.bulk = music_prop(bulk.mtx = bulk.mtx, sc.sce = sce.RNA,
 
 
 
-prop.matrix = t(data.matrix(Est.prop.bulk$Est.prop.allgene))
+prop.matrix = t(data.matrix(Est.prop.bulk$Est.prop.weighted))
 ```
+
 
 # proportion organoid clusters (our experiment)
 
 ## longitudinal trajectories of proportions
+
 ```{r, fig.width=8, fig.height=8}
 long_prop_matrix <-reshape2::melt(prop.matrix)
 colnames(long_prop_matrix) <-c("Cluster", "Sample", "Proportion")
@@ -80,7 +80,9 @@ p
 ggsave(paste0(output, "07_DeconVol_Bulk_timeplots_clusters.svg"), p)
 ```
 
-## testing of time differences per cluster 
+## testing time differences per cluster 
+
+Model: Proportion ~ Day x PamM, corrected for random Batch effects,including Main effects
 
 ```{r}
 library(lme4)
@@ -113,19 +115,22 @@ Significances
 openxlsx2::write_xlsx(Significances, paste0(output,"07_DeconVol_Bulk_StatTimecourseDiff_clusters.xslx"))
 ```
 
+## Heatmap proportions across sampels and clusters
+
+Columns add up to 1 i.e. 100% of cells 
 
 ```{r, fig.height=8, fig.width=6}
 
 col=viridis::viridis(100)
 
 svg(paste0(output, "07_DeconVol_Bulk_propHeatmap_clusters.svg"))
-gplots::heatmap.2(prop.matrix, margins = c(12,5), main = "organoid clusters",
+gplots::heatmap.2(prop.matrix, margins = c(15,10), main = "organoid clusters",cexCol = 0.3,
 Colv = F, trace = "none", density.info = "none", col = col, key.title = "prop", key.xlab = "proportion", key.par = list(mar=c(5,2,5,2)))
-
 dev.off()
 
-gplots::heatmap.2(prop.matrix, margins = c(12,5), main = "organoid clusters",
-Colv = F, trace = "none", density.info = "none", col = col, key.title = "prop", key.xlab = "proportion", key.par = list(mar=c(5,2,5,2)))
+gplots::heatmap.2(prop.matrix, margins = c(15,10), main = "organoid clusters", cexCol = 0.3,
+Colv = F, trace = "none", density.info = "none", col = col, key.title = "prop", key.xlab = "proportion", 
+key.par = list(mar=c(5,2,5,2)))
 
 ```
 # proportion knoblich cell types 
@@ -133,18 +138,18 @@ Colv = F, trace = "none", density.info = "none", col = col, key.title = "prop", 
 ```{r}
 sceRNAknoblich <- readRDS("data/Knoblich/CHOOSE_ASD_Modules.rds")
 Idents(sceRNAknoblich) <- "celltype_cl_coarse"
-sceRNAknoblich <- subset(sceRNAknoblich, cells = WhichCells(sceRNAknoblich, downsample = 200))
+sceRNAknoblich <- subset(sceRNAknoblich, cells = WhichCells(sceRNAknoblich, downsample = 500))
 sceRNAknoblich<- as.SingleCellExperiment(sceRNAknoblich)
 
 Est.prop.bulk.knblich = music_prop(bulk.mtx = bulk.mtx, sc.sce = sceRNAknoblich, 
 clusters = 'celltype_cl_coarse',
 samples = 'orig.ident', verbose = F)
 
-prop.matrix.knblich = t(data.matrix(Est.prop.bulk.knblich$Est.prop.allgene))
+prop.matrix.knblich = t(data.matrix(Est.prop.bulk.knblich$Est.prop.weighted))
 
 ```
 
-## trajectories of proportions 
+## longitudinal trajectories of proportions
 
 ```{r}
 long_prop_matrix <-reshape2::melt(prop.matrix.knblich)
@@ -157,7 +162,7 @@ geom_smooth(method = "loess", alpha = 0.2)+facet_wrap(~Kn.Cluster)+theme_classic
 p
 ggsave(paste0(output, "07_DeconVol_Bulk_timeplots_Knoblichclusters.svg"), p)
 ```
-## testing of time differences per cluster 
+## testing time differences per cell type 
 
 ```{r}
 testres = test_time_by_PA(lmatrix = long_prop_matrix, clustervar = "Kn.Cluster")
@@ -170,16 +175,17 @@ openxlsx2::write_xlsx(Significances, paste0(output,"07_DeconVol_Bulk_StatTimecou
 
 ```
 
+## Heatmap proportions across sampels and clusters
 
 ```{r, fig.height=8, fig.width=6}
 svg(paste0(output, "07_DeconVol_Bulk_propHeatmap_Knoblichclusters.svg"))
-gplots::heatmap.2(prop.matrix.knblich, scale = "col", 
+gplots::heatmap.2(prop.matrix.knblich, scale = "col", cexCol = 0.3,
 margins = c(12,5), main = "knoblich clusters",
 Colv = F, trace = "none", density.info = "none", col = col, key.title = "prop", key.xlab = "proportion", key.par = list(mar=c(5,2,5,2)))
 
 dev.off()
 
-gplots::heatmap.2(prop.matrix.knblich, scale = "col", 
+gplots::heatmap.2(prop.matrix.knblich, scale = "col", cexCol = 0.3, 
 margins = c(12,5), main = "knoblich clusters",
 Colv = F, trace = "none", density.info = "none", col = col, key.title = "prop", key.xlab = "proportion", key.par = list(mar=c(5,2,5,2)))
 
