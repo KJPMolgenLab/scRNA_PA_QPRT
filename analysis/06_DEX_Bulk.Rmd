@@ -6,7 +6,7 @@ output: html_document
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
 ```
 
 ```{r}
@@ -113,7 +113,7 @@ plotlist = list()
 for (set in unique(resGO$result$query)){
   dat=resGO$result[which(resGO$result$query == set),]
   if(nrow(dat)>0){
-    plotlist[[set]]<-GOplot(dat, N = 10, Title = set)
+    plotlist[[set]]<-GOplot(dat, N = 10, Title = set, xlim=NA)
   }else{
     text="no significance"
     plotlist[[set]]<-ggplot() + annotate("text", x = 4, y = 25, label = text) + 
@@ -131,7 +131,7 @@ plotlist = list()
 for (set in unique(resGO$result$query)){
   dat=resGO$result[which(resGO$result$query == set & resGO$result$source == "GO:BP"),]
   if(nrow(dat)>0){
-    plotlist[[set]]<-GOplot(dat, N = 10, Title = set)
+    plotlist[[set]]<-GOplot(dat, N = 10, Title = set, xlim=NA)
   }else{
     text="no signifiance"
     plotlist[[set]]<-ggplot() + annotate("text", x = 4, y = 25, label = text) + 
@@ -144,12 +144,13 @@ p
 ggsave(file=paste0(output, "/06_Bulk_DEX_top10_BP_GOplot.svg"), plot = p)
 ```
 
+
 ```{r, fig.width=15, fig.height=20}
 plotlist = list()
 for (set in unique(resGO$result$query)){
   dat=resGO$result[which(resGO$result$query == set & resGO$result$source == "TF"),]
   if(nrow(dat)>0){
-    plotlist[[set]]<-GOplot(dat, N = 10, Title = set)
+    plotlist[[set]]<-GOplot(dat, N = 10, Title = set, xlim=NA)
   }else{
     text="no signifiance"
     plotlist[[set]]<-ggplot() + annotate("text", x = 4, y = 25, label = text) + 
