@@ -387,7 +387,7 @@ class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2024-01-14
+<strong>Last updated:</strong> 2024-01-18
 </p>
 <p>
 <strong>Checks:</strong> <span
@@ -518,15 +518,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomKJPMolgenLabscRNAPAQPRTtree65a97d33477c4f582687e45b7f6ba29125ce7733targetblank65a97d3a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomKJPMolgenLabscRNAPAQPRTtree4843468dd85dbd342b8179564640fb92df53eb62targetblank4843468a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/KJPMolgenLab/scRNA_PA_QPRT/tree/65a97d33477c4f582687e45b7f6ba29125ce7733" target="_blank">65a97d3</a>
+<a href="https://github.com/KJPMolgenLab/scRNA_PA_QPRT/tree/4843468dd85dbd342b8179564640fb92df53eb62" target="_blank">4843468</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomKJPMolgenLabscRNAPAQPRTtree65a97d33477c4f582687e45b7f6ba29125ce7733targetblank65a97d3a"
+id="strongRepositoryversionstrongahrefhttpsgithubcomKJPMolgenLabscRNAPAQPRTtree4843468dd85dbd342b8179564640fb92df53eb62targetblank4843468a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -536,7 +536,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/KJPMolgenLab/scRNA_PA_QPRT/tree/65a97d33477c4f582687e45b7f6ba29125ce7733" target="_blank">65a97d3</a>.
+<a href="https://github.com/KJPMolgenLab/scRNA_PA_QPRT/tree/4843468dd85dbd342b8179564640fb92df53eb62" target="_blank">4843468</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -565,6 +565,8 @@ Untracked files:
     Untracked:  data/Kanton/
     Untracked:  data/KantonGeneList/
     Untracked:  data/Knoblich/
+    Untracked:  data/Kynurenine_genes.xlsx
+    Untracked:  data/Kynurenine_genes_orig.xlsx
     Untracked:  data/QC_data.filt.rds
     Untracked:  data/QC_dataClustered.filt.rds
     Untracked:  data/QC_dataClustered.filtTyped.rds
@@ -572,13 +574,18 @@ Untracked files:
     Untracked:  data/QC_dataFinal.rds
     Untracked:  data/Sample Allocation P2023-224-LEX-LB.txt
     Untracked:  data/alldata.rds
-    Untracked:  output/06_Bulk_DEX/06_Bulk_DEX_Siggenes_lineplots.svg
-    Untracked:  output/07_Bulk_Deconv/
+    Untracked:  data/chr16p11.xlsx
+    Untracked:  data/chr16p11_orig.xlsx
+    Untracked:  data/tmp.xlsx
 
 Unstaged changes:
     Modified:   .gitignore
-    Modified:   output/02_Clustering/Cluster_markers.xls
-    Modified:   output/02_Clustering/Clusters_GO_termsCluster.xlsx
+    Modified:   analysis/01_QC_Singleron.Rmd
+    Modified:   analysis/02_01_Clustering_scRNA.Rmd
+    Modified:   analysis/02_02_Clustering_Mapping_scRNA.Rmd
+    Modified:   analysis/06_DEX_Bulk.Rmd
+    Modified:   analysis/07_DeconVol_Bulk.Rmd
+    Modified:   code/custom_functions.R
     Modified:   output/04_Biostat/Biostat_DEG_allcells.xlsx
     Modified:   output/04_Biostat/Biostat_DEG_cluster_0cells.xlsx
     Modified:   output/04_Biostat/Biostat_DEG_cluster_10cells.xlsx
@@ -611,12 +618,6 @@ Unstaged changes:
     Modified:   output/04_Biostat/Biostat_GO_termDEG_cluster_9.xlsx
     Modified:   output/04_Biostat/Biostat_HumdevCTFreq.xslsx
     Modified:   output/04_Biostat/Biostat_clusterFreq.xslsx
-    Modified:   output/06_Bulk_DEX/06_Bulk_DEX_GO_results.xlsx
-    Modified:   output/06_Bulk_DEX/06_Bulk_DEX_LFC_results.xlsx
-    Modified:   output/06_Bulk_DEX/06_Bulk_DEX_Siggenes_boxplots.pdf
-    Modified:   output/06_Bulk_DEX/06_Bulk_DEX_top10_BP_GOplot.svg
-    Modified:   output/06_Bulk_DEX/06_Bulk_DEX_top10_TF_GOplot.svg
-    Modified:   output/06_Bulk_DEX/06_Bulk_DEX_top10all_GOplot.svg
     Modified:   workflowHelper.R
 
 </code></pre>
@@ -663,6 +664,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/KJPMolgenLab/scRNA_PA_QPRT/blob/4843468dd85dbd342b8179564640fb92df53eb62/analysis/05_Preprocessing_Bulk.Rmd" target="_blank">4843468</a>
+</td>
+<td>
+Andreas Chiocchetti
+</td>
+<td>
+2024-01-18
+</td>
+<td>
+wflow_publish("./analysis/05_Preprocessing_Bulk.Rmd")
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/KJPMolgenLab/scRNA_PA_QPRT/59bee55d3de39470e828899c8a621492a38ef394/docs/05_Preprocessing_Bulk.html" target="_blank">59bee55</a>
+</td>
+<td>
+Andreas Chiocchetti
+</td>
+<td>
+2024-01-14
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 html
@@ -857,199 +892,6 @@ intermediate stage bulk seq
 </div>
 </div>
 </div>
-<pre class="r"><code>library(knitr)
-library(RCurl) 
-library(DESeq2)</code></pre>
-<pre><code>Loading required package: S4Vectors</code></pre>
-<pre><code>Loading required package: stats4</code></pre>
-<pre><code>Loading required package: BiocGenerics</code></pre>
-<pre><code>
-Attaching package: &#39;BiocGenerics&#39;</code></pre>
-<pre><code>The following objects are masked from &#39;package:stats&#39;:
-
-    IQR, mad, sd, var, xtabs</code></pre>
-<pre><code>The following objects are masked from &#39;package:base&#39;:
-
-    anyDuplicated, aperm, append, as.data.frame, basename, cbind,
-    colnames, dirname, do.call, duplicated, eval, evalq, Filter, Find,
-    get, grep, grepl, intersect, is.unsorted, lapply, Map, mapply,
-    match, mget, order, paste, pmax, pmax.int, pmin, pmin.int,
-    Position, rank, rbind, Reduce, rownames, sapply, setdiff, sort,
-    table, tapply, union, unique, unsplit, which.max, which.min</code></pre>
-<pre><code>
-Attaching package: &#39;S4Vectors&#39;</code></pre>
-<pre><code>The following object is masked from &#39;package:utils&#39;:
-
-    findMatches</code></pre>
-<pre><code>The following objects are masked from &#39;package:base&#39;:
-
-    expand.grid, I, unname</code></pre>
-<pre><code>Loading required package: IRanges</code></pre>
-<pre><code>Loading required package: GenomicRanges</code></pre>
-<pre><code>Loading required package: GenomeInfoDb</code></pre>
-<pre><code>Loading required package: SummarizedExperiment</code></pre>
-<pre><code>Loading required package: MatrixGenerics</code></pre>
-<pre><code>Loading required package: matrixStats</code></pre>
-<pre><code>
-Attaching package: &#39;MatrixGenerics&#39;</code></pre>
-<pre><code>The following objects are masked from &#39;package:matrixStats&#39;:
-
-    colAlls, colAnyNAs, colAnys, colAvgsPerRowSet, colCollapse,
-    colCounts, colCummaxs, colCummins, colCumprods, colCumsums,
-    colDiffs, colIQRDiffs, colIQRs, colLogSumExps, colMadDiffs,
-    colMads, colMaxs, colMeans2, colMedians, colMins, colOrderStats,
-    colProds, colQuantiles, colRanges, colRanks, colSdDiffs, colSds,
-    colSums2, colTabulates, colVarDiffs, colVars, colWeightedMads,
-    colWeightedMeans, colWeightedMedians, colWeightedSds,
-    colWeightedVars, rowAlls, rowAnyNAs, rowAnys, rowAvgsPerColSet,
-    rowCollapse, rowCounts, rowCummaxs, rowCummins, rowCumprods,
-    rowCumsums, rowDiffs, rowIQRDiffs, rowIQRs, rowLogSumExps,
-    rowMadDiffs, rowMads, rowMaxs, rowMeans2, rowMedians, rowMins,
-    rowOrderStats, rowProds, rowQuantiles, rowRanges, rowRanks,
-    rowSdDiffs, rowSds, rowSums2, rowTabulates, rowVarDiffs, rowVars,
-    rowWeightedMads, rowWeightedMeans, rowWeightedMedians,
-    rowWeightedSds, rowWeightedVars</code></pre>
-<pre><code>Loading required package: Biobase</code></pre>
-<pre><code>Welcome to Bioconductor
-
-    Vignettes contain introductory material; view with
-    &#39;browseVignettes()&#39;. To cite Bioconductor, see
-    &#39;citation(&quot;Biobase&quot;)&#39;, and for packages &#39;citation(&quot;pkgname&quot;)&#39;.</code></pre>
-<pre><code>
-Attaching package: &#39;Biobase&#39;</code></pre>
-<pre><code>The following object is masked from &#39;package:MatrixGenerics&#39;:
-
-    rowMedians</code></pre>
-<pre><code>The following objects are masked from &#39;package:matrixStats&#39;:
-
-    anyMissing, rowMedians</code></pre>
-<pre class="r"><code>library(RColorBrewer)
-library(glmpca)
-library(ggplot2)
-library(tidyverse)</code></pre>
-<pre><code>── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
-✔ dplyr     1.1.4     ✔ readr     2.1.4
-✔ forcats   1.0.0     ✔ stringr   1.5.1
-✔ lubridate 1.9.3     ✔ tibble    3.2.1
-✔ purrr     1.0.2     ✔ tidyr     1.3.0</code></pre>
-<pre><code>── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
-✖ lubridate::%within%() masks IRanges::%within%()
-✖ dplyr::collapse()     masks IRanges::collapse()
-✖ dplyr::combine()      masks Biobase::combine(), BiocGenerics::combine()
-✖ tidyr::complete()     masks RCurl::complete()
-✖ dplyr::count()        masks matrixStats::count()
-✖ dplyr::desc()         masks IRanges::desc()
-✖ tidyr::expand()       masks S4Vectors::expand()
-✖ dplyr::filter()       masks stats::filter()
-✖ dplyr::first()        masks S4Vectors::first()
-✖ dplyr::lag()          masks stats::lag()
-✖ ggplot2::Position()   masks BiocGenerics::Position(), base::Position()
-✖ purrr::reduce()       masks GenomicRanges::reduce(), IRanges::reduce()
-✖ dplyr::rename()       masks S4Vectors::rename()
-✖ lubridate::second()   masks S4Vectors::second()
-✖ lubridate::second&lt;-() masks S4Vectors::second&lt;-()
-✖ dplyr::slice()        masks IRanges::slice()
-ℹ Use the conflicted package (&lt;http://conflicted.r-lib.org/&gt;) to force all conflicts to become errors</code></pre>
-<pre class="r"><code>library(pheatmap)
-library(dendextend)</code></pre>
-<pre><code>
----------------------
-Welcome to dendextend version 1.17.1
-Type citation(&#39;dendextend&#39;) for how to cite the package.
-
-Type browseVignettes(package = &#39;dendextend&#39;) for the package vignette.
-The github page is: https://github.com/talgalili/dendextend/
-
-Suggestions and bug-reports can be submitted at: https://github.com/talgalili/dendextend/issues
-You may ask questions at stackoverflow, use the r and dendextend tags: 
-     https://stackoverflow.com/questions/tagged/dendextend
-
-    To suppress this message use:  suppressPackageStartupMessages(library(dendextend))
----------------------
-
-
-Attaching package: &#39;dendextend&#39;
-
-The following object is masked from &#39;package:stats&#39;:
-
-    cutree</code></pre>
-<pre class="r"><code>library(gprofiler2)</code></pre>
-<pre class="r"><code>options(stringsAsFactors = F)
-set.seed(157434538)
-
-Dark8 = RColorBrewer::brewer.pal(8, &quot;Dark2&quot;)
-source(paste0(&quot;code/custom_functions.R&quot;)) #also defines colors</code></pre>
-<pre><code>Loading required package: kableExtra</code></pre>
-<pre><code>
-Attaching package: &#39;kableExtra&#39;</code></pre>
-<pre><code>The following object is masked from &#39;package:dplyr&#39;:
-
-    group_rows</code></pre>
-<pre><code>Loading required package: compareGroups</code></pre>
-<pre class="r"><code>output= paste0(&quot;output/05_Bulk_Preprocessing&quot;)
-dir.create(output, showWarnings = FALSE)
-
-filetarget &lt;- &quot;./data/Bulkdata_Countmatrix.rds&quot;
-Countdata &lt;- readRDS(filetarget)
-
-Ntot= nrow(Countdata)
-
-#merge non unique annotations
-if(length(unique(rownames(Countdata))) != Ntot){
-  Countdata = Countdata %&gt;% group_by(row.names(Countdata)) %&gt;% summarise_each(sum)
-  Ntot= nrow(Countdata)
-}
-
-hgnc=gconvert(query=as.numeric(rownames(Countdata)), 
-              organism = &quot;hsapiens&quot;, 
-              numeric_ns = &quot;ENTREZGENE_ACC&quot;,
-              target = &quot;HGNC&quot;)
-
-Ids = hgnc %&gt;%  dplyr::select(name, input, description) %&gt;% group_by(input) %&gt;% 
-  summarise(name=paste(name, sep=&quot;; &quot;, collapse = &quot;;&quot;), description = dplyr::first(description))
-
-rowdescription = data.frame(entrez_gene = Ids$input, 
-                            hgnc=Ids$name, 
-                            description=Ids$description)
-
-
-rowdescription = rowdescription[match(row.names(Countdata), rowdescription$entrez_gene),]
-rownames(rowdescription)=row.names(Countdata)
-
-# load and parse sample information 
-SampleInfo &lt;- data.frame(Sentrixname = gsub(&quot;_1&quot;, &quot;&quot;, make.names(colnames(Countdata))))
-
-SampleAlloc &lt;- read.table(&quot;./data/Sample Allocation P2023-224-LEX-LB.txt&quot;, header=F)
-
-SampleInfo$Fullname = make.names(SampleAlloc$V2[match(SampleInfo$Sentrixname, SampleAlloc$V1)])
-
-strsplit(SampleInfo$Fullname, split = &quot;\\.&quot;) %&gt;% 
-  lapply(function(x) x[1]) %&gt;% unlist -&gt; SampleInfo$Position
-SampleInfo$Row = substr(SampleInfo$Position, 1,1)
-SampleInfo$Col = as.numeric(substr(SampleInfo$Position, 2,3))
-strsplit(SampleInfo$Fullname, split = &quot;\\.&quot;) %&gt;%  
-  lapply(function(x) x[3]) %&gt;% unlist %&gt;% as.factor()-&gt; SampleInfo$Replicate
-
-strsplit(SampleInfo$Fullname, split = &quot;\\.&quot;) %&gt;%  
-  lapply(function(x) x[2]) %&gt;% unlist -&gt; infos
-strsplit(infos, split = &quot;_&quot;) %&gt;%  
-  lapply(function(x) x[1])%&gt;% unlist %&gt;% as.factor() -&gt; SampleInfo$CellLine
-strsplit(infos, split = &quot;_&quot;) %&gt;%  
-  lapply(function(x) x[2])%&gt;% unlist %&gt;% as.factor() -&gt; SampleInfo$Batch
-strsplit(infos, split = &quot;_&quot;) %&gt;%  
-  lapply(function(x) as.numeric(gsub(&quot;d&quot;,&quot;&quot;, x[3])))%&gt;% unlist -&gt; SampleInfo$Day
-strsplit(infos, split = &quot;_&quot;) %&gt;%  
-  lapply(function(x) factor(gsub(&quot;mM&quot;,&quot;&quot;,x[4]), levels=c(0,5)))%&gt;% unlist -&gt; SampleInfo$PAmM
-rownames(SampleInfo) &lt;- SampleInfo$Fullname
-colnames(Countdata) &lt;- SampleInfo$Fullname[match(gsub(&quot;_1&quot;, &quot;&quot;, colnames(Countdata)),SampleInfo$Sentrixname)]
-
-# align datasets
-checkfiles = all(rownames(SampleInfo) %in% colnames(Countdata))
-IDs=intersect(rownames(SampleInfo), colnames(Countdata))
-Countdata = Countdata[,IDs]
-SampleInfo = SampleInfo[IDs, ]
-SampleInfo$reads_per_sample = colSums(Countdata)</code></pre>
-<pre class="r"><code>display_tab(head(Countdata))</code></pre>
 <div
 style="border: 1px solid #ddd; padding: 0px; overflow-y: scroll; height:500px; overflow-x: scroll; width:900px; ">
 <table class=" lightable-classic" style="font-family: &quot;Arial Narrow&quot;, &quot;Source Sans Pro&quot;, sans-serif; width: auto !important; ">
@@ -1933,7 +1775,6 @@ H05.H9_B14_d80_5mM_PA.2
 </tbody>
 </table>
 </div>
-<pre class="r"><code>display_tab(SampleInfo)</code></pre>
 <div
 style="border: 1px solid #ddd; padding: 0px; overflow-y: scroll; height:500px; overflow-x: scroll; width:900px; ">
 <table class=" lightable-classic" style="font-family: &quot;Arial Narrow&quot;, &quot;Source Sans Pro&quot;, sans-serif; width: auto !important; ">
@@ -3500,31 +3341,6 @@ B14
 </tbody>
 </table>
 </div>
-<pre class="r"><code>boxplot_counts = function(plotsubset,maintitle,colorcode){
-  vals=log2(plotsubset+1)
-  a =boxplot(vals, main = maintitle, 
-             col = Dark8[as.factor(SampleInfo[,colorcode])], names=NA,
-             ylab = &quot;log2 transformed&quot;, xlab=&quot;samples&quot;, xaxt=&quot;n&quot;)
-  legend(ncol(vals)*1.1, max(vals), legend = levels(SampleInfo[,colorcode]),
-         bg=&quot;white&quot;,xpd=T,box.col = &quot;white&quot;,
-         pch = 16, col = Dark8[1:length(unique(SampleInfo[,colorcode]))])
-}
-
-
-barplot_counts = function(DF, maintitle, colorcode, coltoplot=&quot;reads_per_sample&quot;) {
-
-  vals=log2(DF[,coltoplot])
-  barplot(vals, main = maintitle, 
-          col = Dark8[as.factor(DF[,colorcode])], names=NA, xaxt=&quot;n&quot;,
-          ylab = &quot;log2 transformed&quot;, xlab=&quot;samples&quot;)
-  legend(length(vals)*1.25, max(vals), legend = levels(DF[,colorcode]), pch = 16, 
-         bg =&quot;white&quot;,xpd=T, box.col=&quot;white&quot;,
-         col = Dark8[1:length(unique(DF[,colorcode]))])
-}
-
-
-par(mar=c(3,5,5,7))
-boxplot_counts(plotsubset = Countdata, maintitle = &quot;raw counts&quot;, colorcode = &quot;Batch&quot;)</code></pre>
 <p><img src="figure/05_Preprocessing_Bulk.Rmd/plot_counts-1.png" width="768" style="display: block; margin: auto;" /></p>
 <p>
 <button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-plot_counts-1">
@@ -3574,7 +3390,6 @@ Andreas Chiocchetti
 </table>
 </div>
 </div>
-<pre class="r"><code>barplot_counts(SampleInfo, &quot;total reads&quot;, &quot;Batch&quot;)</code></pre>
 <p><img src="figure/05_Preprocessing_Bulk.Rmd/plot_counts-2.png" width="768" style="display: block; margin: auto;" /></p>
 <p>
 <button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-plot_counts-2">
@@ -3624,8 +3439,6 @@ Andreas Chiocchetti
 </table>
 </div>
 </div>
-<pre class="r"><code>plot(density(log2(rowMeans(Countdata))), main=&quot;distribution of gene expression&quot;, 
-     xlab=&quot;mean log2(counts +1)&quot;)</code></pre>
 <p><img src="figure/05_Preprocessing_Bulk.Rmd/plot_counts-3.png" width="768" style="display: block; margin: auto;" /></p>
 <p>
 <button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-plot_counts-3">
@@ -3675,47 +3488,6 @@ Andreas Chiocchetti
 </table>
 </div>
 </div>
-<pre class="r"><code># remove genes wich were not detected in at least 25% of the samples 
-keeperidx = rowSums(Countdata&gt;1)&gt;nrow(SampleInfo)/4
-
-Countdata_cl = Countdata[keeperidx, ]
-
-rowdescription = rowdescription[row.names(Countdata_cl),]
-
-fullmodel = as.formula(&quot;~Day+PAmM&quot;)
-
-ddsMat &lt;- DESeqDataSetFromMatrix(countData = Countdata_cl,
-                                 colData = SampleInfo,
-                                 rowData = rowdescription,
-                                 design = fullmodel)</code></pre>
-<pre><code>  the design formula contains one or more numeric variables with integer values,
-  specifying a model with increasing fold change for higher values.
-  did you mean for this to be a factor? if so, first convert
-  this variable to a factor using the factor() function</code></pre>
-<pre><code>  the design formula contains one or more numeric variables that have mean or
-  standard deviation larger than 5 (an arbitrary threshold to trigger this message).
-  Including numeric variables with large mean can induce collinearity with the intercept.
-  Users should center and scale numeric variables in the design to improve GLM convergence.</code></pre>
-<pre class="r"><code>ddsMat = estimateSizeFactors(ddsMat)
-ddsMat = estimateDispersions(ddsMat)</code></pre>
-<pre><code>gene-wise dispersion estimates</code></pre>
-<pre><code>mean-dispersion relationship</code></pre>
-<pre><code>final dispersion estimates</code></pre>
-<pre class="r"><code>reads  = as.data.frame(counts(ddsMat, normalized=T))
-
-SDs = apply(reads, 1, sd)
-keepvar = SDs&gt;0
-
-ddsMat &lt;- ddsMat[keepvar,]
-
-Nfilt = length(ddsMat)
-reads  = as.data.frame(counts(ddsMat, normalized=T))
-
-SampleInfo$reads_per_sample_cl= colSums(reads)
-
-
-par(mar=c(3,5,5,7))
-boxplot_counts(plotsubset = Countdata_cl, maintitle = &quot;raw counts QCed&quot;, colorcode = &quot;Batch&quot;)</code></pre>
 <p><img src="figure/05_Preprocessing_Bulk.Rmd/clean%20and%20plot_counts-1.png" width="768" style="display: block; margin: auto;" /></p>
 <p>
 <button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-no-spaces-clean-and-plot_counts-1">
@@ -3765,7 +3537,6 @@ Andreas Chiocchetti
 </table>
 </div>
 </div>
-<pre class="r"><code>barplot_counts(SampleInfo, &quot;total reads QCed&quot;, &quot;Batch&quot;, coltoplot =&quot;reads_per_sample_cl&quot;)</code></pre>
 <p><img src="figure/05_Preprocessing_Bulk.Rmd/clean%20and%20plot_counts-2.png" width="768" style="display: block; margin: auto;" /></p>
 <p>
 <button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-no-spaces-clean-and-plot_counts-2">
@@ -3815,8 +3586,6 @@ Andreas Chiocchetti
 </table>
 </div>
 </div>
-<pre class="r"><code>plot(density(log2(rowMeans(Countdata_cl))), main=&quot;distribution of gene expression&quot;, 
-     xlab=&quot;mean log2(counts +1) QCed&quot;)</code></pre>
 <p><img src="figure/05_Preprocessing_Bulk.Rmd/clean%20and%20plot_counts-3.png" width="768" style="display: block; margin: auto;" /></p>
 <p>
 <button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-no-spaces-clean-and-plot_counts-3">
@@ -3886,31 +3655,6 @@ Andreas Chiocchetti
 <div id="clustering" class="section level2">
 <h2>Clustering</h2>
 <p>hierarchical clustering based on the top 2000 genes by variance</p>
-<pre class="r"><code>log2_cpm = log2(reads+1)
-
-varsset=apply(log2_cpm, 1, var)
-
-cpm.sel.trans = t(log2_cpm[order(varsset,decreasing = T)[1:2000],])
-
-rownames(cpm.sel.trans)=rownames(SampleInfo)
-
-distance = dist(cpm.sel.trans)
-hc = stats::hclust(distance, method=&quot;ward.D2&quot;)
-cutN=10 #number of different conditions (2xPA, 5xDay)
-clusters = cutree(hc, k=cutN)
-Colors=sample(jetcolors(cutN))[clusters]
-
-myLetters &lt;- LETTERS[1:26]
-
-numRow=match(SampleInfo$Row, myLetters)
-addRow=LETTERS[numRow]
-
-Plotdata=data.frame(Rows=addRow, numRow = numRow, Cols = SampleInfo$Col, 
-                    Group=clusters, Colors=Colors)
-
-par(mar=c(15,3,5,3))
-plot(as.dendrogram(hc), main=paste(&quot;Similairtiy by gene expression, guessed&quot;,cutN,&quot;clusters&quot;), cex=0.7)
-colored_dots(colors = Colors, dend = as.dendrogram(hc), rowLabels = &quot;cluster&quot;)</code></pre>
 <p><img src="figure/05_Preprocessing_Bulk.Rmd/hcluster-1.png" width="1440" style="display: block; margin: auto;" /></p>
 <p>
 <button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-hcluster-1">
@@ -3960,19 +3704,8 @@ Andreas Chiocchetti
 </table>
 </div>
 </div>
-<p>Similarity based on hcluster plot #todo: check code snippet</p>
-<pre class="r"><code>par(mar=c(2,5,8,3))
-plot(0,0, type=&quot;n&quot;, ylab=&quot;&quot;, xlab=&quot;&quot;, 
-     ylim=rev(range(Plotdata$numRow))+c(1,-1), 
-     xlim=range(Plotdata$Cols)+c(-1,1), xaxt=&quot;n&quot;,yaxt=&quot;n&quot; ,
-     main=&quot;plate similarity plot&quot;)
-points(y=Plotdata$numRow, x=Plotdata$Cols, pch=16, cex=4, col=Plotdata$Colors)
-text(y=Plotdata$numRow, x=Plotdata$Cols, labels = Plotdata$Group)
-text(y=Plotdata$numRow, x=Plotdata$Cols, labels = Plotdata$Group)
-axis(2, at=1:9, labels = c(paste0(&quot;P1_&quot;, LETTERS[1:8]), &quot;P2_A&quot;), las=1)
-axis(3, at=1:12, labels = c(paste0(&quot;Col_&quot;, 1:12)), las=3)
-abline(h=8.5)</code></pre>
-<p><img src="figure/05_Preprocessing_Bulk.Rmd/platesetup_cluster-1.png" width="1440" style="display: block; margin: auto;" /></p>
+<p>Similarity based on hcluster plot #todo: check code snippet
+<img src="figure/05_Preprocessing_Bulk.Rmd/platesetup_cluster-1.png" width="1440" style="display: block; margin: auto;" /></p>
 <p>
 <button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-platesetup_cluster-1">
 Past versions of platesetup_cluster-1.png
@@ -4021,44 +3754,6 @@ Andreas Chiocchetti
 </table>
 </div>
 </div>
-<pre class="r"><code>sampleDistMatrix &lt;- as.matrix(distance)
-
-#colors for plotting heatmap
-colors &lt;- colorRampPalette(brewer.pal(9, &quot;Spectral&quot;))(255)
-
-PAcols = Dark8[c(1:2)+1]
-names(PAcols) = unique(SampleInfo$PAmM)
-
-Batchcols = brewer.pal(3,&quot;Set1&quot;)[1:nlevels(SampleInfo$Batch)]
-names(Batchcols) = levels(SampleInfo$Batch)
-
-Replicol = brewer.pal(3,&quot;Set2&quot;)[1:2]
-names(Replicol) = levels(SampleInfo$Replicate)
-
-Daycol = c(&quot;dodgerblue&quot;, &quot;dodgerblue4&quot;)
-
-ann_colors = list(
-  PAmM = PAcols,
-  Batch = Batchcols, 
-  Replicate = Replicol,
-  Day = Daycol
-  )
-
-labels = SampleInfo[,c(&quot;Batch&quot;,&quot;Replicate&quot;, &quot;Day&quot;, &quot;PAmM&quot;)] %&gt;% mutate_at(c(&quot;Batch&quot;, &quot;Replicate&quot;, &quot;PAmM&quot;), as.character) %&gt;% as.data.frame()
-
-rownames(labels)=rownames(SampleInfo)
-
-pheatmap(sampleDistMatrix,
-         clustering_distance_rows = distance,
-         clustering_distance_cols = distance,
-         clustering_method = &quot;ward.D2&quot;,
-         scale =&quot;row&quot;,
-         border_color = NA, 
-         annotation_row = labels,
-         annotation_col = labels,
-         annotation_colors = ann_colors,
-         col = colors, 
-         main = &quot;Distances normalized log2 counts&quot;)</code></pre>
 <p><img src="figure/05_Preprocessing_Bulk.Rmd/clusterandqual-1.png" width="1440" style="display: block; margin: auto;" /></p>
 <p>
 <button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-clusterandqual-1">
@@ -4111,22 +3806,6 @@ Andreas Chiocchetti
 </div>
 <div id="pca-and-mds" class="section level2">
 <h2>PCA and MDS</h2>
-<pre class="r"><code># PCA
-gpca &lt;- glmpca(t(cpm.sel.trans), L = 2)
-gpca.dat &lt;- gpca$factors
-gpca.dat$CellLine &lt;- SampleInfo$CellLine
-gpca.dat$Batch &lt;- SampleInfo$Batch
-gpca.dat$PAmM&lt;- as.factor(SampleInfo$PAmM)
-gpca.dat$Day&lt;- SampleInfo$Day
-gpca.dat$Replicate &lt;- as.factor(SampleInfo$Replicate)
-
-rownames(gpca.dat) = rownames(SampleInfo)
-mds = as.data.frame(SampleInfo) %&gt;% cbind(cmdscale(distance))
-
-
-ggplot(gpca.dat, aes(x = dim1, y = dim2, color = Day, 
-                     shape = PAmM)) +
-            geom_point(size = 2)  + ggtitle(&quot;PCA with log2 counts&quot;)</code></pre>
 <p><img src="figure/05_Preprocessing_Bulk.Rmd/PCA_MDS-1.png" width="672" style="display: block; margin: auto;" /></p>
 <p>
 <button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-PCA_MDS-1">
@@ -4176,8 +3855,6 @@ Andreas Chiocchetti
 </table>
 </div>
 </div>
-<pre class="r"><code>ggplot(mds, aes(x = `1`, y = `2`, color = Day, shape = PAmM)) +
-            geom_point(size = 2)  + ggtitle(&quot;MDS with log2 counts&quot;)</code></pre>
 <p><img src="figure/05_Preprocessing_Bulk.Rmd/PCA_MDS-2.png" width="672" style="display: block; margin: auto;" /></p>
 <p>
 <button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-PCA_MDS-2">
@@ -4227,7 +3904,6 @@ Andreas Chiocchetti
 </table>
 </div>
 </div>
-<pre class="r"><code>saveRDS(ddsMat, file=paste0(&quot;./data/Bulk_dds_matrix.rds&quot;))</code></pre>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
@@ -4236,7 +3912,6 @@ Session information
 </button>
 </p>
 <div id="workflowr-sessioninfo" class="collapse">
-<pre class="r"><code>sessionInfo()</code></pre>
 <pre><code>R version 4.3.1 (2023-06-16)
 Platform: x86_64-pc-linux-gnu (64-bit)
 Running under: Ubuntu 22.04.2 LTS
