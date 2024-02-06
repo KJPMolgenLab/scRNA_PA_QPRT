@@ -258,6 +258,8 @@ for(g in unique(dataplot$hgnc)){
 
 openxlsx2::write_xlsx(file=paste0(output, "/06_Bulk_DEX_Kynurenine_stat_DayxmM.xlsx"), results)
 
+display_tab(results)
+
 ```
 
 ```{r, fig.width=7, fig.height=10}
@@ -280,4 +282,7 @@ p
 ggsave(file=paste0(output, "/06_Bulk_DEX_16p11_lineplots.svg"), p)
 
 openxlsx2::write_xlsx(file=paste0(output, "/06_Bulk_DEX_chr16p11_stat_DayxmM.xlsx"), results)
+
+display_tab(results)
+
 ```
