@@ -2,7 +2,12 @@
 title: "Bulk_Data"
 author: "A Chiocchetti"
 date: "2024-01-09"
-output: html_document
+output:
+  html_document:
+    theme: cerulean
+    toc: yes
+    toc_float:
+      collapsed: true
 ---
 
 ```{r setup, include=FALSE}
