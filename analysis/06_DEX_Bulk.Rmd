@@ -2,7 +2,12 @@
 title: "DEX Analysis"
 author: "A Chiocchetti"
 date: "2024-01-09"
-output: html_document
+output:
+  html_document:
+    theme: cerulean
+    toc: yes
+    toc_float:
+      collapsed: true
 ---
 
 ```{r setup, include=FALSE}
@@ -48,6 +53,8 @@ hgnc=gconvert(query=as.numeric(rownames(ddsMat)),
 
 ```
 
+# Differential gene expression 
+
 ```{r analyze DEX}
 ## comparisons against 0MM PA
 PA=levels(SampleInfo$PAmM)
@@ -82,7 +89,7 @@ l = l[sort(names(l))]
 openxlsx2::write_xlsx(l, file=paste0(output, "06_Bulk_DEX_LFC_results.xlsx"), row_names=T )
 ```
 
-
+## GO terms
 ```{r, fig.width=15, fig.height=20}
 geneuniverses <- rownames(log_2cpm)
 GOtermlist <- list()
@@ -165,6 +172,9 @@ p <- ggpubr::ggarrange(plotlist = plotlist, common.legend = T, nrow = 5, ncol =3
 p
 ggsave(file=paste0(output, "/06_Bulk_DEX_top10_TF_GOplot.svg"), plot = p)
 ```
+
+## Trajectories over time top genes per comparison
+
 ```{r plot top 10 DEX genes, fig.width=14, fig.height=21}
 
 topgenes=c()
