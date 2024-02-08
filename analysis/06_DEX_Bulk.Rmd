@@ -42,6 +42,7 @@ source("code/custom_functions.R")
 ddsMat <- readRDS("data/Bulk_dds_matrix.rds")
 chr16p11_genes <- openxlsx::read.xlsx("data/chr16p11_orig.xlsx")
 Kynurenine_genes <- openxlsx::read.xlsx("data/Kynurenine_genes_orig.xlsx")
+Astrocyte_genes <- openxlsx::read.xlsx("data/AstrocyteGenes.xlsx")
 
 SampleInfo = as.data.frame(colData(ddsMat))
 log_2cpm=log2(counts(ddsMat, normalize=T)+1)
@@ -262,9 +263,10 @@ display_tab(results)
 
 
 ```
+## Astrocyte genes over time
 
 ```{r, fig.width=7, fig.height=10}
-dataplot <- log_2cpm[which(geneinfo$hgnc%in%chr16p11_genes$Gene_symbol),] %>% reshape2::melt()
+dataplot <- log_2cpm[which(geneinfo$hgnc%in%Astrocyte_genes$Gene_symbol),] %>% reshape2::melt()
 colnames(dataplot) <- c("gene","Sample", "reads")  
 dataplot$PAmM = SampleInfo[dataplot$Sample, "PAmM"]
 dataplot$Batch = SampleInfo[dataplot$Sample, "Batch"]
@@ -281,10 +283,9 @@ ggplot(dataplot, aes(x = Day, y = reads,col=PAmM, fill = PAmM)) +
 
 p
 
-ggsave(file=paste0(output, "/06_Bulk_DEX_16p11_lineplots.svg"), p)
+ggsave(file=paste0(output, "/06_Bulk_DEX_Kynurenine_lineplots.svg"), p)
 
 results<-data.frame(matrix(ncol=2, nrow=0))
-
 for(g in unique(dataplot$hgnc)){
   subdat<-dataplot[dataplot$hgnc == g, ]
   res <- lme4::glmer(reads~Day*PAmM+(1|Batch), data = subdat)
@@ -292,8 +293,8 @@ for(g in unique(dataplot$hgnc)){
   results<-rbind(results, c(g, res_stat$`Pr(>Chisq)`[4]))
 }
 
+openxlsx2::write_xlsx(file=paste0(output, "/06_Bulk_DEX_Astrocyte_stat_DayxmM.xlsx"), results)
 
-openxlsx2::write_xlsx(file=paste0(output, "/06_Bulk_DEX_chr16p11_stat_DayxmM.xlsx"), results)
 colnames(results) <- c("gene", "Pval")
 display_tab(results)
 
