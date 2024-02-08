@@ -24,6 +24,7 @@ library(gprofiler2)
 library(tidyverse)
 
 dir.create("./output/04_Biostat/", showWarnings = F)
+source("./code/custom_functions.R")
 SamplePalette =  c("#000000","#3399FF")
 ```
 
@@ -41,15 +42,15 @@ DEG_allcells<-FindMarkers(seurat_integrated,ident.1 = "5mM", ident.2 = "0mM")
 
 ```{r}
 DT::datatable(DEG_allcells, extensions = "Buttons",
-                    filter="top",
-                    options = list(
-                      pageLength = 15,
-                      info = FALSE,
-                      lengthMenu = list(c(15,50, 100, -1),
-                                        c("15","50", "100" ,"All")
-                      ),dom = 'Blfrtip',
-                      buttons = c('copy', 'csv', 'excel', 'pdf')
-                    ))
+              filter="top",
+              options = list(
+                pageLength = 15,
+                info = FALSE,
+                lengthMenu = list(c(15,50, 100, -1),
+                                  c("15","50", "100" ,"All")
+                ),dom = 'Blfrtip',
+                buttons = c('copy', 'csv', 'excel', 'pdf')
+              ))
 
 DEG_allcells <- cbind("Gene"=rownames(DEG_allcells), DEG_allcells)
 openxlsx2::write_xlsx(DEG_allcells, "./output/04_Biostat/Biostat_DEG_allcells.xlsx", as_table = T)
@@ -70,15 +71,15 @@ gostres = gost(query = genelist, evcodes = T, custom_bg = genebackground)
 tablegostres = gostres$result[grepl("GO:", gostres$result$source), c("query", "source", "term_name","p_value", "intersection")]
 
 DT::datatable(tablegostres, extensions = "Buttons",
-                    filter="top",
-                    options = list(
-                      pageLength = 15,
-                      info = FALSE,
-                      lengthMenu = list(c(15,50, 100, -1),
-                                        c("15","50", "100" ,"All")
-                      ),dom = 'Blfrtip',
-                      buttons = c('copy', 'csv', 'excel', 'pdf')
-                    ))
+              filter="top",
+              options = list(
+                pageLength = 15,
+                info = FALSE,
+                lengthMenu = list(c(15,50, 100, -1),
+                                  c("15","50", "100" ,"All")
+                ),dom = 'Blfrtip',
+                buttons = c('copy', 'csv', 'excel', 'pdf')
+              ))
 
 openxlsx2::write_xlsx(tablegostres, "./output/04_Biostat/Biostat_GO_termDEG_all.xlsx")
 ```
@@ -87,7 +88,7 @@ openxlsx2::write_xlsx(tablegostres, "./output/04_Biostat/Biostat_GO_termDEG_all.
 
 ```{r}
 clusters = unique(seurat_integrated$seurat_clusters)
-       
+
 DEG_reslist <- list()
 Idents(seurat_integrated) <- "seurat_clusters"
 
@@ -103,9 +104,11 @@ for(clus in clusters){
 ```
 
 ```{r}
-goreslist <- list()
+genelist <- list()
+plotlist <- list()
+res = "cluster_5"
 
-for(res in names(DEG_reslist)){
+for(res in sort(names(DEG_reslist))){
   DEGRes <- DEG_reslist[[res]]
   idx_sig<-DEGRes$p_val_adj<0.05
   idx_fdr <- abs(DEGRes$avg_log2FC)> 0.25 
@@ -114,14 +117,41 @@ for(res in names(DEG_reslist)){
   idx_dwn<- idx_reg & sign(DEGRes$avg_log2FC)<0
   
   genebackground = rownames(DEGRes)
-  genelist = list(DEG_all_reg=genebackground[idx_reg], DEG_all_down=genebackground[idx_dwn], DEG_all_up=genebackground[idx_up])
-  names(genelist)= paste0(res, names(genelist))
-  gostres = gost(query = genelist, evcodes = T, custom_bg = genebackground)
-  goreslist[[res]]<-gostres
-  tablegostres = gostres$result[grepl("GO:", gostres$result$source), c("query", "source", "term_name","p_value", "intersection")]
-  openxlsx2::write_xlsx(tablegostres, paste0("./output/04_Biostat/Biostat_GO_termDEG_",res,".xlsx"))
+  genelisttmp = list(DEG_all=genebackground[idx_reg], 
+                  DEG_all_down=genebackground[idx_dwn], 
+                  DEG_all_up=genebackground[idx_up])
+  
+  names(genelisttmp)= paste0(res, names(genelisttmp))
+  genelist <- c(genelist, genelisttmp)
 }
+
+gostres = gost(query = genelist, evcodes = T, custom_bg = genebackground)
+
+resGO = gostres$result[grepl("GO:", gostres$result$source), c("query", "source", "term_name","p_value", "intersection")]
+
+openxlsx::write.xlsx(resGO, "./output/04_Biostat/Biostat_DEG_GO_Cluster.xlsx")
+
+for (set in sort(names(genelist))){
+  if(set %in% gostres$result$query){
+  dat=gostres$result[which(gostres$result$query == set),]
+  plotlist[[set]]<-GOplot(dat, N = 10, Title = set, xlim=NA)
+  }else{
+    text="no significance"
+    plotlist[[set]]<-ggplot() + annotate("text", x = 4, y = 25, label = text) + 
+      ggtitle(set) + theme_void()
+  }
+}
+
 ```
+
+```{r, fig.width=16, fig.height=50}
+p = ggpubr::ggarrange(plotlist = plotlist, ncol = 3, nrow = 14)
+p
+ggsave(filename = "./output/04_Biostat/Biostat_DEG_GO_clusters.svg")
+```
+
+
+
 
 
 ## Cluster based differences in distribution
@@ -146,8 +176,10 @@ n_cells$OR = unlist(lapply(res, function(x){x$estimate}))
 n_cells$p.value = unlist(lapply(res, function(x){x$p.value}))
 n_cells$adj.pvalue = p.adjust(n_cells$p.value)
 
+n_cells
 n_cells <- cbind("cluster"=rownames(n_cells), n_cells)
 openxlsx2::write_xlsx(file="./output/04_Biostat/Biostat_clusterFreq.xslsx",n_cells)
+
 ```
 
 ## Human Developmental Cell Types based differences in distribution
@@ -171,7 +203,7 @@ for(i in rownames(n_cells)){
 n_cells$OR = unlist(lapply(res, function(x){x$estimate}))
 n_cells$p.value = unlist(lapply(res, function(x){x$p.value}))
 n_cells$adj.pvalue = p.adjust(n_cells$p.value)
-
+n_cells
 n_cells <- cbind("HumdevCT"=rownames(n_cells), n_cells)
 openxlsx2::write_xlsx(file="./output/04_Biostat/Biostat_HumdevCTFreq.xslsx",n_cells)
 ```
@@ -185,7 +217,7 @@ library(rstatix)
 
 metadata$type = as.factor(metadata$type)
 metadata$type = relevel(metadata$type, ref = "5mM")
-  
+
 plotlist=list()
 for(lin in c("shared.pseudo",lineages)){
   data=metadata[,c(lin, "type")]
@@ -195,7 +227,7 @@ for(lin in c("shared.pseudo",lineages)){
     geom_density() + 
     scale_fill_manual(values=SamplePalette, aesthetics="colour")+
     theme_classic()+ ggtitle(lin)+xlab("pseudotime") + 
-  labs(subtitle = get_test_label(stat.test,  detailed = TRUE))
+    labs(subtitle = get_test_label(stat.test,  detailed = TRUE))
   plotlist[[lin]]<-ggp2
 }
 
