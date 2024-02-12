@@ -99,7 +99,7 @@ getGOresults = function(geneset, genereference=NULL, evcodes=FALSE){
 }
 
 
-GOplot = function(GOtable, N, Title="GO plot", ylabel="GO term"){
+GOplot = function(GOtable, N, Title="GO plot", ylabel="GO term", xlim=15){
   if(nrow(GOtable)<N){N=nrow(GOtable)}
   GOtable = GOtable[GOtable$parents!="character(0)",]
   Tabtoplot=GOtable[order(GOtable$p_value, decreasing = F)[1:N],]
@@ -131,9 +131,14 @@ GOplot = function(GOtable, N, Title="GO plot", ylabel="GO term"){
     scale_y_continuous(breaks=N:1,
                        labels=Tabtoplot$term_name)+
     guides(size = guide_legend(order = 2),
-           colour = guide_colorsteps(order = 1, barheight = 4))+
-    xlim(0,15)
-  return(p)
+           colour = guide_colorsteps(order = 1, barheight = 4))
+  if(is.na(xlim)){
+    p+xlim(0,max(Tabtoplot$log10pvalue, na.rm=T))
+    return(p)
+  }else{
+    p+xlim(0,xlim)
+    return(p)
+  }
 }
 
 
