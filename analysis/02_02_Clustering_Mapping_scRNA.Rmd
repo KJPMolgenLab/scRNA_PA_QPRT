@@ -343,6 +343,20 @@ ggarrange(plotlist=p, nrow = 4,ncol=4, common.legend = T, legend = "right")
 
 ```
 
+```{r}
+summ_lab<- openxlsx2::read_xlsx("./data/SummarizedCellTypes.xlsx")
+summ_lab$Abbrev <- gsub("\\(", "", summ_lab$Abbrev)
+summ_lab$Abbrev <- gsub("\\)", "_", summ_lab$Abbrev)
+rownames(summ_lab) <- summ_lab$Orig_cluster
+seuratmeta <- seurat_integrated@meta.data
+seuratmeta$merges_clusters <- summ_lab[seuratmeta$seurat_clusters, "Abbrev"]
+seuratmeta -> seurat_integrated@meta.data
+
+
+p<- DimPlot(seurat_integrated, group.by = "merges_clusters")
+ggsave(file="output/Clusterain_final_optimized_all_merged_lables.svg", p)
+
+```
 
 
 ```{r last cleanup}
