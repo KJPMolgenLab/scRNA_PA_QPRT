@@ -383,7 +383,7 @@ class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2024-02-12
+<strong>Last updated:</strong> 2024-04-12
 </p>
 <p>
 <strong>Checks:</strong> <span
@@ -514,15 +514,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomKJPMolgenLabscRNAPAQPRTtreed6ec67131eed43d151e16b238dd56a9776546180targetblankd6ec671a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomKJPMolgenLabscRNAPAQPRTtree3451eda0df609320de9702791746c4f93b7bc1d3targetblank3451edaa">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/KJPMolgenLab/scRNA_PA_QPRT/tree/d6ec67131eed43d151e16b238dd56a9776546180" target="_blank">d6ec671</a>
+<a href="https://github.com/KJPMolgenLab/scRNA_PA_QPRT/tree/3451eda0df609320de9702791746c4f93b7bc1d3" target="_blank">3451eda</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomKJPMolgenLabscRNAPAQPRTtreed6ec67131eed43d151e16b238dd56a9776546180targetblankd6ec671a"
+id="strongRepositoryversionstrongahrefhttpsgithubcomKJPMolgenLabscRNAPAQPRTtree3451eda0df609320de9702791746c4f93b7bc1d3targetblank3451edaa"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -532,7 +532,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/KJPMolgenLab/scRNA_PA_QPRT/tree/d6ec67131eed43d151e16b238dd56a9776546180" target="_blank">d6ec671</a>.
+<a href="https://github.com/KJPMolgenLab/scRNA_PA_QPRT/tree/3451eda0df609320de9702791746c4f93b7bc1d3" target="_blank">3451eda</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -550,11 +550,14 @@ Ignored files:
     Ignored:    .Rhistory
     Ignored:    .Rprofile
     Ignored:    .Rproj.user/
+    Ignored:    analysis/figure/
     Ignored:    output/05_Bulk_Preprocessing/
 
 Untracked files:
     Untracked:  .bashrc
     Untracked:  .nuvolos/
+    Untracked:  analysis/04b_GroupAnalysisMergedClusters_scRNA.Rmd
+    Untracked:  analysis/08_GABA_subtypes.Rmd
     Untracked:  data/AstrocyteGenes.xlsx
     Untracked:  data/Bulk_dds_matrix.rds
     Untracked:  data/Bulkdata_Countmatrix.rds
@@ -570,15 +573,62 @@ Untracked files:
     Untracked:  data/QC_dataClustered.filtTypedTraj.rds
     Untracked:  data/QC_dataFinal.rds
     Untracked:  data/Sample Allocation P2023-224-LEX-LB.txt
+    Untracked:  data/SummarizedCellTypes.xlsx
     Untracked:  data/alldata.rds
     Untracked:  data/chr16p11.xlsx
     Untracked:  data/chr16p11_orig.xlsx
     Untracked:  data/tmp.xlsx
+    Untracked:  output/04_Biostat/Biostat_DEG_Astcells.xlsx
+    Untracked:  output/04_Biostat/Biostat_DEG_Ex_Ncells.xlsx
+    Untracked:  output/04_Biostat/Biostat_DEG_Ex_Pcells.xlsx
+    Untracked:  output/04_Biostat/Biostat_DEG_In_Ncells.xlsx
+    Untracked:  output/04_Biostat/Biostat_DEG_In_Pcells.xlsx
+    Untracked:  output/04_Biostat/Biostat_DEG_ccRGcells.xlsx
+    Untracked:  output/04_Biostat/Biostat_DEG_o_RGcells.xlsx
+    Untracked:  output/04_Biostat/Biostat_clusterMergedFreq.xslsx
+    Untracked:  output/07_Bulk_Deconv/07_DeconVol_Bulk_StatTimecourseDiff_clusters_merged.xslx
+    Untracked:  output/07_Bulk_Deconv/07_DeconVol_Bulk_propHeatmap_clusters_merged.svg
+    Untracked:  output/07_Bulk_Deconv/07_DeconVol_Bulk_timeplots_clusters_batchcompare.svg
+    Untracked:  output/07_Bulk_Deconv/07_DeconVol_Bulk_timeplots_clusters_batchcompare_merged.svg
+    Untracked:  output/07_Bulk_Deconv/07_DeconVol_Bulk_timeplots_clusters_batchinline.svg
+    Untracked:  output/07_Bulk_Deconv/07_DeconVol_Bulk_timeplots_clusters_batchinline_merged.svg
+    Untracked:  output/07_Bulk_Deconv/07_DeconVol_Bulk_timeplots_clusters_merged.svg
+    Untracked:  output/Clusterain_final_optimized_all_merged_lables.svg
 
 Unstaged changes:
     Modified:   .gitignore
+    Modified:   analysis/04_GroupAnalysis_scRNA.Rmd
+    Modified:   analysis/07_DeconVol_Bulk.Rmd
+    Modified:   analysis/index.Rmd
     Modified:   output/02_Clustering/Cluster_markers.xls
-    Modified:   output/02_Clustering/Clusters_GO_termsCluster.xlsx
+    Modified:   output/03_Trajectories/Trajectories_All.svg
+    Modified:   output/03_Trajectories/Trajectories_Lineages.svg
+    Modified:   output/04_Biostat/Biostat_DEG_GO_Cluster.xlsx
+    Modified:   output/04_Biostat/Biostat_DEG_GO_clusters.svg
+    Modified:   output/04_Biostat/Biostat_DEG_allcells.xlsx
+    Modified:   output/04_Biostat/Biostat_DEG_cluster_0cells.xlsx
+    Modified:   output/04_Biostat/Biostat_DEG_cluster_10cells.xlsx
+    Modified:   output/04_Biostat/Biostat_DEG_cluster_11cells.xlsx
+    Modified:   output/04_Biostat/Biostat_DEG_cluster_12cells.xlsx
+    Modified:   output/04_Biostat/Biostat_DEG_cluster_13cells.xlsx
+    Modified:   output/04_Biostat/Biostat_DEG_cluster_1cells.xlsx
+    Modified:   output/04_Biostat/Biostat_DEG_cluster_2cells.xlsx
+    Modified:   output/04_Biostat/Biostat_DEG_cluster_3cells.xlsx
+    Modified:   output/04_Biostat/Biostat_DEG_cluster_4cells.xlsx
+    Modified:   output/04_Biostat/Biostat_DEG_cluster_5cells.xlsx
+    Modified:   output/04_Biostat/Biostat_DEG_cluster_6cells.xlsx
+    Modified:   output/04_Biostat/Biostat_DEG_cluster_7cells.xlsx
+    Modified:   output/04_Biostat/Biostat_DEG_cluster_8cells.xlsx
+    Modified:   output/04_Biostat/Biostat_DEG_cluster_9cells.xlsx
+    Modified:   output/04_Biostat/Biostat_GO_termDEG_all.xlsx
+    Modified:   output/04_Biostat/Biostat_HumdevCTFreq.xslsx
+    Modified:   output/04_Biostat/Biostat_clusterFreq.xslsx
+    Modified:   output/07_Bulk_Deconv/07_DeconVol_Bulk_StatTimecourseDiff_KnCelltypes.xslx
+    Modified:   output/07_Bulk_Deconv/07_DeconVol_Bulk_StatTimecourseDiff_clusters.xslx
+    Modified:   output/07_Bulk_Deconv/07_DeconVol_Bulk_propHeatmap_Knoblichclusters.svg
+    Modified:   output/07_Bulk_Deconv/07_DeconVol_Bulk_propHeatmap_clusters.svg
+    Modified:   output/07_Bulk_Deconv/07_DeconVol_Bulk_timeplots_Knoblichclusters.svg
+    Modified:   output/07_Bulk_Deconv/07_DeconVol_Bulk_timeplots_clusters.svg
     Modified:   workflowHelper.R
 
 </code></pre>
@@ -626,6 +676,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/KJPMolgenLab/scRNA_PA_QPRT/blob/3451eda0df609320de9702791746c4f93b7bc1d3/analysis/02_02_Clustering_Mapping_scRNA.Rmd" target="_blank">3451eda</a>
+</td>
+<td>
+Andreas Chiocchetti
+</td>
+<td>
+2024-04-12
+</td>
+<td>
+wflow_publish("./analysis/02_02_Clustering_Mapping_scRNA.Rmd")
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/KJPMolgenLab/scRNA_PA_QPRT/8963c8bff1bb9670e7597806d4a4954a1bdcd5b3/docs/02_02_Clustering_Mapping_scRNA.html" target="_blank">8963c8b</a>
+</td>
+<td>
+Andreas Chiocchetti
+</td>
+<td>
+2024-02-12
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -966,8 +1050,8 @@ KnoblichType   0  1  2  3  4  5  6  7  8  9 10 11 12 13
 data:  crosstab
 X-squared = 2429.9, df = 182, p-value &lt; 2.2e-16</code></pre>
 <pre><code>           used  (Mb) gc trigger   (Mb)  max used   (Mb)
-Ncells 10189271 544.2   17877388  954.8  17877388  954.8
-Vcells 78396543 598.2  258505145 1972.3 323131431 2465.3</code></pre>
+Ncells 10189340 544.2   17876260  954.7  17876260  954.7
+Vcells 78397791 598.2  267971480 2044.5 334964350 2555.6</code></pre>
 </div>
 <div id="knoblich-map-to-annotation" class="section level2">
 <h2>Knoblich Map to annotation</h2>
@@ -1168,8 +1252,8 @@ Andreas Chiocchetti
 </div>
 </div>
 <pre><code>           used  (Mb) gc trigger   (Mb)  max used   (Mb)
-Ncells 10274999 548.8   17877388  954.8  17877388  954.8
-Vcells 79023975 603.0  515539938 3933.3 805531152 6145.8</code></pre>
+Ncells 10275101 548.8   17876260  954.7  17876260  954.7
+Vcells 79025278 603.0  515540943 3933.3 805532721 6145.8</code></pre>
 </div>
 <div id="kanton-et-al-table-4-celltypes" class="section level2">
 <h2>Kanton et al Table 4 Celltypes</h2>
@@ -1630,8 +1714,8 @@ Kanton14Type  0  1  2  3  4  5  6  7  8  9 10 11 12 13
 data:  crosstab
 X-squared = 1093.7, df = 78, p-value &lt; 2.2e-16</code></pre>
 <pre><code>           used  (Mb) gc trigger   (Mb)  max used   (Mb)
-Ncells 10245259 547.2   17877394  954.8  17877394  954.8
-Vcells 78807326 601.3  329953480 2517.4 805531152 6145.8</code></pre>
+Ncells 10245359 547.2   17876260  954.7  17876260  954.7
+Vcells 78808634 601.3  329948985 2517.4 805532721 6145.8</code></pre>
 </div>
 <div id="humandevdata-map-to-annotation" class="section level2">
 <h2>HumanDevData Map to annotation</h2>
@@ -1759,8 +1843,8 @@ CellClass         HsapDv:0000107 HsapDv:0000108
   b&#39;Radial glia&#39;             839            851
   b&#39;Vascular&#39;                227            894</code></pre>
 <pre><code>            used   (Mb) gc trigger    (Mb)   max used    (Mb)
-Ncells  11347294  606.1   17877394   954.8   17877394   954.8
-Vcells 156492851 1194.0 5398852680 41190.0 6214200040 47410.6</code></pre>
+Ncells  11347394  606.1   17876260   954.7   17876260   954.7
+Vcells 156494159 1194.0 5398853936 41190.0 6214201108 47410.6</code></pre>
 <pre><code>Modularity Optimizer version 1.3.0 by Ludo Waltman and Nees Jan van Eck
 
 Number of nodes: 17262
@@ -1771,8 +1855,8 @@ Maximum modularity in 10 random starts: 0.9375
 Number of communities: 31
 Elapsed time: 1 seconds</code></pre>
 <pre><code>            used   (Mb) gc trigger    (Mb)   max used    (Mb)
-Ncells  11447402  611.4   17877394   954.8   17877394   954.8
-Vcells 814067815 6210.9 2211370059 16871.5 6214200040 47410.6</code></pre>
+Ncells  11447505  611.4   17876260   954.7   17876260   954.7
+Vcells 814069127 6210.9 2211370573 16871.5 6214201108 47410.6</code></pre>
 <p><img src="figure/02_02_Clustering_Mapping_scRNA.Rmd/maphumdev%20plot%20humdev%20ref%20cluster-1.png" width="576" style="display: block; margin: auto;" /></p>
 <p>
 <button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-no-spaces-maphumdev-plot-humdev-ref-cluster-1">
@@ -2775,8 +2859,8 @@ Andreas Chiocchetti
 attr(,&quot;class&quot;)
 [1] &quot;list&quot;      &quot;ggarrange&quot;</code></pre>
 <pre><code>           used  (Mb) gc trigger    (Mb)   max used    (Mb)
-Ncells 11917917 636.5   17877394   954.8   17877394   954.8
-Vcells 94371888 720.1 2122979256 16197.1 6214200040 47410.6</code></pre>
+Ncells 11557125 617.3   25511355  1362.5   25511355  1362.5
+Vcells 82710759 631.1 2122979750 16197.1 6214201108 47410.6</code></pre>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
@@ -2906,28 +2990,29 @@ loaded via a namespace (and not attached):
 [141] rjson_0.2.21                ggridges_0.5.5             
 [143] progressr_0.14.0            parallel_4.3.1             
 [145] jsonlite_1.8.8              RcppHNSW_0.5.0             
-[147] bitops_1.0-7                bit64_4.0.5                
-[149] Rtsne_0.17                  FlowSOM_2.8.0              
-[151] spatstat.utils_3.0-4        BiocNeighbors_1.18.0       
-[153] flowCore_2.12.2             jquerylib_0.1.4            
-[155] highr_0.10                  lazyeval_0.2.2             
-[157] shiny_1.8.0                 ConsensusClusterPlus_1.64.0
-[159] htmltools_0.5.7             sctransform_0.4.1          
-[161] glue_1.6.2                  spam_2.10-0                
-[163] XVector_0.42.0              rprojroot_2.0.4            
-[165] gridExtra_2.3               igraph_1.6.0               
-[167] R6_2.5.1                    labeling_0.4.3             
-[169] cluster_2.1.6               DelayedArray_0.28.0        
-[171] tidyselect_1.2.0            vipor_0.4.7                
-[173] plotrix_3.8-4               maps_3.4.2                 
-[175] ggforce_0.4.1               car_3.1-2                  
-[177] future_1.33.1               rsvd_1.0.5                 
-[179] munsell_0.5.0               KernSmooth_2.23-22         
-[181] htmlwidgets_1.6.4           ComplexHeatmap_2.16.0      
-[183] rlang_1.1.2                 spatstat.sparse_3.0-3      
-[185] spatstat.explore_3.2-5      colorRamps_2.3.1           
-[187] ggnewscale_0.4.9            fansi_1.0.6                
-[189] beeswarm_0.4.0             </code></pre>
+[147] bitops_1.0-7                openxlsx2_1.2              
+[149] bit64_4.0.5                 Rtsne_0.17                 
+[151] FlowSOM_2.8.0               spatstat.utils_3.0-4       
+[153] BiocNeighbors_1.18.0        zip_2.3.0                  
+[155] flowCore_2.12.2             jquerylib_0.1.4            
+[157] highr_0.10                  lazyeval_0.2.2             
+[159] shiny_1.8.0                 ConsensusClusterPlus_1.64.0
+[161] htmltools_0.5.7             sctransform_0.4.1          
+[163] glue_1.6.2                  spam_2.10-0                
+[165] XVector_0.42.0              rprojroot_2.0.4            
+[167] gridExtra_2.3               igraph_1.6.0               
+[169] R6_2.5.1                    labeling_0.4.3             
+[171] cluster_2.1.6               DelayedArray_0.28.0        
+[173] tidyselect_1.2.0            vipor_0.4.7                
+[175] plotrix_3.8-4               maps_3.4.2                 
+[177] ggforce_0.4.1               car_3.1-2                  
+[179] future_1.33.1               rsvd_1.0.5                 
+[181] munsell_0.5.0               KernSmooth_2.23-22         
+[183] htmlwidgets_1.6.4           ComplexHeatmap_2.16.0      
+[185] rlang_1.1.2                 spatstat.sparse_3.0-3      
+[187] spatstat.explore_3.2-5      colorRamps_2.3.1           
+[189] ggnewscale_0.4.9            fansi_1.0.6                
+[191] beeswarm_0.4.0             </code></pre>
 </div>
 </div>
 </div>
