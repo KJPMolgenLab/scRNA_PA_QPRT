@@ -25,6 +25,7 @@ library(tidyverse)
 library(pheatmap)
 library(dendextend)
 library(gprofiler2)
+library(Seurat)
 ```
 
 ```{r}
