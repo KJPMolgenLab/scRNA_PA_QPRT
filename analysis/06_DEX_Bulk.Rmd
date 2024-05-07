@@ -23,8 +23,11 @@ library(glmpca)
 library(ggplot2)
 library(tidyverse)
 library(pheatmap)
+library(viridisLite)
 library(dendextend)
 library(gprofiler2)
+library(Seurat)
+library(lme4)
 ```
 ```{r}
 options(stringsAsFactors = F)
@@ -144,7 +147,7 @@ for (set in unique(resGO$result$query)){
   if(nrow(dat)>0){
     plotlist[[set]]<-GOplot(dat, N = 10, Title = set, xlim=NA)
   }else{
-    text="no signifiance"
+    text="no significance"
     plotlist[[set]]<-ggplot() + annotate("text", x = 4, y = 25, label = text) + 
       ggtitle(set) + theme_void()
   }
@@ -163,7 +166,7 @@ for (set in unique(resGO$result$query)){
   if(nrow(dat)>0){
     plotlist[[set]]<-GOplot(dat, N = 10, Title = set, xlim=NA)
   }else{
-    text="no signifiance"
+    text="no significance"
     plotlist[[set]]<-ggplot() + annotate("text", x = 4, y = 25, label = text) + 
       ggtitle(set) + theme_void()
   }
@@ -217,7 +220,7 @@ idx=is.na(dataplot$hgnc)
 dataplot$hgnc[idx] = dataplot$gene[idx]
 
 ggplot(dataplot, aes(x = Day, y = reads,col=PAmM, fill = PAmM)) +
-    geom_smooth() +
+    geom_smooth(span=0.5) + scale_x_continuous(breaks=c(5,10,17,40,80))+
     theme_classic() + facet_wrap(~hgnc) +
     theme(axis.text.x = element_text(angle = 90, hjust = 1))+
     labs(x = "Day", y = "log2(CPM+1)") -> p
@@ -241,7 +244,7 @@ idx=is.na(dataplot$hgnc)
 dataplot$hgnc[idx] = dataplot$gene[idx]
 
 ggplot(dataplot, aes(x = Day, y = reads,col=PAmM, fill = PAmM)) +
-    geom_smooth() +
+    geom_smooth(span=0.5) + scale_x_continuous(breaks=sort(unique(dataplot$Day)))+
     theme_classic() + facet_wrap(~hgnc) +
     theme(axis.text.x = element_text(angle = 90, hjust = 1))+
     labs(x = "Day", y = "log2(CPM+1)") -> p
@@ -281,7 +284,7 @@ idx=is.na(dataplot$hgnc)
 dataplot$hgnc[idx] = dataplot$gene[idx]
 
 ggplot(dataplot, aes(x = Day, y = reads,col=PAmM, fill = PAmM)) +
-    geom_smooth() +
+    geom_smooth(span=0.5) + scale_x_continuous(breaks=sort(unique(dataplot$Day)))+
     theme_classic() + facet_wrap(~hgnc) +
     theme(axis.text.x = element_text(angle = 90, hjust = 1))+
     labs(x = "Day", y = "log2(CPM+1)") -> p
@@ -320,14 +323,14 @@ idx=is.na(dataplot$hgnc)
 dataplot$hgnc[idx] = dataplot$gene[idx]
 
 ggplot(dataplot, aes(x = Day, y = reads,col=PAmM, fill = PAmM)) +
-    geom_smooth() +
+    geom_smooth(span=0.5) +scale_x_continuous(breaks=sort(unique(dataplot$Day)))+
     theme_classic() + facet_wrap(~hgnc) +
     theme(axis.text.x = element_text(angle = 90, hjust = 1))+
     labs(x = "Day", y = "log2(CPM+1)") -> p
 
 p
 
-ggsave(file=paste0(output, "/06_Bulk_DEX_Kynurenine_lineplots.svg"), p)
+ggsave(file=paste0(output, "/06_Bulk_DEX_Astrocytes_lineplots.svg"), p)
 
 results<-data.frame(matrix(ncol=2, nrow=0))
 for(g in unique(dataplot$hgnc)){
@@ -343,3 +346,352 @@ colnames(results) <- c("gene", "Pval")
 display_tab(results)
 
 ```
+
+
+## WGCNA 
+
+  
+
+```{r fig.width=8, fig.height=6}
+library(org.Hs.eg.db)
+library(WGCNA)
+
+force.recalc = T
+powers = c(seq(1,10,by=1), seq(12,20, by=2));
+
+if(force.recalc | (! file.exists(file="/files/output/net.rds"))){ # skips recalculation of net object as it takes long... 
+  
+  datExpr <- t(counts(ddsMat, normalized=T))
+
+  # expressed in more than 10% of samples 
+  exprgenes = colSums(datExpr>0)>nrow(datExpr)*0.1
+  datExpr <- datExpr[,exprgenes]
+  
+  #annotated only 
+  
+  
+  hsacc=as.list(org.Hs.egACCNUM)
+  annotatedgenes = colnames(datExpr) %in% names(hsacc)
+  datExpr <- datExpr[,annotatedgenes]
+  
+  powers = c(seq(1,10,by=1), seq(12,20, by=2));
+  
+  
+  enableWGCNAThreads()
+  
+  # Call the network topology analysis function for each set in turn
+  powerTable = list(
+    data = pickSoftThreshold(
+      datExpr,
+      powerVector=powers,
+      verbose = 100,
+      networkType="unsigned",
+      corFnc="cor"
+    )[[2]]
+  );
+  
+  
+  colors = c("blue", "red","black")
+  # Will plot these columns of the returned scale free analysis tables
+  plotCols = c(2,5,6,7)
+  colNames = c("Scale Free Topology Model Fit", "Mean connectivity", "mean connectivity",
+               "Max connectivity");
+  
+  # Get the minima and maxima of the plotted points
+  ylim = matrix(NA, nrow = 2, ncol = 4);
+  for (col in 1:length(plotCols)){
+    ylim[1, col] = min(ylim[1, col], powerTable$data[, plotCols[col]], na.rm = TRUE);
+    ylim[2, col] = max(ylim[2, col], powerTable$data[, plotCols[col]], na.rm = TRUE);
+  }
+  
+  # Plot the quantities in the chosen columns vs. the soft thresholding power
+  
+  par(mfcol = c(2,2));
+  par(mar = c(4.2, 4.2 , 2.2, 0.5))
+  cex1 = 0.7;
+  
+  for (col in 1:length(plotCols)){
+    plot(powerTable$data[,1], -sign(powerTable$data[,3])*powerTable$data[,2],
+         xlab="Soft Threshold (power)",ylab=colNames[col],type="n", ylim = ylim[, col],
+         main = colNames[col]);
+    addGrid();
+    
+    if (col==1){
+      text(powerTable$data[,1], -sign(powerTable$data[,3])*powerTable$data[,2],
+           labels=powers,cex=cex1,col=colors[1]);
+    } else
+      text(powerTable$data[,1], powerTable$data[,plotCols[col]],
+           labels=powers,cex=cex1,col=colors[1]);
+    if (col==1){
+      legend("bottomright", legend = 'Metacells', col = colors, pch = 20) ;
+    } else
+      legend("topright", legend = 'Metacells', col = colors, pch = 20) ;
+  }
+
+  softPower=4
+  
+  nSets = 1
+  setLabels = 'OCS'
+  shortLabels = setLabels
+  
+  multiExpr <- list()
+  multiExpr[['ODC']] <- list(data=datExpr)
+  
+  checkSets(multiExpr) # check data size
+  
+  # construct network
+
+  net=blockwiseConsensusModules(multiExpr, blocks = NULL,
+                                maxBlockSize = 30000, ## This should be set to a smaller size if the user has limited RAM
+                                randomSeed = 12345,
+                                corType = "pearson",
+                                power = softPower,
+                                consensusQuantile = 0.3,
+                                networkType = "unsigned",
+                                TOMType = "signed",
+                                TOMDenom = "min",
+                                scaleTOMs = TRUE, scaleQuantile = 0.8,
+                                sampleForScaling = TRUE, sampleForScalingFactor = 1000,
+                                useDiskCache = TRUE, chunkSize = NULL,
+                                deepSplit = 4,
+                                pamStage=FALSE,
+                                detectCutHeight = 0.995, minModuleSize = 50,
+                                mergeCutHeight = 0.2,
+                                saveConsensusTOMs = TRUE,
+                                consensusTOMFilePattern = "ConsensusTOM-block.%b.rda")
+  
+  saveRDS(net, file="/files/output/net.rds")
+  saveRDS(powerTable, file="/files/output/powertable.rds")
+} else {
+  net = readRDS(file="/files/output/net.rds")
+  powerTable = readRDS(file="/files/output/powertable.rds")
+  powers = c(seq(1,10,by=1), seq(12,20, by=2));
+  colors = c("blue", "red","black")
+  # Will plot these columns of the returned scale free analysis tables
+  plotCols = c(2,5,6,7)
+  colNames = c("Scale Free Topology Model Fit", "Mean connectivity", "mean connectivity",
+               "Max connectivity");
+  
+  # Get the minima and maxima of the plotted points
+  ylim = matrix(NA, nrow = 2, ncol = 4);
+  for (col in 1:length(plotCols)){
+    ylim[1, col] = min(ylim[1, col], powerTable$data[, plotCols[col]], na.rm = TRUE);
+    ylim[2, col] = max(ylim[2, col], powerTable$data[, plotCols[col]], na.rm = TRUE);
+  }
+  
+  # Plot the quantities in the chosen columns vs. the soft thresholding power
+  
+  par(mfcol = c(2,2));
+  par(mar = c(4.2, 4.2 , 2.2, 0.5))
+  cex1 = 0.7;
+  
+  for (col in 1:length(plotCols)){
+    plot(powerTable$data[,1], -sign(powerTable$data[,3])*powerTable$data[,2],
+         xlab="Soft Threshold (power)",ylab=colNames[col],type="n", ylim = ylim[, col],
+         main = colNames[col]);
+    addGrid();
+    
+    if (col==1){
+      text(powerTable$data[,1], -sign(powerTable$data[,3])*powerTable$data[,2],
+           labels=powers,cex=cex1,col=colors[1]);
+    } else
+      text(powerTable$data[,1], powerTable$data[,plotCols[col]],
+           labels=powers,cex=cex1,col=colors[1]);
+    if (col==1){
+      legend("bottomright", legend = 'Metacells', col = colors, pch = 20) ;
+    } else
+      legend("topright", legend = 'Metacells', col = colors, pch = 20) ;
+  }
+}
+
+consMEs = net$multiMEs;
+moduleLabels = net$colors;
+
+
+# Convert the numeric labels to color labels
+moduleColors = as.character(moduleLabels)
+consTree = net$dendrograms[[1]];
+
+
+
+# module eigengenes
+MEs=moduleEigengenes(multiExpr[[1]]$data, colors = moduleColors, nPC=1)$eigengenes
+MEs=orderMEs(MEs)
+meInfo<-data.frame(rownames(datExpr), MEs)
+colnames(meInfo)[1]= "SampleID"
+
+# intramodular connectivity
+KMEs<-signedKME(datExpr, MEs,outputColumnName = "kME",corFnc = "bicor")
+
+# compile into a module metadata table
+geneInfo=as.data.frame(cbind(colnames(datExpr),moduleColors, KMEs))
+
+# how many modules did we get?
+nmodules <- length(unique(moduleColors))
+
+# merged gene symbol column
+colnames(geneInfo)[1]= "GeneSymbol"
+colnames(geneInfo)[2]= "Initially.Assigned.Module.Color"
+
+# save info
+write.csv(geneInfo,file=paste0(output,'geneInfoSigned.csv'))
+
+PCvalues=MEs
+```
+
+
+```{r}
+p = WGCNA::plotDendroAndColors(consTree, moduleColors[net$goodGenes], "Module colors", dendroLabels = FALSE, hang = 0.03, addGuide = TRUE, guideHang = 0.05,
+main = paste0("dendrogram and module colors"))
+
+ggsave(file=paste0(output, "06_Bulk_DEX_WGCNA_Dendrocolplot.svg"))
+
+```
+
+```{r, fig.width=12, fig.height=12}
+## Todo adjust 
+targets=colData(ddsMat) %>% as.data.frame()
+
+targes = targets[rownames(PCvalues),]
+
+plot_df <- cbind(dplyr::select(targets, c(Day, PAmM, Batch)), PCvalues)
+plot_df <- reshape2::melt(plot_df, id.vars = c('Day', 'PAmM', "Batch"))
+
+colors <- sub('ME', '', as.character(levels(plot_df$variable)))
+names(colors)<- as.character(levels(plot_df$variable))
+p <- ggplot(plot_df, aes(x=Day, y=value, fill=variable, lty=PAmM)) +
+  geom_smooth(col="black", span=0.5) +scale_x_continuous(breaks=sort(unique(plot_df$Day)))+
+  RotatedAxis() + ylab('Module Eigengene') + xlab('') +
+  theme(
+    axis.text.x=element_blank(),
+    axis.ticks.x=element_blank(),
+  )+scale_fill_manual(values = colors)
+
+p <- p + facet_wrap(~variable, scales='free_x')+theme_classic()
+
+p
+
+ggsave(filename = paste0(output, "/06_Bulk_DEX_WGCNA_plots.svg"), p)
+
+```
+
+
+
+```{r, fig.width=6, fig.height=4}
+reslist = list()
+for(M in unique(plot_df$variable)){
+
+  Mdata = plot_df[plot_df$variable==M,]
+  fit=lmer(value~PAmM*poly(Day,2)+(1|Batch), data = Mdata)
+  resfit = car::Anova(fit, type=3)%>% as.data.frame()
+  res = c(PAmM5_Day = resfit["PAmM:poly(Day, 2)", "Pr(>Chisq)"])
+  for(d in unique(Mdata$Day)){
+    fit=lmer(value~PAmM+(1|Batch), data = Mdata[Mdata$Day==d,])
+    resfit = car::Anova(fit, type=3)%>% as.data.frame()
+    resd = resfit["PAmM", "Pr(>Chisq)"]
+    names(resd) = paste0("D",d)
+    res = c(res, resd)
+  }
+  
+  reslist[[M]] <- res
+  
+}
+
+wgcnastats <- do.call(rbind, reslist)
+openxlsx2::write_xlsx(wgcnastats, paste0(output, "06_DEX_Bulk_WGCNA_Stats.xlsx"))
+
+```
+
+
+```{r, fig.width=12, fig.height=12}
+targets$Day_PA = paste0(targets$Day, "d_",targets$PAmM, "mMPA")
+targets$Day_PA <- factor(targets$Day_PA, levels=c("5d_0mMPA", "5d_5mMPA", "10d_0mMPA","10d_5mMPA", "17d_0mMPA", "17d_5mMPA","40d_0mMPA", "40d_5mMPA","80d_0mMPA",   "80d_5mMPA"))
+
+Meandata = MEs %>% group_by(targets$Day_PA) %>% summarise_all(mean) %>% column_to_rownames("targets$Day_PA") %>% t()
+SDdata = MEs %>% group_by(targets$Day_PA) %>% summarise_all(sd)%>% column_to_rownames("targets$Day_PA") %>% t()
+colLabels=colnames(Meandata)
+rowLabels=rownames(Meandata)
+textlab = paste0(signif(Meandata,2), "\n", "(", signif(SDdata, 2), ")")
+
+svg("/files/output/WGCNA_labeled_Heatmap.svg")
+labeledHeatmap(Meandata, xLabels = colLabels, 
+               yLabels = rowLabels,
+               colorLabels = TRUE,
+               colors = viridis(50),
+               setStdMargins = FALSE, textMatrix = textlab,
+               cex.col="white",
+               main = "Mean(SD) Eigengene-expression");
+dev.off()
+```
+
+#### WGCNA GO terms
+
+```{r, fig.width=15, fig.height=20}
+genelist = split(names(net$colors), net$colors)
+gene_univers = names(net$colors)
+
+pvallist = unlist(reslist)
+MOI = gsub("ME", "", names(pvallist)) %>% gsub(".PAmM5_Day", "", .)
+# MOI = MOI[pvallist<0.05]
+
+# if you want to have the affected genes set return_genelist = T; this takes roughly 4-8 hours 
+
+Gores = getGOresults(geneset = genelist[MOI], evcodes = T,
+                     #genereference = gene_univers, 
+                     organism = "hsapiens")
+
+display_tab(Gores$result)
+
+plotlist = list()
+for (set in unique(Gores$result$query)){
+  dat=Gores$result[which(Gores$result$query == set & Gores$result$source == "GO:BP"),]
+  if(nrow(dat)>0){
+    plotlist[[set]]<-GOplot(dat, N = 10, Title = set, xlim=NA)
+  }else {
+    text="no significance"
+    plotlist[[set]]<-ggplot() + annotate("text", x = 4, y = 25, label = text) + 
+      ggtitle(set) + theme_void()
+  }
+}
+
+p <- ggpubr::ggarrange(plotlist = plotlist, common.legend = T, nrow = 5, ncol =3)
+p
+ggsave(file=paste0(output, "/06_Bulk_DEX_Modules_BP_GOplot.svg"), plot = p)
+
+
+plotlist = list()
+for (set in unique(Gores$result$query)){
+  dat=Gores$result[which(Gores$result$query == set & Gores$result$source == "TF"),]
+  if(nrow(dat)>0){
+    plotlist[[set]]<-GOplot(dat, N = 10, Title = set, xlim=NA)
+  }else {
+    text="no significance"
+    plotlist[[set]]<-ggplot() + annotate("text", x = 4, y = 25, label = text) + 
+      ggtitle(set) + theme_void()
+  }
+}
+
+p <- ggpubr::ggarrange(plotlist = plotlist, common.legend = T, nrow = 5, ncol =3)
+p
+ggsave(file=paste0(output, "/06_Bulk_DEX_Modules_TF_GOplot.svg"), plot = p)
+
+
+plotlist = list()
+for (set in unique(Gores$result$query)){
+  dat=Gores$result[which(Gores$result$query == set),]
+  if(nrow(dat)>0){
+    plotlist[[set]]<-GOplot(dat, N = 10, Title = set, xlim=NA)
+  }else {
+    text="no significance"
+    plotlist[[set]]<-ggplot() + annotate("text", x = 4, y = 25, label = text) + 
+      ggtitle(set) + theme_void()
+  }
+}
+
+p <- ggpubr::ggarrange(plotlist = plotlist, common.legend = T, nrow = 5, ncol =3)
+p
+ggsave(file=paste0(output, "/06_Bulk_DEX_Modules_GOplot.svg"), plot = p)
+
+
+```
+
