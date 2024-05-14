@@ -220,10 +220,10 @@ idx=is.na(dataplot$hgnc)
 dataplot$hgnc[idx] = dataplot$gene[idx]
 
 ggplot(dataplot, aes(x = Day, y = reads,col=PAmM, fill = PAmM)) +
-    geom_smooth(span=0.5) + scale_x_continuous(breaks=c(5,10,17,40,80))+
-    theme_classic() + facet_wrap(~hgnc) +
-    theme(axis.text.x = element_text(angle = 90, hjust = 1))+
-    labs(x = "Day", y = "log2(CPM+1)") -> p
+  geom_smooth(span=0.5) + scale_x_continuous(breaks=c(5,10,17,40,80))+
+  theme_classic() + facet_wrap(~hgnc) +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))+
+  labs(x = "Day", y = "log2(CPM+1)") -> p
 
 p
 
@@ -244,10 +244,10 @@ idx=is.na(dataplot$hgnc)
 dataplot$hgnc[idx] = dataplot$gene[idx]
 
 ggplot(dataplot, aes(x = Day, y = reads,col=PAmM, fill = PAmM)) +
-    geom_smooth(span=0.5) + scale_x_continuous(breaks=sort(unique(dataplot$Day)))+
-    theme_classic() + facet_wrap(~hgnc) +
-    theme(axis.text.x = element_text(angle = 90, hjust = 1))+
-    labs(x = "Day", y = "log2(CPM+1)") -> p
+  geom_smooth(span=0.5) + scale_x_continuous(breaks=sort(unique(dataplot$Day)))+
+  theme_classic() + facet_wrap(~hgnc) +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))+
+  labs(x = "Day", y = "log2(CPM+1)") -> p
 
 p
 
@@ -284,10 +284,10 @@ idx=is.na(dataplot$hgnc)
 dataplot$hgnc[idx] = dataplot$gene[idx]
 
 ggplot(dataplot, aes(x = Day, y = reads,col=PAmM, fill = PAmM)) +
-    geom_smooth(span=0.5) + scale_x_continuous(breaks=sort(unique(dataplot$Day)))+
-    theme_classic() + facet_wrap(~hgnc) +
-    theme(axis.text.x = element_text(angle = 90, hjust = 1))+
-    labs(x = "Day", y = "log2(CPM+1)") -> p
+  geom_smooth(span=0.5) + scale_x_continuous(breaks=sort(unique(dataplot$Day)))+
+  theme_classic() + facet_wrap(~hgnc) +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))+
+  labs(x = "Day", y = "log2(CPM+1)") -> p
 
 p
 
@@ -323,10 +323,10 @@ idx=is.na(dataplot$hgnc)
 dataplot$hgnc[idx] = dataplot$gene[idx]
 
 ggplot(dataplot, aes(x = Day, y = reads,col=PAmM, fill = PAmM)) +
-    geom_smooth(span=0.5) +scale_x_continuous(breaks=sort(unique(dataplot$Day)))+
-    theme_classic() + facet_wrap(~hgnc) +
-    theme(axis.text.x = element_text(angle = 90, hjust = 1))+
-    labs(x = "Day", y = "log2(CPM+1)") -> p
+  geom_smooth(span=0.5) +scale_x_continuous(breaks=sort(unique(dataplot$Day)))+
+  theme_classic() + facet_wrap(~hgnc) +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))+
+  labs(x = "Day", y = "log2(CPM+1)") -> p
 
 p
 
@@ -350,7 +350,7 @@ display_tab(results)
 
 ## WGCNA 
 
-  
+
 
 ```{r fig.width=8, fig.height=6}
 library(org.Hs.eg.db)
@@ -359,20 +359,29 @@ library(WGCNA)
 force.recalc = T
 powers = c(seq(1,10,by=1), seq(12,20, by=2));
 
-if(force.recalc | (! file.exists(file="/files/output/net.rds"))){ # skips recalculation of net object as it takes long... 
-  
-  datExpr <- t(counts(ddsMat, normalized=T))
+datExpr <- t(counts(ddsMat, normalized=T))
 
-  # expressed in more than 10% of samples 
-  exprgenes = colSums(datExpr>0)>nrow(datExpr)*0.1
-  datExpr <- datExpr[,exprgenes]
+# expressed in more than 10% of samples 
+exprgenes = colSums(datExpr>0)>nrow(datExpr)*0.1
+datExpr <- datExpr[,exprgenes]
+hsacc=as.list(org.Hs.egACCNUM)
+annotatedgenes = colnames(datExpr) %in% names(hsacc)
+datExpr <- datExpr[,annotatedgenes]
+
+multiExpr <- list()
+multiExpr[['ODC']] <- list(data=datExpr)
+
+checkSets(multiExpr) # check data size
+
+
+if(force.recalc | (! file.exists(file=paste0(output,"/net.rds")))){ # skips recalculation of net object as it takes long... 
+  
+  
   
   #annotated only 
   
   
-  hsacc=as.list(org.Hs.egACCNUM)
-  annotatedgenes = colnames(datExpr) %in% names(hsacc)
-  datExpr <- datExpr[,annotatedgenes]
+  
   
   powers = c(seq(1,10,by=1), seq(12,20, by=2));
   
@@ -427,20 +436,17 @@ if(force.recalc | (! file.exists(file="/files/output/net.rds"))){ # skips recalc
     } else
       legend("topright", legend = 'Metacells', col = colors, pch = 20) ;
   }
-
+  
   softPower=4
   
   nSets = 1
   setLabels = 'OCS'
   shortLabels = setLabels
   
-  multiExpr <- list()
-  multiExpr[['ODC']] <- list(data=datExpr)
   
-  checkSets(multiExpr) # check data size
   
   # construct network
-
+  
   net=blockwiseConsensusModules(multiExpr, blocks = NULL,
                                 maxBlockSize = 30000, ## This should be set to a smaller size if the user has limited RAM
                                 randomSeed = 12345,
@@ -460,11 +466,11 @@ if(force.recalc | (! file.exists(file="/files/output/net.rds"))){ # skips recalc
                                 saveConsensusTOMs = TRUE,
                                 consensusTOMFilePattern = "ConsensusTOM-block.%b.rda")
   
-  saveRDS(net, file="/files/output/net.rds")
-  saveRDS(powerTable, file="/files/output/powertable.rds")
+  saveRDS(net, file=paste0(output,"net.rds"))
+  saveRDS(powerTable, file=paste0(output,"powertable.rds"))
 } else {
-  net = readRDS(file="/files/output/net.rds")
-  powerTable = readRDS(file="/files/output/powertable.rds")
+  net = readRDS(file=paste0(output,"net.rds"))
+  powerTable = readRDS(file=paste0(output,"powertable.rds"))
   powers = c(seq(1,10,by=1), seq(12,20, by=2));
   colors = c("blue", "red","black")
   # Will plot these columns of the returned scale free analysis tables
@@ -534,7 +540,7 @@ colnames(geneInfo)[1]= "GeneSymbol"
 colnames(geneInfo)[2]= "Initially.Assigned.Module.Color"
 
 # save info
-write.csv(geneInfo,file=paste0(output,'geneInfoSigned.csv'))
+write.csv(geneInfo,file=paste0(output,'/geneInfoSigned.csv'))
 
 PCvalues=MEs
 ```
@@ -542,7 +548,7 @@ PCvalues=MEs
 
 ```{r}
 p = WGCNA::plotDendroAndColors(consTree, moduleColors[net$goodGenes], "Module colors", dendroLabels = FALSE, hang = 0.03, addGuide = TRUE, guideHang = 0.05,
-main = paste0("dendrogram and module colors"))
+                               main = paste0("dendrogram and module colors"))
 
 ggsave(file=paste0(output, "06_Bulk_DEX_WGCNA_Dendrocolplot.svg"))
 
@@ -580,7 +586,7 @@ ggsave(filename = paste0(output, "/06_Bulk_DEX_WGCNA_plots.svg"), p)
 ```{r, fig.width=6, fig.height=4}
 reslist = list()
 for(M in unique(plot_df$variable)){
-
+  
   Mdata = plot_df[plot_df$variable==M,]
   fit=lmer(value~PAmM*poly(Day,2)+(1|Batch), data = Mdata)
   resfit = car::Anova(fit, type=3)%>% as.data.frame()
@@ -598,7 +604,9 @@ for(M in unique(plot_df$variable)){
 }
 
 wgcnastats <- do.call(rbind, reslist)
-openxlsx2::write_xlsx(wgcnastats, paste0(output, "06_DEX_Bulk_WGCNA_Stats.xlsx"))
+rownames(wgcnastats) <- names(reslist)
+openxlsx2::write_xlsx(wgcnastats, paste0(output, "06_DEX_Bulk_WGCNA_Stats.xlsx"),
+                      row_names=T)
 
 ```
 
@@ -613,7 +621,7 @@ colLabels=colnames(Meandata)
 rowLabels=rownames(Meandata)
 textlab = paste0(signif(Meandata,2), "\n", "(", signif(SDdata, 2), ")")
 
-svg("/files/output/WGCNA_labeled_Heatmap.svg")
+svg(paste0(output,"/06_DEX_WGCNA_labeled_Heatmap.svg"))
 labeledHeatmap(Meandata, xLabels = colLabels, 
                yLabels = rowLabels,
                colorLabels = TRUE,
@@ -642,6 +650,12 @@ Gores = getGOresults(geneset = genelist[MOI], evcodes = T,
 
 display_tab(Gores$result)
 
+restab = Gores$result
+
+restab$parents<- as.character(restab$parents)
+
+openxlsx2::write_xlsx(restab, file=paste0(output,"06_DEX_Bulk_WGCNA_GO_Terms.xlsx"))
+
 plotlist = list()
 for (set in unique(Gores$result$query)){
   dat=Gores$result[which(Gores$result$query == set & Gores$result$source == "GO:BP"),]
@@ -656,7 +670,7 @@ for (set in unique(Gores$result$query)){
 
 p <- ggpubr::ggarrange(plotlist = plotlist, common.legend = T, nrow = 5, ncol =3)
 p
-ggsave(file=paste0(output, "/06_Bulk_DEX_Modules_BP_GOplot.svg"), plot = p)
+ggsave(file=paste0(output, "/06_Bulk_DEX_WGCNA_BP_GOplot.svg"), plot = p)
 
 
 plotlist = list()
@@ -673,7 +687,7 @@ for (set in unique(Gores$result$query)){
 
 p <- ggpubr::ggarrange(plotlist = plotlist, common.legend = T, nrow = 5, ncol =3)
 p
-ggsave(file=paste0(output, "/06_Bulk_DEX_Modules_TF_GOplot.svg"), plot = p)
+ggsave(file=paste0(output, "/06_Bulk_DEX_WGCNA_TF_GOplot.svg"), plot = p)
 
 
 plotlist = list()
@@ -690,8 +704,7 @@ for (set in unique(Gores$result$query)){
 
 p <- ggpubr::ggarrange(plotlist = plotlist, common.legend = T, nrow = 5, ncol =3)
 p
-ggsave(file=paste0(output, "/06_Bulk_DEX_Modules_GOplot.svg"), plot = p)
-
+ggsave(file=paste0(output, "/06_Bulk_DEX_WGCNA_GOplot.svg"), plot = p)
 
 ```
 
