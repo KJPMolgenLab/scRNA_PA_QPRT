@@ -30,6 +30,7 @@ library(ggstream)
 options(stringsAsFactors = F)
 set.seed(157434538)
 reanalyze=F
+limit_to_markers=F
 cutoff = 0.05 # pavalue cutoff for DEG
 padj_cu=FALSE # use adjusted pvalue 
 Dark8 = RColorBrewer::brewer.pal(8, "Dark2")
@@ -40,11 +41,21 @@ output= paste0("output/07_Bulk_Deconv/")
 dir.create(output, showWarnings = F)
 source("code/custom_functions.R")
 ddsMat <- readRDS("data/Bulk_dds_matrix.rds")
+seurat_integrated <- readRDS("./data/QC_dataClustered.filtTypedTraj.rds")
+
+
+
 SampleInfo = as.data.frame(colData(ddsMat))
+
 log_2cpm=log2(counts(ddsMat, normalize=T)+1)
 SamplePalette =  c("#000000","#3399FF")
 
-seurat_integrated <- readRDS("./data/QC_dataClustered.filtTypedTraj.rds")
+if(limit_to_markers==TRUE){
+  Idents(seurat_integrated) <- "seurat_clusters" 
+  Markers<-FindAllMarkers(seurat_integrated)
+  Mfeatures <- Markers$gene[Markers$p_val_adj<0.05] %>% unique()
+}
+
 sce.RNA <- as.SingleCellExperiment(seurat_integrated)
 metadata<- seurat_integrated@meta.data
 ```
@@ -55,6 +66,10 @@ bulk.meta = colData(ddsMat)
 bulk.gene = rowData(ddsMat)
 rownames(bulk.mtx) = bulk.gene$hgnc[match(rownames(bulk.mtx), bulk.gene$entrez_gene)]
 genes = intersect(rownames(sce.RNA), bulk.gene$hgnc)
+
+if(limit_to_markers==TRUE){
+  genes = intersect(genes, Mfeatures)
+}
 
 bulk.mtx=bulk.mtx[genes, ]
 sce.RNA <- sce.RNA[genes,]
@@ -79,10 +94,23 @@ colnames(long_prop_matrix) <-c("Cluster", "Sample", "Proportion")
 metadata_bulk <- as.data.frame(colData(ddsMat))
 long_prop_matrix <- cbind(long_prop_matrix,metadata_bulk[long_prop_matrix$Sample,])
 
-p<-ggplot(long_prop_matrix, aes(x=Day, y=Proportion, col=PAmM, fill=PAmM))+
-  geom_smooth(method = "loess", alpha = 0.2)+facet_wrap(~Cluster)+theme_classic()
-p
-ggsave(paste0(output, "07_DeconVol_Bulk_timeplots_clusters.svg"), p)
+p1<-ggplot(long_prop_matrix, aes(x=Day, y=Proportion, col=PAmM, fill=PAmM))+
+  geom_smooth(method = "loess", alpha = 0.2, span=0.5)+facet_wrap(~Cluster, scales = "free_y")+theme_classic()+scale_x_continuous(breaks=c(5,10,17,40,80))
+p1
+
+p2<-ggplot(long_prop_matrix, aes(x=Day, y=Proportion, col=PAmM, fill=PAmM, lty=Batch))+
+  geom_smooth(method = "loess", alpha = 0.2, span=0.5)+facet_wrap(~Cluster, scales = "free_y")+theme_classic()+scale_x_continuous(breaks=c(5,10,17,40,80))
+p2
+
+p3<-ggplot(long_prop_matrix, aes(x=Day, y=Proportion, col=PAmM, fill=PAmM))+
+  geom_smooth(method = "loess", alpha = 0.2, span=0.5)+facet_wrap(~Cluster+Batch, scales = "free_y")+theme_classic()+scale_x_continuous(breaks=c(5,10,17,40,80))
+p3
+
+
+ggsave(paste0(output, "07_DeconVol_Bulk_timeplots_clusters.svg"), p1)
+ggsave(paste0(output, "07_DeconVol_Bulk_timeplots_clusters_batchinline.svg"), p2)
+ggsave(paste0(output, "07_DeconVol_Bulk_timeplots_clusters_batchcompare.svg"), p3)
+
 ```
 
 ## testing time differences per cluster 
@@ -103,21 +131,45 @@ test_time_by_PA = function(lmatrix, clustervar){
       lmres=lmer(Proportion~poly(Day,2)*PAmM+(1|Batch), data = dataset)
       res = car::Anova(lmres, type=3)%>% as.data.frame()
       colnames(res) <- c("Chisq", "df", "pvalue")
-      reslist[[as.character(cl)]] <- res 
+      # todo:by timepoints 
+      for(d in unique(dataset$Day)){
+         if(var(dataset[dataset$Day==d,]$Proportion) != 0){
+          lmres=lmer(Proportion~PAmM+(1|Batch), data = dataset[dataset$Day==d,])
+          restp = car::Anova(lmres, type=3)%>% as.data.frame()
+          colnames(restp) <- c("Chisq", "df", "pvalue")
+          res[,paste0("D",d)] <- c(NA, NA, restp$pvalue[2], NA)
+         }
+        else{
+          res[,paste0("D",d)] <- c(NA, NA, "novar", NA)
+        }
+      }
+  
     } else {
-      reslist[[as.character(cl)]] <- data.frame("pvalue"=rep("no var",4))
+      res = data.frame("pvalue"=rep("no var",4))
+      for(d in unique(dataset$Day)){
+        res[,paste0("D",d)] <- c(NA, NA, "novar", NA)
+      }
+       
     }
-  } 
+    reslist[[as.character(cl)]] <- res
+  }
+  
   return(reslist)
 }
+
 
 testres = test_time_by_PA(lmatrix = long_prop_matrix, clustervar = "Cluster")
 
 pvals=lapply(testres, function(x){x[4,"pvalue"]})
 Significances = data.frame(cluster = names(pvals), p.value = unlist(pvals,recursive = F))
-Significances
 
-openxlsx2::write_xlsx(Significances, paste0(output,"07_DeconVol_Bulk_StatTimecourseDiff_clusters.xslx"))
+for(d in unique(long_prop_matrix$Day)){
+  pvals=lapply(testres, function(x){x[3,paste0("D",d)]})
+  Significances[names(pvals), paste0("D",d)] <- unlist(pvals,recursive = F)
+}
+
+Significances
+openxlsx2::write_xlsx(Significances, paste0(output,"07_DeconVol_Bulk_StatTimecourseDiff_clusters.xlsx"))
 ```
 
 ## Heatmap proportions across sampels and clusters
@@ -163,7 +215,7 @@ metadata_bulk <- as.data.frame(colData(ddsMat))
 long_prop_matrix <- cbind(long_prop_matrix,metadata_bulk[long_prop_matrix$Sample,])
 
 p<-ggplot(long_prop_matrix, aes(x=Day, y=Proportion, col=PAmM, fill=PAmM))+
-geom_smooth(method = "loess", alpha = 0.2)+facet_wrap(~Kn.Cluster)+theme_classic()
+geom_smooth(method = "loess", alpha = 0.2,span=0.5 )+facet_wrap(~Kn.Cluster, scales = "free_y")+theme_classic()+scale_x_continuous(breaks=c(5,10,17,40,80))
 p
 ggsave(paste0(output, "07_DeconVol_Bulk_timeplots_Knoblichclusters.svg"), p)
 ```
@@ -174,9 +226,15 @@ testres = test_time_by_PA(lmatrix = long_prop_matrix, clustervar = "Kn.Cluster")
 
 pvals=lapply(testres, function(x){x[4,"pvalue"]})
 Significances = data.frame(cluster = names(pvals), p.value = unlist(pvals,recursive = F))
-Significances
 
-openxlsx2::write_xlsx(Significances, paste0(output,"07_DeconVol_Bulk_StatTimecourseDiff_KnCelltypes.xslx"))
+
+for(d in unique(long_prop_matrix$Day)){
+  pvals=lapply(testres, function(x){x[3,paste0("D",d)]})
+  Significances[names(pvals), paste0("D",d)] <- unlist(pvals,recursive = F)
+}
+
+Significances
+openxlsx2::write_xlsx(Significances, paste0(output,"07_DeconVol_Bulk_StatTimecourseDiff_KnCelltypes.xlsx"))
 
 ```
 
@@ -198,6 +256,93 @@ Colv = F, trace = "none", density.info = "none", col = col, key.title = "prop", 
 
 
 
+
+# Analyses with merged clusters 
+
+```{r}
+DimPlot(seurat_integrated, group.by = "merged_clusters")
+```
+
+
+```{r}
+
+Est.prop.bulk = music_prop(bulk.mtx = bulk.mtx, sc.sce = sce.RNA, 
+                           clusters = 'merged_clusters',
+                           samples = 'orig.ident', verbose = F)
+
+
+prop.matrix = t(data.matrix(Est.prop.bulk$Est.prop.weighted))
+```
+
+
+# proportion organoid clusters (our experiment)
+
+## longitudinal trajectories of proportions
+
+```{r, fig.width=8, fig.height=8}
+long_prop_matrix <-reshape2::melt(prop.matrix)
+colnames(long_prop_matrix) <-c("Cluster", "Sample", "Proportion")
+metadata_bulk <- as.data.frame(colData(ddsMat))
+long_prop_matrix <- cbind(long_prop_matrix,metadata_bulk[long_prop_matrix$Sample,])
+
+p1<-ggplot(long_prop_matrix, aes(x=Day, y=Proportion, col=PAmM, fill=PAmM))+
+  geom_smooth(method = "loess", span=0.5,alpha = 0.2)+facet_wrap(~Cluster, scales = "free_y")+theme_classic()+ scale_x_continuous(breaks=c(5,10,17,40,80))
+p1
+
+p2<-ggplot(long_prop_matrix, aes(x=Day, y=Proportion, col=PAmM, fill=PAmM, lty=Batch))+
+  geom_smooth(method = "loess", span=0.5,alpha = 0.2)+facet_wrap(~Cluster, scales = "free_y")+theme_classic()+ scale_x_continuous(breaks=c(5,10,17,40,80))
+p2
+
+p3<-ggplot(long_prop_matrix, aes(x=Day, y=Proportion, col=PAmM, fill=PAmM))+
+  geom_smooth(method = "loess",span=0.5, alpha = 0.2)+facet_wrap(~Cluster+Batch, scales = "free_y")+theme_classic()+ scale_x_continuous(breaks=c(5,10,17,40,80))
+p3
+
+ggsave(paste0(output, "07_DeconVol_Bulk_timeplots_clusters_merged.svg"), p1)
+ggsave(paste0(output, "07_DeconVol_Bulk_timeplots_clusters_batchinline_merged.svg"), p2)
+ggsave(paste0(output, "07_DeconVol_Bulk_timeplots_clusters_batchcompare_merged.svg"), p3)
+
+```
+
+## testing time differences per cluster 
+
+Model: Proportion ~ Day x PamM, corrected for random Batch effects,including Main effects
+
+```{r}
+
+testres = test_time_by_PA(lmatrix = long_prop_matrix, clustervar = "Cluster")
+
+pvals=lapply(testres, function(x){x[4,"pvalue"]})
+Significances = data.frame(cluster = names(pvals), p.value = unlist(pvals,recursive = F))
+
+
+for(d in unique(long_prop_matrix$Day)){
+  pvals=lapply(testres, function(x){x[3,paste0("D",d)]})
+  Significances[names(pvals), paste0("D",d)] <- unlist(pvals,recursive = F)
+}
+
+Significances
+
+openxlsx2::write_xlsx(Significances, paste0(output,"07_DeconVol_Bulk_StatTimecourseDiff_clusters_merged.xlsx"))
+```
+
+## Heatmap proportions across sampels and clusters
+
+Columns add up to 1 i.e. 100% of cells 
+
+```{r, fig.height=8, fig.width=6}
+
+col=viridis::viridis(100)
+
+svg(paste0(output, "07_DeconVol_Bulk_propHeatmap_clusters_merged.svg"))
+gplots::heatmap.2(prop.matrix, margins = c(15,10), main = "organoid clusters",cexCol = 0.3,
+Colv = F, trace = "none", density.info = "none", col = col, key.title = "prop", key.xlab = "proportion", key.par = list(mar=c(5,2,5,2)))
+dev.off()
+
+gplots::heatmap.2(prop.matrix, margins = c(15,10), main = "organoid clusters", cexCol = 0.3,
+Colv = F, trace = "none", density.info = "none", col = col, key.title = "prop", key.xlab = "proportion", 
+key.par = list(mar=c(5,2,5,2)))
+
+```
 
 
 
