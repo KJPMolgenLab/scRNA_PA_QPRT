@@ -15,7 +15,7 @@
 
 <title>Deconvolution</title>
 
-<script src="site_libs/header-attrs-2.25/header-attrs.js"></script>
+<script src="site_libs/header-attrs-2.26/header-attrs.js"></script>
 <script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <link href="site_libs/bootstrap-3.3.5/css/cerulean.min.css" rel="stylesheet" />
@@ -385,7 +385,7 @@ class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2024-02-12
+<strong>Last updated:</strong> 2024-05-14
 </p>
 <p>
 <strong>Checks:</strong> <span
@@ -516,15 +516,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomKJPMolgenLabscRNAPAQPRTtreed6ec67131eed43d151e16b238dd56a9776546180targetblankd6ec671a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomKJPMolgenLabscRNAPAQPRTtreee45d74283f4f82919d46d7e609d04e9f6ec6279ctargetblanke45d742a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/KJPMolgenLab/scRNA_PA_QPRT/tree/d6ec67131eed43d151e16b238dd56a9776546180" target="_blank">d6ec671</a>
+<a href="https://github.com/KJPMolgenLab/scRNA_PA_QPRT/tree/e45d74283f4f82919d46d7e609d04e9f6ec6279c" target="_blank">e45d742</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomKJPMolgenLabscRNAPAQPRTtreed6ec67131eed43d151e16b238dd56a9776546180targetblankd6ec671a"
+id="strongRepositoryversionstrongahrefhttpsgithubcomKJPMolgenLabscRNAPAQPRTtreee45d74283f4f82919d46d7e609d04e9f6ec6279ctargetblanke45d742a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -534,7 +534,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/KJPMolgenLab/scRNA_PA_QPRT/tree/d6ec67131eed43d151e16b238dd56a9776546180" target="_blank">d6ec671</a>.
+<a href="https://github.com/KJPMolgenLab/scRNA_PA_QPRT/tree/e45d74283f4f82919d46d7e609d04e9f6ec6279c" target="_blank">e45d742</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -557,6 +557,9 @@ Ignored files:
 Untracked files:
     Untracked:  .bashrc
     Untracked:  .nuvolos/
+    Untracked:  ConsensusTOM-block.1.rda
+    Untracked:  analysis/04b_GroupAnalysisMergedClusters_scRNA.Rmd
+    Untracked:  analysis/08_GABA_subtypes.Rmd
     Untracked:  data/AstrocyteGenes.xlsx
     Untracked:  data/Bulk_dds_matrix.rds
     Untracked:  data/Bulkdata_Countmatrix.rds
@@ -572,16 +575,66 @@ Untracked files:
     Untracked:  data/QC_dataClustered.filtTypedTraj.rds
     Untracked:  data/QC_dataFinal.rds
     Untracked:  data/Sample Allocation P2023-224-LEX-LB.txt
+    Untracked:  data/SummarizedCellTypes.xlsx
     Untracked:  data/alldata.rds
     Untracked:  data/chr16p11.xlsx
     Untracked:  data/chr16p11_orig.xlsx
     Untracked:  data/tmp.xlsx
+    Untracked:  output/04_Biostat/Biostat_DEG_Astcells.xlsx
+    Untracked:  output/04_Biostat/Biostat_DEG_Ex_Ncells.xlsx
+    Untracked:  output/04_Biostat/Biostat_DEG_Ex_Pcells.xlsx
+    Untracked:  output/04_Biostat/Biostat_DEG_GO_ClusterMerged.xlsx
+    Untracked:  output/04_Biostat/Biostat_DEG_GO_clustersMerged.svg
+    Untracked:  output/04_Biostat/Biostat_DEG_In_Ncells.xlsx
+    Untracked:  output/04_Biostat/Biostat_DEG_In_Pcells.xlsx
+    Untracked:  output/04_Biostat/Biostat_DEG_MergedClusters_Astcells.xlsx
+    Untracked:  output/04_Biostat/Biostat_DEG_MergedClusters_Ex_Ncells.xlsx
+    Untracked:  output/04_Biostat/Biostat_DEG_MergedClusters_Ex_Pcells.xlsx
+    Untracked:  output/04_Biostat/Biostat_DEG_MergedClusters_In_Ncells.xlsx
+    Untracked:  output/04_Biostat/Biostat_DEG_MergedClusters_In_Pcells.xlsx
+    Untracked:  output/04_Biostat/Biostat_DEG_MergedClusters_ccRGcells.xlsx
+    Untracked:  output/04_Biostat/Biostat_DEG_MergedClusters_o_RGcells.xlsx
+    Untracked:  output/04_Biostat/Biostat_DEG_ccRGcells.xlsx
+    Untracked:  output/04_Biostat/Biostat_DEG_o_RGcells.xlsx
+    Untracked:  output/04_Biostat/Biostat_clusterMergedFreq.xslsx
+    Untracked:  output/06_Bulk_DEX/06_Bulk_DEX_Astrocytes_lineplots.svg
+    Untracked:  output/06_Bulk_DEX/06_Bulk_DEX_Modules_BP_GOplot.svg
+    Untracked:  output/06_Bulk_DEX/06_Bulk_DEX_Modules_GOplot.svg
+    Untracked:  output/06_Bulk_DEX/06_Bulk_DEX_Modules_TF_GOplot.svg
+    Untracked:  output/06_Bulk_DEX/06_Bulk_DEX_WGCNA_BP_GOplot.svg
+    Untracked:  output/06_Bulk_DEX/06_Bulk_DEX_WGCNA_Dendrocolplot.svg
+    Untracked:  output/06_Bulk_DEX/06_Bulk_DEX_WGCNA_GOplot.svg
+    Untracked:  output/06_Bulk_DEX/06_Bulk_DEX_WGCNA_TF_GOplot.svg
+    Untracked:  output/06_Bulk_DEX/06_Bulk_DEX_WGCNA_plots.svg
+    Untracked:  output/06_Bulk_DEX/06_DEX_Bulk_WGCNA_GO_Terms.xlsx
+    Untracked:  output/06_Bulk_DEX/06_DEX_Bulk_WGCNA_Stats.xlsx
+    Untracked:  output/06_Bulk_DEX/06_DEX_WGCNA_labeled_Heatmap.svg
+    Untracked:  output/06_Bulk_DEX/geneInfoSigned.csv
+    Untracked:  output/06_Bulk_DEX/net.rds
+    Untracked:  output/06_Bulk_DEX/powertable.rds
+    Untracked:  output/07_Bulk_Deconv/07_DeconVol_Bulk_StatTimecourseDiff_KnCelltypes.xlsx
+    Untracked:  output/07_Bulk_Deconv/07_DeconVol_Bulk_StatTimecourseDiff_clusters.xlsx
+    Untracked:  output/07_Bulk_Deconv/07_DeconVol_Bulk_StatTimecourseDiff_clusters_merged.xslx
+    Untracked:  output/07_Bulk_Deconv/07_DeconVol_Bulk_propHeatmap_clusters_merged.svg
+    Untracked:  output/07_Bulk_Deconv/07_DeconVol_Bulk_timeplots_clusters_batchcompare.svg
+    Untracked:  output/07_Bulk_Deconv/07_DeconVol_Bulk_timeplots_clusters_batchcompare_merged.svg
+    Untracked:  output/07_Bulk_Deconv/07_DeconVol_Bulk_timeplots_clusters_batchinline.svg
+    Untracked:  output/07_Bulk_Deconv/07_DeconVol_Bulk_timeplots_clusters_batchinline_merged.svg
+    Untracked:  output/07_Bulk_Deconv/07_DeconVol_Bulk_timeplots_clusters_merged.svg
+    Untracked:  output/Microglia_WGCNA_Dendrocolplot.svg
+    Untracked:  output/WGCNA_labeled_Heatmap.svg
+    Untracked:  output/geneInfoSigned.csv
 
 Unstaged changes:
     Modified:   .gitignore
+    Modified:   analysis/04_GroupAnalysis_scRNA.Rmd
+    Modified:   analysis/index.Rmd
+    Modified:   code/custom_functions.R
     Modified:   output/02_Clustering/Cluster_markers.xls
-    Modified:   output/02_Clustering/Clusters_GO_termsCluster.xlsx
+    Modified:   output/03_Trajectories/Trajectories_All.svg
+    Modified:   output/03_Trajectories/Trajectories_Lineages.svg
     Modified:   output/04_Biostat/Biostat_DEG_GO_Cluster.xlsx
+    Modified:   output/04_Biostat/Biostat_DEG_GO_clusters.svg
     Modified:   output/04_Biostat/Biostat_DEG_allcells.xlsx
     Modified:   output/04_Biostat/Biostat_DEG_cluster_0cells.xlsx
     Modified:   output/04_Biostat/Biostat_DEG_cluster_10cells.xlsx
@@ -602,10 +655,23 @@ Unstaged changes:
     Modified:   output/04_Biostat/Biostat_clusterFreq.xslsx
     Modified:   output/06_Bulk_DEX/06_Bulk_DEX_Astrocyte_stat_DayxmM.xlsx
     Modified:   output/06_Bulk_DEX/06_Bulk_DEX_GO_results.xlsx
+    Modified:   output/06_Bulk_DEX/06_Bulk_DEX_Kynurenine_lineplots.svg
     Modified:   output/06_Bulk_DEX/06_Bulk_DEX_Kynurenine_stat_DayxmM.xlsx
     Modified:   output/06_Bulk_DEX/06_Bulk_DEX_LFC_results.xlsx
     Modified:   output/06_Bulk_DEX/06_Bulk_DEX_Siggenes_boxplots.pdf
+    Modified:   output/06_Bulk_DEX/06_Bulk_DEX_Siggenes_lineplots.svg
+    Modified:   output/06_Bulk_DEX/06_Bulk_DEX_chr16p11_lineplots.svg
     Modified:   output/06_Bulk_DEX/06_Bulk_DEX_chr16p11_stat_DayxmM.xlsx
+    Modified:   output/06_Bulk_DEX/06_Bulk_DEX_top10_BP_GOplot.svg
+    Modified:   output/06_Bulk_DEX/06_Bulk_DEX_top10_TF_GOplot.svg
+    Modified:   output/06_Bulk_DEX/06_Bulk_DEX_top10all_GOplot.svg
+    Deleted:    output/06_Bulk_DEX/07_DeconVol_Bulk_propHeatmap_clusters.svg
+    Modified:   output/07_Bulk_Deconv/07_DeconVol_Bulk_StatTimecourseDiff_KnCelltypes.xslx
+    Modified:   output/07_Bulk_Deconv/07_DeconVol_Bulk_StatTimecourseDiff_clusters.xslx
+    Modified:   output/07_Bulk_Deconv/07_DeconVol_Bulk_propHeatmap_Knoblichclusters.svg
+    Modified:   output/07_Bulk_Deconv/07_DeconVol_Bulk_propHeatmap_clusters.svg
+    Modified:   output/07_Bulk_Deconv/07_DeconVol_Bulk_timeplots_Knoblichclusters.svg
+    Modified:   output/07_Bulk_Deconv/07_DeconVol_Bulk_timeplots_clusters.svg
     Modified:   workflowHelper.R
 
 </code></pre>
@@ -652,6 +718,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/KJPMolgenLab/scRNA_PA_QPRT/blob/e45d74283f4f82919d46d7e609d04e9f6ec6279c/analysis/07_DeconVol_Bulk.Rmd" target="_blank">e45d742</a>
+</td>
+<td>
+Andreas Chiocchetti
+</td>
+<td>
+2024-05-14
+</td>
+<td>
+wflow_publish("./analysis/07_DeconVol_Bulk.Rmd")
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/KJPMolgenLab/scRNA_PA_QPRT/8963c8bff1bb9670e7597806d4a4954a1bdcd5b3/docs/07_DeconVol_Bulk.html" target="_blank">8963c8b</a>
+</td>
+<td>
+Andreas Chiocchetti
+</td>
+<td>
+2024-02-12
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 html
@@ -928,6 +1028,17 @@ Date
 <tbody>
 <tr>
 <td>
+<a href="https://github.com/KJPMolgenLab/scRNA_PA_QPRT/blob/8963c8bff1bb9670e7597806d4a4954a1bdcd5b3/docs/figure/07_DeconVol_Bulk.Rmd/unnamed-chunk-4-1.png" target="_blank">8963c8b</a>
+</td>
+<td>
+Andreas Chiocchetti
+</td>
+<td>
+2024-02-12
+</td>
+</tr>
+<tr>
+<td>
 <a href="https://github.com/KJPMolgenLab/scRNA_PA_QPRT/blob/d6ec67131eed43d151e16b238dd56a9776546180/docs/figure/07_DeconVol_Bulk.Rmd/unnamed-chunk-4-1.png" target="_blank">d6ec671</a>
 </td>
 <td>
@@ -985,26 +1096,42 @@ Andreas Chiocchetti
 </table>
 </div>
 </div>
+<p><img src="figure/07_DeconVol_Bulk.Rmd/unnamed-chunk-4-2.png" width="768" style="display: block; margin: auto;" /><img src="figure/07_DeconVol_Bulk.Rmd/unnamed-chunk-4-3.png" width="768" style="display: block; margin: auto;" /></p>
 </div>
 <div id="testing-time-differences-per-cluster" class="section level2">
 <h2>testing time differences per cluster</h2>
 <p>Model: Proportion ~ Day x PamM, corrected for random Batch
 effects,including Main effects</p>
-<pre><code>   cluster      p.value
-5        5 6.969246e-01
-9        9 4.995992e-01
-8        8 1.232625e-06
-1        1 1.473062e-01
-0        0 4.408933e-01
-3        3 8.325512e-01
-4        4 8.835161e-01
-7        7 6.763952e-02
-6        6 4.230409e-01
-2        2 1.330274e-02
-12      12 7.759198e-01
-11      11 4.395575e-01
-10      10 6.754050e-01
-13      13 1.579848e-04</code></pre>
+<pre><code>   cluster      p.value                D5               D10                D17
+5        5 6.978461e-01             novar             novar  0.241680735578263
+9        9 6.731171e-01 0.768142321459835 0.645520313905799  0.016106426119855
+8        8 1.907690e-06             novar             novar              novar
+1        1 1.437609e-01             novar             novar              novar
+0        0 4.445913e-01             novar             novar  0.317292357193629
+3        3 8.316851e-01 0.089054882524644  0.21725611873601 0.0212652773211934
+4        4 7.929640e-01   0.5131576022917 0.671171683336468  0.556606077256481
+7        7 6.764770e-02             novar             novar  0.695108938330471
+6        6 4.235562e-01 0.317292357194056             novar              novar
+2        2 1.373598e-02 0.317292357192823 0.466925300311176  0.333924479564087
+12      12 7.872546e-01             novar 0.317292357193227  0.985993561303123
+11      11 4.176788e-01 0.276123465925838 0.766800266147341  0.551156587774888
+10      10 6.715678e-01 0.113181200880665 0.869458440712563  0.174680746565294
+13      13 1.680899e-04             novar 0.317292357192453  0.117360551723711
+                    D40         D80
+5      0.43375445787929 0.403919819
+9     0.184371767239057 0.046698646
+8     0.765702348613602 0.002795336
+1     0.317292357193639 0.341904908
+0     0.153636471465858 0.597790250
+3     0.839124092618713 0.043903885
+4     0.611270967517041 0.519463934
+7     0.392808060559521 0.046262744
+6                 novar 0.317292357
+2  0.000136182813575676 0.067841746
+12    0.997770569069611 0.434477645
+11                novar 0.088487116
+10    0.269521614554584 0.733318534
+13   0.0542594631439053 0.021573014</code></pre>
 </div>
 <div id="heatmap-proportions-across-sampels-and-clusters"
 class="section level2">
@@ -1035,6 +1162,17 @@ Date
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+<a href="https://github.com/KJPMolgenLab/scRNA_PA_QPRT/blob/8963c8bff1bb9670e7597806d4a4954a1bdcd5b3/docs/figure/07_DeconVol_Bulk.Rmd/unnamed-chunk-6-1.png" target="_blank">8963c8b</a>
+</td>
+<td>
+Andreas Chiocchetti
+</td>
+<td>
+2024-02-12
+</td>
+</tr>
 <tr>
 <td>
 <a href="https://github.com/KJPMolgenLab/scRNA_PA_QPRT/blob/d6ec67131eed43d151e16b238dd56a9776546180/docs/figure/07_DeconVol_Bulk.Rmd/unnamed-chunk-6-1.png" target="_blank">d6ec671</a>
@@ -1137,6 +1275,17 @@ Date
 <tbody>
 <tr>
 <td>
+<a href="https://github.com/KJPMolgenLab/scRNA_PA_QPRT/blob/8963c8bff1bb9670e7597806d4a4954a1bdcd5b3/docs/figure/07_DeconVol_Bulk.Rmd/unnamed-chunk-8-1.png" target="_blank">8963c8b</a>
+</td>
+<td>
+Andreas Chiocchetti
+</td>
+<td>
+2024-02-12
+</td>
+</tr>
+<tr>
+<td>
 <a href="https://github.com/KJPMolgenLab/scRNA_PA_QPRT/blob/d6ec67131eed43d151e16b238dd56a9776546180/docs/figure/07_DeconVol_Bulk.Rmd/unnamed-chunk-8-1.png" target="_blank">d6ec671</a>
 </td>
 <td>
@@ -1197,23 +1346,40 @@ Andreas Chiocchetti
 </div>
 <div id="testing-time-differences-per-cell-type" class="section level2">
 <h2>testing time differences per cell type</h2>
-<pre><code>              cluster           p.value
-LGE_IN         LGE_IN            no var
-CGE_LGE_IN CGE_LGE_IN            no var
-L56               L56 0.483429505851505
-L23               L23            no var
-L6_CThPN     L6_CThPN 0.889026648918864
-RG                 RG            no var
-INP               INP            no var
-ccvRG           ccvRG 0.866052780742045
-IP                 IP 0.437919423334641
-Astrocytes Astrocytes 0.506986650779625
-CGE_IN         CGE_IN 0.536115311934474
-ccRG             ccRG  0.75609452265005
-oRG               oRG            no var
-vRG               vRG            no var
-L4                 L4            no var
-mesenchyme mesenchyme 0.994732842442993</code></pre>
+<pre><code>              cluster           p.value                D5               D10
+LGE_IN         LGE_IN            no var             novar             novar
+CGE_LGE_IN CGE_LGE_IN            no var             novar             novar
+L56               L56 0.815408940226298             novar             novar
+L23               L23            no var             novar             novar
+L6_CThPN     L6_CThPN 0.897144287178736             novar             novar
+RG                 RG            no var             novar             novar
+INP               INP            no var             novar             novar
+ccvRG           ccvRG 0.853894943639242 0.497048171711877 0.209971574426907
+IP                 IP 0.441369354440442             novar             novar
+Astrocytes Astrocytes   0.4728533468887 0.390393549790597 0.385953435622409
+CGE_IN         CGE_IN 0.608897971533936             novar             novar
+ccRG             ccRG 0.779146816931238 0.566956372265711 0.257242371288536
+oRG               oRG            no var             novar             novar
+vRG               vRG            no var             novar             novar
+L4                 L4            no var             novar             novar
+mesenchyme mesenchyme 0.908702011907223 0.598962979912211 0.981365938212097
+                         D17                D40                  D80
+LGE_IN                 novar              novar                novar
+CGE_LGE_IN             novar              novar                novar
+L56        0.317292357192325              novar                novar
+L23                    novar              novar                novar
+L6_CThPN     0.1510813788258  0.915830969646569    0.792545494839691
+RG                     novar              novar                novar
+INP                    novar              novar                novar
+ccvRG      0.393119188608934  0.552687841488945    0.279022145126459
+IP         0.156274136730197  0.172786555246604    0.152341340198931
+Astrocytes 0.769323667993211  0.300169407963808 0.000534831089281622
+CGE_IN                 novar  0.766175138304353    0.390123397120774
+ccRG       0.470953570898641 0.0757482453697097    0.567094655829515
+oRG                    novar              novar                novar
+vRG                    novar              novar                novar
+L4                     novar              novar                novar
+mesenchyme 0.247185161928597  0.690272789205647   0.0644901157064368</code></pre>
 </div>
 <div id="heatmap-proportions-across-sampels-and-clusters-1"
 class="section level2">
@@ -1243,6 +1409,17 @@ Date
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+<a href="https://github.com/KJPMolgenLab/scRNA_PA_QPRT/blob/8963c8bff1bb9670e7597806d4a4954a1bdcd5b3/docs/figure/07_DeconVol_Bulk.Rmd/unnamed-chunk-10-1.png" target="_blank">8963c8b</a>
+</td>
+<td>
+Andreas Chiocchetti
+</td>
+<td>
+2024-02-12
+</td>
+</tr>
 <tr>
 <td>
 <a href="https://github.com/KJPMolgenLab/scRNA_PA_QPRT/blob/d6ec67131eed43d151e16b238dd56a9776546180/docs/figure/07_DeconVol_Bulk.Rmd/unnamed-chunk-10-1.png" target="_blank">d6ec671</a>
@@ -1291,6 +1468,48 @@ Andreas Chiocchetti
 </table>
 </div>
 </div>
+</div>
+</div>
+<div id="analyses-with-merged-clusters" class="section level1">
+<h1>Analyses with merged clusters</h1>
+<p><img src="figure/07_DeconVol_Bulk.Rmd/unnamed-chunk-11-1.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="proportion-organoid-clusters-our-experiment-1"
+class="section level1">
+<h1>proportion organoid clusters (our experiment)</h1>
+<div id="longitudinal-trajectories-of-proportions-2"
+class="section level2">
+<h2>longitudinal trajectories of proportions</h2>
+<p><img src="figure/07_DeconVol_Bulk.Rmd/unnamed-chunk-13-1.png" width="768" style="display: block; margin: auto;" /><img src="figure/07_DeconVol_Bulk.Rmd/unnamed-chunk-13-2.png" width="768" style="display: block; margin: auto;" /><img src="figure/07_DeconVol_Bulk.Rmd/unnamed-chunk-13-3.png" width="768" style="display: block; margin: auto;" /></p>
+</div>
+<div id="testing-time-differences-per-cluster-1" class="section level2">
+<h2>testing time differences per cluster</h2>
+<p>Model: Proportion ~ Day x PamM, corrected for random Batch
+effects,including Main effects</p>
+<pre><code>     cluster      p.value                 D5               D10
+Ex_P    Ex_P 1.798637e-01              novar             novar
+ccRG    ccRG 2.947307e-01 0.0570252803323118 0.257683724028998
+In_P    In_P 1.763222e-05              novar             novar
+Ex_N    Ex_N 4.778869e-02              novar 0.497260335307385
+In_N    In_N 4.670962e-01              novar 0.317292357193198
+o_RG    o_RG 3.877681e-01 0.0570252803323132 0.200650694766325
+Ast      Ast 7.222667e-01              novar  0.31729235719233
+                    D17                 D40         D80
+Ex_P 0.0321974429516091  0.0614298427438355 0.832641671
+ccRG  0.544141368075108   0.289421404773488 0.419343265
+In_P              novar   0.504668763170975 0.008063563
+Ex_N  0.151786547894189 0.00540333120797238 0.107554732
+In_N  0.796747660614371   0.598928775146033 0.023386368
+o_RG  0.838028619551877   0.798791509303774 0.021023701
+Ast               novar               novar 0.754396004</code></pre>
+</div>
+<div id="heatmap-proportions-across-sampels-and-clusters-2"
+class="section level2">
+<h2>Heatmap proportions across sampels and clusters</h2>
+<p>Columns add up to 1 i.e. 100% of cells</p>
+<pre><code>png 
+  2 </code></pre>
+<p><img src="figure/07_DeconVol_Bulk.Rmd/unnamed-chunk-15-1.png" width="576" style="display: block; margin: auto;" /></p>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
@@ -1323,135 +1542,134 @@ attached base packages:
 [8] base     
 
 other attached packages:
- [1] lme4_1.1-35.1               Matrix_1.6-4               
+ [1] lme4_1.1-35.2               Matrix_1.6-5               
  [3] DESeq2_1.40.2               pheatmap_1.0.12            
- [5] RColorBrewer_1.1-3          compareGroups_4.7.2        
- [7] kableExtra_1.3.4            ggstream_0.1.0             
+ [5] RColorBrewer_1.1-3          compareGroups_4.8.0        
+ [7] kableExtra_1.4.0            ggstream_0.1.0             
  [9] MuSiC_1.0.0                 TOAST_1.14.0               
 [11] quadprog_1.5-8              limma_3.56.2               
 [13] EpiDISH_2.16.0              nnls_1.5                   
 [15] lubridate_1.9.3             forcats_1.0.0              
 [17] stringr_1.5.1               dplyr_1.1.4                
-[19] purrr_1.0.2                 readr_2.1.4                
-[21] tidyr_1.3.0                 tibble_3.2.1               
-[23] ggplot2_3.4.4               tidyverse_2.0.0            
-[25] gprofiler2_0.2.2            slingshot_2.8.0            
+[19] purrr_1.0.2                 readr_2.1.5                
+[21] tidyr_1.3.1                 tibble_3.2.1               
+[23] ggplot2_3.5.0               tidyverse_2.0.0            
+[25] gprofiler2_0.2.3            slingshot_2.8.0            
 [27] TrajectoryUtils_1.8.0       princurve_2.1.6            
-[29] Seurat_5.0.1                SeuratObject_5.0.1         
-[31] sp_2.1-2                    DropletUtils_1.20.0        
+[29] Seurat_5.0.3                SeuratObject_5.0.1         
+[31] sp_2.1-3                    DropletUtils_1.20.0        
 [33] SingleCellExperiment_1.24.0 SingleR_2.2.0              
 [35] SummarizedExperiment_1.32.0 Biobase_2.62.0             
 [37] GenomicRanges_1.54.1        GenomeInfoDb_1.38.1        
 [39] IRanges_2.36.0              S4Vectors_0.40.2           
 [41] BiocGenerics_0.48.1         MatrixGenerics_1.14.0      
-[43] matrixStats_1.1.0           workflowr_1.7.1            
+[43] matrixStats_1.3.0           workflowr_1.7.1            
 
 loaded via a namespace (and not attached):
   [1] R.methodsS3_1.8.2         nnet_7.3-19              
   [3] locfdr_1.1-8              goftest_1.2-3            
   [5] HDF5Array_1.28.1          vctrs_0.6.5              
-  [7] spatstat.random_3.2-2     digest_0.6.33            
+  [7] spatstat.random_3.2-3     digest_0.6.35            
   [9] png_0.1-8                 corpcor_1.6.10           
- [11] shape_1.4.6               MCMCpack_1.6-3           
+ [11] shape_1.4.6.1             MCMCpack_1.7-0           
  [13] proxy_0.4-27              git2r_0.33.0             
- [15] ggrepel_0.9.4             httpcode_0.3.0           
- [17] deldir_2.0-2              parallelly_1.36.0        
- [19] fontLiberation_0.1.0      MASS_7.3-60              
- [21] reshape2_1.4.4            httpuv_1.6.13            
- [23] foreach_1.5.2             withr_2.5.2              
- [25] xfun_0.41                 ellipsis_0.3.2           
- [27] survival_3.5-7            crul_1.4.0               
- [29] MatrixModels_0.5-3        systemfonts_1.0.5        
- [31] gtools_3.9.5              ragg_1.2.7               
- [33] zoo_1.8-12                pbapply_1.7-2            
- [35] R.oo_1.25.0               GGally_2.2.0             
- [37] promises_1.2.1            httr_1.4.7               
- [39] globals_0.16.2            fitdistrplus_1.1-11      
- [41] rhdf5filters_1.12.1       ps_1.7.5                 
- [43] rhdf5_2.44.0              rstudioapi_0.15.0        
- [45] pan_1.9                   miniUI_0.1.1.1           
- [47] generics_0.1.3            processx_3.8.3           
- [49] curl_5.2.0                zlibbioc_1.48.0          
- [51] ScaledMatrix_1.8.1        polyclip_1.10-6          
- [53] GenomeInfoDbData_1.2.11   SparseArray_1.2.2        
- [55] xtable_1.8-4              doParallel_1.0.17        
- [57] evaluate_0.23             S4Arrays_1.2.0           
- [59] hms_1.1.3                 glmnet_4.1-8             
- [61] irlba_2.3.5.1             colorspace_2.1-0         
- [63] ROCR_1.0-11               reticulate_1.34.0        
- [65] spatstat.data_3.0-3       magrittr_2.0.3           
- [67] lmtest_0.9-40             viridis_0.6.4            
- [69] later_1.3.2               lattice_0.22-5           
- [71] spatstat.geom_3.2-7       future.apply_1.11.1      
- [73] SparseM_1.81              getPass_0.2-4            
- [75] scattermore_1.2           scuttle_1.10.3           
- [77] cowplot_1.1.2             RcppAnnoy_0.0.21         
- [79] class_7.3-22              pillar_1.9.0             
- [81] nlme_3.1-164              iterators_1.0.14         
- [83] caTools_1.18.2            compiler_4.3.1           
- [85] beachmat_2.16.0           RSpectra_0.16-1          
- [87] stringi_1.8.3             jomo_2.7-6               
- [89] tensor_1.5                minqa_1.2.6              
- [91] plyr_1.8.9                crayon_1.5.2             
- [93] abind_1.4-5               truncnorm_1.0-9          
- [95] chron_2.3-61              locfit_1.5-9.8           
- [97] whisker_0.4.1             codetools_0.2-19         
- [99] textshaping_0.3.7         BiocSingular_1.16.0      
-[101] openssl_2.1.1             flextable_0.9.4          
-[103] bslib_0.6.1               e1071_1.7-14             
-[105] plotly_4.10.3             mime_0.12                
-[107] splines_4.3.1             Rcpp_1.0.11              
-[109] fastDummies_1.7.3         quantreg_5.97            
-[111] sparseMatrixStats_1.12.2  knitr_1.45               
-[113] utf8_1.2.4                fs_1.6.3                 
-[115] listenv_0.9.0             DelayedMatrixStats_1.22.6
-[117] callr_3.7.3               tzdb_0.4.0               
-[119] svglite_2.1.3             pkgconfig_2.0.3          
-[121] tools_4.3.1               cachem_1.0.8             
-[123] viridisLite_0.4.2         rvest_1.0.3              
-[125] fastmap_1.1.1             rmarkdown_2.25           
-[127] scales_1.3.0              grid_4.3.1               
-[129] ica_1.0-3                 broom_1.0.5              
-[131] sass_0.4.8                officer_0.6.3            
-[133] patchwork_1.2.0           coda_0.19-4              
-[135] ggstats_0.5.1             dotCall64_1.1-1          
-[137] carData_3.0-5             RANN_2.6.1               
-[139] rpart_4.1.23              farver_2.1.1             
-[141] mgcv_1.9-1                yaml_2.3.8               
-[143] cli_3.6.2                 writexl_1.4.2            
-[145] webshot_0.5.5             leiden_0.4.3.1           
-[147] lifecycle_1.0.4           askpass_1.2.0            
-[149] uwot_0.1.16               backports_1.4.1          
-[151] BiocParallel_1.34.2       timechange_0.2.0         
-[153] gtable_0.3.4              ggridges_0.5.5           
-[155] progressr_0.14.0          parallel_4.3.1           
-[157] jsonlite_1.8.8            edgeR_3.42.4             
-[159] RcppHNSW_0.5.0            mitml_0.4-5              
-[161] bitops_1.0-7              openxlsx2_1.2            
-[163] Rtsne_0.17                spatstat.utils_3.0-4     
-[165] zip_2.3.0                 mice_3.16.0              
-[167] highr_0.10                jquerylib_0.1.4          
-[169] dqrng_0.3.2               R.utils_2.12.3           
-[171] lazyeval_0.2.2            shiny_1.8.0              
-[173] htmltools_0.5.7           sctransform_0.4.1        
-[175] gfonts_0.2.0              glue_1.6.2               
-[177] spam_2.10-0               XVector_0.42.0           
-[179] gdtools_0.3.5             RCurl_1.98-1.13          
-[181] rprojroot_2.0.4           mcmc_0.9-8               
-[183] Rsolnp_1.16               gridExtra_2.3            
-[185] boot_1.3-28.1             igraph_1.6.0             
-[187] R6_2.5.1                  gplots_3.1.3             
-[189] labeling_0.4.3            cluster_2.1.6            
-[191] Rhdf5lib_1.22.1           nloptr_2.0.3             
-[193] DelayedArray_0.28.0       tidyselect_1.2.0         
-[195] xml2_1.3.6                car_3.1-2                
-[197] fontBitstreamVera_0.1.1   future_1.33.1            
-[199] rsvd_1.0.5                munsell_0.5.0            
-[201] KernSmooth_2.23-22        fontquiver_0.2.1         
-[203] data.table_1.14.10        htmlwidgets_1.6.4        
-[205] rlang_1.1.2               spatstat.sparse_3.0-3    
-[207] spatstat.explore_3.2-5    uuid_1.1-1               
-[209] HardyWeinberg_1.7.5       fansi_1.0.6              </code></pre>
+ [15] ggrepel_0.9.5             httpcode_0.3.0           
+ [17] deldir_2.0-4              parallelly_1.37.1        
+ [19] fontLiberation_0.1.0      MASS_7.3-60.0.1          
+ [21] reshape2_1.4.4            httpuv_1.6.15            
+ [23] foreach_1.5.2             withr_3.0.0              
+ [25] xfun_0.43                 survival_3.5-8           
+ [27] crul_1.4.2                MatrixModels_0.5-3       
+ [29] systemfonts_1.0.6         gtools_3.9.5             
+ [31] ragg_1.3.0                zoo_1.8-12               
+ [33] pbapply_1.7-2             R.oo_1.26.0              
+ [35] GGally_2.2.1              promises_1.3.0           
+ [37] httr_1.4.7                globals_0.16.3           
+ [39] fitdistrplus_1.1-11       rhdf5filters_1.12.1      
+ [41] ps_1.7.6                  rhdf5_2.44.0             
+ [43] rstudioapi_0.16.0         pan_1.9                  
+ [45] miniUI_0.1.1.1            generics_0.1.3           
+ [47] processx_3.8.4            curl_5.2.1               
+ [49] zlibbioc_1.48.0           ScaledMatrix_1.8.1       
+ [51] polyclip_1.10-6           GenomeInfoDbData_1.2.11  
+ [53] SparseArray_1.2.2         xtable_1.8-4             
+ [55] doParallel_1.0.17         evaluate_0.23            
+ [57] S4Arrays_1.2.0            hms_1.1.3                
+ [59] glmnet_4.1-8              irlba_2.3.5.1            
+ [61] colorspace_2.1-0          ROCR_1.0-11              
+ [63] reticulate_1.36.0         spatstat.data_3.0-4      
+ [65] magrittr_2.0.3            lmtest_0.9-40            
+ [67] viridis_0.6.5             later_1.3.2              
+ [69] lattice_0.22-6            spatstat.geom_3.2-9      
+ [71] future.apply_1.11.2       SparseM_1.81             
+ [73] getPass_0.2-4             scattermore_1.2          
+ [75] scuttle_1.10.3            cowplot_1.1.3            
+ [77] RcppAnnoy_0.0.22          class_7.3-22             
+ [79] pillar_1.9.0              nlme_3.1-164             
+ [81] iterators_1.0.14          caTools_1.18.2           
+ [83] compiler_4.3.1            beachmat_2.16.0          
+ [85] RSpectra_0.16-1           stringi_1.8.3            
+ [87] jomo_2.7-6                tensor_1.5               
+ [89] minqa_1.2.6               plyr_1.8.9               
+ [91] crayon_1.5.2              abind_1.4-5              
+ [93] truncnorm_1.0-9           chron_2.3-61             
+ [95] locfit_1.5-9.9            whisker_0.4.1            
+ [97] codetools_0.2-20          textshaping_0.3.7        
+ [99] BiocSingular_1.16.0       openssl_2.1.1            
+[101] flextable_0.9.5           bslib_0.7.0              
+[103] e1071_1.7-14              plotly_4.10.4            
+[105] mime_0.12                 splines_4.3.1            
+[107] Rcpp_1.0.12               fastDummies_1.7.3        
+[109] quantreg_5.97             sparseMatrixStats_1.12.2 
+[111] knitr_1.46                utf8_1.2.4               
+[113] fs_1.6.3                  listenv_0.9.1            
+[115] DelayedMatrixStats_1.22.6 callr_3.7.6              
+[117] tzdb_0.4.0                svglite_2.1.3            
+[119] pkgconfig_2.0.3           tools_4.3.1              
+[121] cachem_1.0.8              viridisLite_0.4.2        
+[123] fastmap_1.1.1             rmarkdown_2.26           
+[125] scales_1.3.0              grid_4.3.1               
+[127] ica_1.0-3                 broom_1.0.5              
+[129] sass_0.4.9                officer_0.6.5            
+[131] patchwork_1.2.0           coda_0.19-4.1            
+[133] ggstats_0.6.0             dotCall64_1.1-1          
+[135] carData_3.0-5             RANN_2.6.1               
+[137] rpart_4.1.23              farver_2.1.1             
+[139] mgcv_1.9-1                yaml_2.3.8               
+[141] cli_3.6.2                 writexl_1.5.0            
+[143] leiden_0.4.3.1            lifecycle_1.0.4          
+[145] askpass_1.2.0             uwot_0.2.1               
+[147] backports_1.4.1           BiocParallel_1.34.2      
+[149] timechange_0.3.0          gtable_0.3.4             
+[151] ggridges_0.5.6            progressr_0.14.0         
+[153] parallel_4.3.1            jsonlite_1.8.8           
+[155] edgeR_3.42.4              RcppHNSW_0.6.0           
+[157] mitml_0.4-5               bitops_1.0-7             
+[159] openxlsx2_1.5             Rtsne_0.17               
+[161] spatstat.utils_3.0-4      zip_2.3.1                
+[163] mice_3.16.0               highr_0.10               
+[165] jquerylib_0.1.4           dqrng_0.3.2              
+[167] R.utils_2.12.3            lazyeval_0.2.2           
+[169] shiny_1.8.1.1             htmltools_0.5.8.1        
+[171] sctransform_0.4.1         gfonts_0.2.0             
+[173] glue_1.7.0                spam_2.10-0              
+[175] XVector_0.42.0            gdtools_0.3.7            
+[177] RCurl_1.98-1.14           rprojroot_2.0.4          
+[179] mcmc_0.9-8                Rsolnp_1.16              
+[181] gridExtra_2.3             boot_1.3-30              
+[183] igraph_2.0.3              R6_2.5.1                 
+[185] gplots_3.1.3.1            labeling_0.4.3           
+[187] cluster_2.1.6             Rhdf5lib_1.22.1          
+[189] nloptr_2.0.3              DelayedArray_0.28.0      
+[191] tidyselect_1.2.1          xml2_1.3.6               
+[193] car_3.1-2                 fontBitstreamVera_0.1.1  
+[195] future_1.33.2             rsvd_1.0.5               
+[197] munsell_0.5.1             KernSmooth_2.23-22       
+[199] fontquiver_0.2.1          data.table_1.15.4        
+[201] htmlwidgets_1.6.4         rlang_1.1.3              
+[203] spatstat.sparse_3.0-3     spatstat.explore_3.2-7   
+[205] uuid_1.2-0                HardyWeinberg_1.7.8      
+[207] fansi_1.0.6              </code></pre>
 </div>
 </div>
 </div>
