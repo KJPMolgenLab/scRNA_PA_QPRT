@@ -1,0 +1,150 @@
+---
+title: "Diagnosis analysis"
+author: "AGC AK"
+date: "2023-02-11"
+html_document:
+    theme: cerulean
+    toc: yes
+    toc_float:
+      collapsed: true
+---
+
+# Compare across treatment
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
+```
+
+```{r Calling libraries, echo=FALSE, include=FALSE}
+library(SingleR)
+library(DropletUtils)
+library(SingleCellExperiment)
+library(Seurat)
+library(slingshot)
+library(gprofiler2)
+library(tidyverse)
+
+dir.create("./output/04_Biostat/", showWarnings = F)
+source("./code/custom_functions.R")
+SamplePalette =  c("#000000","#3399FF")
+output="./output/04_Biostat/"
+```
+
+```{r load files}
+seurat_integrated <- readRDS("./data/QC_dataFinal.rds")
+metadata<- seurat_integrated@meta.data
+```
+
+## Clusterwise analysis 
+
+```{r}
+clusters = unique(seurat_integrated$merged_clusters)
+
+DEG_reslist <- list()
+Idents(seurat_integrated) <- "merged_clusters"
+
+for(clus in clusters){
+  clusnam <- clus
+  markers <-FindMarkers(seurat_integrated, ident.1 = "5mM", ident.2 = "0mM", 
+                        group.by = 'type', subset.ident = clus)
+  DEG_reslist[[clusnam]]<-markers
+  markers <- cbind("Gene"=rownames(markers), markers)
+  openxlsx2::write_xlsx(markers, paste0("./output/04_Biostat/Biostat_DEG_",clusnam,"cells.xlsx"))
+}
+
+```
+
+```{r}
+genelist <- list()
+plotlist <- list()
+
+for(res in sort(names(DEG_reslist))){
+  DEGRes <- DEG_reslist[[res]]
+  idx_sig<-DEGRes$p_val_adj<0.05
+  idx_fdr <- abs(DEGRes$avg_log2FC)> 0.25 
+  idx_reg <- idx_sig & idx_fdr
+  idx_up<- idx_reg & sign(DEGRes$avg_log2FC)>0
+  idx_dwn<- idx_reg & sign(DEGRes$avg_log2FC)<0
+  
+  genebackground = rownames(DEGRes)
+  genelisttmp = list(DEG_all=genebackground[idx_reg], 
+                  DEG_all_down=genebackground[idx_dwn], 
+                  DEG_all_up=genebackground[idx_up])
+  
+  names(genelisttmp)= paste0(res, names(genelisttmp))
+  genelist <- c(genelist, genelisttmp)
+}
+
+gostres = gost(query = genelist, evcodes = T, custom_bg = genebackground)
+
+resGO = gostres$result[grepl("GO:", gostres$result$source), c("query", "source", "term_name","p_value", "intersection")]
+
+openxlsx::write.xlsx(resGO, "./output/04_Biostat/Biostat_DEG_GO_ClusterMerged.xlsx")
+
+
+Sfari_Syndromic_test <- test_Genelist(
+  mygenelist = genelist, 
+  basegenelist = SFARI$gene.symbol[SFARI$syndromic==1], 
+  geneunivers = genebackground)
+
+Sfari_All_test <- test_Genelist(
+  mygenelist = genelist, 
+  basegenelist = SFARI$gene.symbol, 
+  geneunivers = genebackground)
+
+l = list(Sfari_All_test, Sfari_Syndromic_test)
+openxlsx2::write_xlsx(l, file=paste0(output, "Biostat_DEG_SFARI_ClusterMerged.xlsx"), row_names=T)
+
+for (set in sort(names(genelist))){
+  if(set %in% gostres$result$query){
+  dat=gostres$result[which(gostres$result$query == set),]
+  plotlist[[set]]<-GOplot(dat, N = 10, Title = set, xlim=NA)
+  }else{
+    text="no significance"
+    plotlist[[set]]<-ggplot() + annotate("text", x = 4, y = 25, label = text) + 
+      ggtitle(set) + theme_void()
+  }
+}
+
+```
+
+```{r, fig.width=16, fig.height=50}
+p = ggpubr::ggarrange(plotlist = plotlist, ncol = 3, nrow = 14)
+p
+ggsave(filename = "./output/04_Biostat/Biostat_DEG_GO_clustersMerged.svg")
+```
+
+
+
+
+
+## Cluster based differences in distribution
+
+```{r}
+n_cells=(table(clusters=seurat_integrated$merged_clusters, treatment=seurat_integrated$type))
+
+n_cells %>% as.data.frame() %>% reshape(timevar = "clusters",
+                                        idvar = "treatment",
+                                        direction = "wide") %>% 
+  remove_rownames() %>% column_to_rownames("treatment") %>% t() %>% as.data.frame()-> n_cells
+
+res=list()
+
+for(i in rownames(n_cells)){
+  crosstab = rbind(colSums(n_cells[rownames(n_cells) != i,]),n_cells[i,])
+  res[[i]]<-fisher.test(crosstab)
+  
+}
+
+n_cells$OR = unlist(lapply(res, function(x){x$estimate}))
+n_cells$p.value = unlist(lapply(res, function(x){x$p.value}))
+n_cells$adj.pvalue = p.adjust(n_cells$p.value)
+
+n_cells
+n_cells <- cbind("cluster"=rownames(n_cells), n_cells)
+openxlsx2::write_xlsx(file="./output/04_Biostat/Biostat_clusterMergedFreq.xslsx",n_cells)
+
+```
+
+```{r}
+saveRDS(file="./data/QC_dataFinal.rds", seurat_integrated)
+```
