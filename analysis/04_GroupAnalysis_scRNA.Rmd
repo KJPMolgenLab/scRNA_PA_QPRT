@@ -26,6 +26,7 @@ library(tidyverse)
 dir.create("./output/04_Biostat/", showWarnings = F)
 source("./code/custom_functions.R")
 SamplePalette =  c("#000000","#3399FF")
+output="./output/04_Biostat/"
 ```
 
 ```{r load files}
@@ -82,6 +83,19 @@ DT::datatable(tablegostres, extensions = "Buttons",
               ))
 
 openxlsx2::write_xlsx(tablegostres, "./output/04_Biostat/Biostat_GO_termDEG_all.xlsx")
+
+Sfari_Syndromic_test <- test_Genelist(
+  mygenelist = genelist, 
+  basegenelist = SFARI$gene.symbol[SFARI$syndromic==1], 
+  geneunivers = genebackground)
+
+Sfari_All_test <- test_Genelist(
+  mygenelist = genelist, 
+  basegenelist = SFARI$gene.symbol, 
+  geneunivers = genebackground)
+
+l = list(Sfari_All_test, Sfari_Syndromic_test)
+openxlsx2::write_xlsx(l, file=paste0(output, "Biostat_DEG_SFARI.xlsx"), row_names=T)
 ```
 
 ## Clusterwise analysis 
@@ -130,6 +144,22 @@ gostres = gost(query = genelist, evcodes = T, custom_bg = genebackground)
 resGO = gostres$result[grepl("GO:", gostres$result$source), c("query", "source", "term_name","p_value", "intersection")]
 
 openxlsx::write.xlsx(resGO, "./output/04_Biostat/Biostat_DEG_GO_Cluster.xlsx")
+
+
+Sfari_Syndromic_test <- test_Genelist(
+  mygenelist = genelist, 
+  basegenelist = SFARI$gene.symbol[SFARI$syndromic==1], 
+  geneunivers = genebackground)
+
+Sfari_All_test <- test_Genelist(
+  mygenelist = genelist, 
+  basegenelist = SFARI$gene.symbol, 
+  geneunivers = genebackground)
+
+l = list(Sfari_All_test, Sfari_Syndromic_test)
+openxlsx2::write_xlsx(l, file=paste0(output, "Biostat_DEG_SFARI_Cluster.xlsx"), row_names=T)
+
+
 
 for (set in sort(names(genelist))){
   if(set %in% gostres$result$query){
@@ -236,6 +266,7 @@ lineagesplots
 ggsave("./output/04_Biostat/Biostat_Comparelineages.svg")
 
 ```
+
 ```{r}
 saveRDS(file="./data/QC_dataFinal.rds", seurat_integrated)
 ```
