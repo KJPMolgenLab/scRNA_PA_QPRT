@@ -10,6 +10,8 @@ output:
       collapsed: true
 ---
 
+# DEX Analysis 
+
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
 ```
@@ -28,6 +30,7 @@ library(dendextend)
 library(gprofiler2)
 library(Seurat)
 library(lme4)
+
 ```
 ```{r}
 options(stringsAsFactors = F)
@@ -54,6 +57,8 @@ hgnc=gconvert(query=as.numeric(rownames(ddsMat)),
               organism = "hsapiens", 
               numeric_ns = "ENTREZGENE_ACC",
               target = "HGNC")
+
+
 
 ```
 
@@ -91,33 +96,66 @@ l <- list(mget(apropos("restab_")))[[1]]
 names(l) = gsub("restab_", "", names(l)) %>% gsub("Day_5", "Day_05",.)
 l = l[sort(names(l))]
 openxlsx2::write_xlsx(l, file=paste0(output, "06_Bulk_DEX_LFC_results.xlsx"), row_names=T )
+
 ```
 
-## GO terms
+## GO terms comparing eacht timpoint treated vs untreated 
 ```{r, fig.width=15, fig.height=20}
-geneuniverses <- rownames(log_2cpm)
+getnames = function(x){return(geneinfo[x,"hgnc"])}
+
+geneuniverses <- rownames(log_2cpm) %>% getnames()
+
 GOtermlist <- list()
+
 
 for (i in apropos("restab_")){
   restab <- get(i)
   if(padj_cu){
-    GOtermlist[[paste0(i, "_all")]] <- rownames(restab)[restab$adj.P.Val < cutoff]
-    GOtermlist[[paste0(i, "_up")]] <- rownames(restab)[restab$adj.P.Val < cutoff  & restab$logFC >0]
-    GOtermlist[[paste0(i, "_dwn")]] <- rownames(restab)[restab$adj.P.Val < cutoff  & restab$logFC < 0]
+    GOtermlist[[paste0(i, "_all")]] <- 
+      rownames(restab)[restab$adj.P.Val < cutoff] %>% getnames()
+    GOtermlist[[paste0(i, "_up")]] <- 
+      rownames(restab)[restab$adj.P.Val < cutoff  & restab$logFC >0]%>% getnames()
+    GOtermlist[[paste0(i, "_dwn")]] <- 
+      rownames(restab)[restab$adj.P.Val < cutoff  & restab$logFC < 0]%>% getnames()
   }else{
-    GOtermlist[[paste0(i, "_all")]] <- rownames(restab)[restab$P.Value < cutoff]
-    GOtermlist[[paste0(i, "_up")]] <- rownames(restab)[restab$P.Value < cutoff  & restab$logFC >0]
-    GOtermlist[[paste0(i, "_dwn")]] <- rownames(restab)[restab$P.Value < cutoff  & restab$logFC < 0]
+    GOtermlist[[paste0(i, "_all")]] <- 
+      rownames(restab)[restab$P.Value < cutoff]%>% getnames()
+    GOtermlist[[paste0(i, "_up")]] <- 
+      rownames(restab)[restab$P.Value < cutoff  & restab$logFC >0]%>% getnames()
+    GOtermlist[[paste0(i, "_dwn")]] <- 
+      rownames(restab)[restab$P.Value < cutoff  & restab$logFC < 0]%>% getnames()
   }
 }
+
+
 
 names(GOtermlist) = gsub("restab_Day", "Day", names(GOtermlist))
 names(GOtermlist) = gsub("Day_5", "Day_05", names(GOtermlist))
 GOtermlist = GOtermlist[sort(names(GOtermlist))]
 
+
 resGO = getGOresults(GOtermlist, genereference = NULL, evcodes = T)
 
 openxlsx::write.xlsx(file = paste0(output, "/06_Bulk_DEX_GO_results.xlsx"), as.data.frame(resGO$result))
+
+
+Sfari_Syndromic_test <- test_Genelist(
+  mygenelist = GOtermlist, 
+  basegenelist=SFARI$gene.symbol[SFARI$syndromic==1],
+  geneunivers = geneuniverses)
+
+
+
+Sfari_All_test <- test_Genelist(
+  mygenelist = GOtermlist,
+  basegenelist = SFARI$gene.symbol,
+  geneunivers = geneuniverses)
+
+
+
+l = list(Sfari_All_test, Sfari_Syndromic_test)
+l
+openxlsx2::write_xlsx(l, file=paste0(output, "06_Bulk_DEX_SFARIenrichment.xlsx"), row_names=T )
 
 ```
 
@@ -156,6 +194,7 @@ for (set in unique(resGO$result$query)){
 p <- ggpubr::ggarrange(plotlist = plotlist, common.legend = T, nrow = 5, ncol =3)
 p
 ggsave(file=paste0(output, "/06_Bulk_DEX_top10_BP_GOplot.svg"), plot = p)
+
 ```
 
 
@@ -175,9 +214,303 @@ for (set in unique(resGO$result$query)){
 p <- ggpubr::ggarrange(plotlist = plotlist, common.legend = T, nrow = 5, ncol =3)
 p
 ggsave(file=paste0(output, "/06_Bulk_DEX_top10_TF_GOplot.svg"), plot = p)
+
 ```
 
-## Trajectories over time top genes per comparison
+# Differential gene expression between timepoints 0mM only 
+
+```{r analyze DEX TP}
+## comparisons against 0MM PA
+PA=levels(SampleInfo$PAmM)
+Days=c(sort(unique(SampleInfo$Day)))
+
+p = 0
+d = Days[1]
+target = "Day"
+randomeffect = "Batch"
+
+geneinfo = rowData(ddsMat) %>% as.data.frame()
+geneinfo$entrez_gene = rownames(geneinfo)
+geneinfo$hgnc[is.na(geneinfo$hgnc)] <- geneinfo$entrez_gene[is.na(geneinfo$hgnc)]
+
+for(i in 1:length(Days)){
+  if(i==1){} else {
+    Dayfilter = SampleInfo$Day %in% Days[c(i-1,i)] & SampleInfo$PAmM==0
+    Set = rownames(SampleInfo)[Dayfilter]
+    lab = paste("TPrestab", "Day", paste0(Days[c(i-1,i)], collapse = "vs"),"0mM_PA",sep="_")
+    print(lab)
+    res <- comparison(dds_object = ddsMat, 
+                      samples = Set, 
+                      target = target,
+                      randomeffect = randomeffect)
+    res$HGNC = rownames(res) %>% getnames()
+    assign(lab, res)
+  }
+}
+
+#Lists elements are written to individual worksheets, using list names as sheet names if available
+l <- list(mget(apropos("TPrestab_")))[[1]]
+names(l) = gsub("TPrestab_", "", names(l)) %>% gsub("Day_5", "Day_05",.)
+l = l[sort(names(l))]
+openxlsx2::write_xlsx(l, file=paste0(output, "06_Bulk_timpoints_DEX_LFC_results.xlsx"), row_names=T )
+```
+
+## GO terms comparing eacht timpoint gainst previous timepoint Wildtype only
+
+```{r, fig.width=15, fig.height=20}
+
+GOtermlist <- list()
+
+for (i in apropos("TPrestab_")){
+  restab <- get(i)
+  if(padj_cu){
+    GOtermlist[[paste0(i, "_all")]] <- 
+      rownames(restab)[restab$adj.P.Val < cutoff] %>% getnames()
+    GOtermlist[[paste0(i, "_up")]] <- 
+      rownames(restab)[restab$adj.P.Val < cutoff  & restab$logFC >0]%>% getnames()
+    GOtermlist[[paste0(i, "_dwn")]] <- 
+      rownames(restab)[restab$adj.P.Val < cutoff  & restab$logFC < 0]%>% getnames()
+  }else{
+    GOtermlist[[paste0(i, "_all")]] <- 
+      rownames(restab)[restab$P.Value < cutoff]%>% getnames()
+    GOtermlist[[paste0(i, "_up")]] <- 
+      rownames(restab)[restab$P.Value < cutoff  & restab$logFC >0]%>% getnames()
+    GOtermlist[[paste0(i, "_dwn")]] <- 
+      rownames(restab)[restab$P.Value < cutoff  & restab$logFC < 0]%>% getnames()
+  }
+}
+
+
+
+names(GOtermlist) = gsub("TPrestab_Day", "Day", names(GOtermlist))
+names(GOtermlist) = gsub("Day_5", "Day_05", names(GOtermlist))
+GOtermlist = GOtermlist[sort(names(GOtermlist))]
+
+
+
+resGO = getGOresults(GOtermlist, genereference = NULL, evcodes = T)
+
+openxlsx::write.xlsx(file = paste0(output, "/06_Bulk_Timepoints_DEX_GO_results.xlsx"), as.data.frame(resGO$result))
+
+
+Sfari_Syndromic_test <- test_Genelist(mygenelist = GOtermlist, 
+                                      basegenelist = SFARI$gene.symbol[SFARI$syndromic==1], 
+                                      geneunivers = geneuniverses)
+
+
+
+Sfari_All_test <- test_Genelist(mygenelist = GOtermlist, 
+                                basegenelist = SFARI$gene.symbol, 
+                                geneunivers = geneuniverses)
+
+
+
+l = list(Sfari_All_test, Sfari_Syndromic_test)
+openxlsx2::write_xlsx(l, file=paste0(output, "06_Bulk_Timepoints_DEX_SFARIenrichment.xlsx"), row_names=T)
+
+
+```
+
+
+```{r, fig.width=15, fig.height=20}
+
+plotlist = list()
+for (set in unique(resGO$result$query)){
+  dat=resGO$result[which(resGO$result$query == set),]
+  if(nrow(dat)>0){
+    plotlist[[set]]<-GOplot(dat, N = 10, Title = set, xlim=NA)
+  }else{
+    text="no significance"
+    plotlist[[set]]<-ggplot() + annotate("text", x = 4, y = 25, label = text) + 
+      ggtitle(set) + theme_void()
+  }
+}
+
+p <- ggpubr::ggarrange(plotlist = plotlist, common.legend = T, nrow = 5, ncol =3)
+p
+ggsave(file=paste0(output, "/06_Bulk_Timepoints_DEX_top10all_GOplot.svg"), plot = p)
+```
+
+```{r, fig.width=15, fig.height=20}
+plotlist = list()
+for (set in unique(resGO$result$query)){
+  dat=resGO$result[which(resGO$result$query == set & resGO$result$source == "GO:BP"),]
+  if(nrow(dat)>0){
+    plotlist[[set]]<-GOplot(dat, N = 10, Title = set, xlim=NA)
+  }else{
+    text="no significance"
+    plotlist[[set]]<-ggplot() + annotate("text", x = 4, y = 25, label = text) + 
+      ggtitle(set) + theme_void()
+  }
+}
+
+p <- ggpubr::ggarrange(plotlist = plotlist, common.legend = T, nrow = 5, ncol =3)
+p
+ggsave(file=paste0(output, "/06_Bulk_Timepoints_DEX_top10_BP_GOplot.svg"), plot = p)
+```
+
+
+```{r, fig.width=15, fig.height=20}
+plotlist = list()
+for (set in unique(resGO$result$query)){
+  dat=resGO$result[which(resGO$result$query == set & resGO$result$source == "TF"),]
+  if(nrow(dat)>0){
+    plotlist[[set]]<-GOplot(dat, N = 10, Title = set, xlim=NA)
+  }else{
+    text="no significance"
+    plotlist[[set]]<-ggplot() + annotate("text", x = 4, y = 25, label = text) + 
+      ggtitle(set) + theme_void()
+  }
+}
+
+p <- ggpubr::ggarrange(plotlist = plotlist, common.legend = T, nrow = 5, ncol =3)
+p
+ggsave(file=paste0(output, "/06_Bulk_Timepoints_DEX_top10_TF_GOplot.svg"), plot = p)
+```
+
+
+# Differential gene expression time x PA
+
+```{r analyze DEX TPxPA}
+## comparisons against 0MM PA
+PA=levels(SampleInfo$PAmM)
+Days=c(sort(unique(SampleInfo$Day)))
+
+p = 0
+d = Days[1]
+target = "Day*PAmM"
+randomeffect = "Batch"
+
+geneinfo = rowData(ddsMat) %>% as.data.frame()
+geneinfo$entrez_gene = rownames(geneinfo)
+geneinfo$hgnc[is.na(geneinfo$hgnc)] <- geneinfo$entrez_gene[is.na(geneinfo$hgnc)]
+
+lab = paste("Restab_TPxPA")
+print(lab)
+res <- comparison(dds_object = ddsMat, 
+                  target = target,
+                  randomeffect = randomeffect)
+res$HGNC = rownames(res) %>% getnames()
+assign(lab, res)
+
+
+#Lists elements are written to individual worksheets, using list names as sheet names if available
+l <- list(mget(apropos("Restab_TPxPA")))[[1]]
+names(l) = "DayxPA"
+l = l[sort(names(l))]
+openxlsx2::write_xlsx(l, file=paste0(output, "06_Bulk_DayxPA_DEX_LFC_results.xlsx"), row_names=T )
+```
+
+## GO terms  Day xPA 
+
+```{r, fig.width=15, fig.height=20}
+
+GOtermlist <- list()
+
+restab <- Restab_TPxPA
+i="Restab_TPxPA"
+if(padj_cu){
+  GOtermlist[[paste0(i, "_all")]] <- 
+    rownames(restab)[restab$adj.P.Val < cutoff] %>% getnames()
+  GOtermlist[[paste0(i, "_up")]] <- 
+    rownames(restab)[restab$adj.P.Val < cutoff  & restab$Day.PAmM5 >0]%>% getnames()
+  GOtermlist[[paste0(i, "_dwn")]] <- 
+    rownames(restab)[restab$adj.P.Val < cutoff  & restab$Day.PAmM5 < 0]%>% getnames()
+}else{
+  GOtermlist[[paste0(i, "_all")]] <- 
+    rownames(restab)[restab$P.Value < cutoff]%>% getnames()
+  GOtermlist[[paste0(i, "_up")]] <- 
+    rownames(restab)[restab$P.Value < cutoff  & restab$Day.PAmM5 >0]%>% getnames()
+  GOtermlist[[paste0(i, "_dwn")]] <- 
+    rownames(restab)[restab$P.Value < cutoff  & restab$Day.PAmM5 < 0]%>% getnames()
+}
+
+
+names(GOtermlist) = gsub("Restab_TPxPA", "TPxPA", names(GOtermlist))
+GOtermlist = GOtermlist[sort(names(GOtermlist))]
+
+resGO = getGOresults(GOtermlist, genereference = NULL, evcodes = T)
+
+openxlsx::write.xlsx(file = paste0(output, "/06_Bulk_DayxPA_DEX_GO_results.xlsx"), as.data.frame(resGO$result))
+
+
+Sfari_Syndromic_test <- test_Genelist(mygenelist = GOtermlist, 
+                                      basegenelist = SFARI$gene.symbol[SFARI$syndromic==1], 
+                                      geneunivers = geneuniverses)
+
+
+
+Sfari_All_test <- test_Genelist(mygenelist = GOtermlist, 
+                                basegenelist = SFARI$gene.symbol, 
+                                geneunivers = geneuniverses)
+
+
+
+l = list(Sfari_All_test, Sfari_Syndromic_test)
+openxlsx2::write_xlsx(l, file=paste0(output, "06_Bulk_DayxPA_DEX_SFARIenrichment.xlsx"), row_names=T)
+
+
+```
+
+
+```{r, fig.width=15, fig.height=20}
+
+plotlist = list()
+for (set in unique(resGO$result$query)){
+  dat=resGO$result[which(resGO$result$query == set),]
+  if(nrow(dat)>0){
+    plotlist[[set]]<-GOplot(dat, N = 10, Title = set, xlim=NA)
+  }else{
+    text="no significance"
+    plotlist[[set]]<-ggplot() + annotate("text", x = 4, y = 25, label = text) + 
+      ggtitle(set) + theme_void()
+  }
+}
+
+p <- ggpubr::ggarrange(plotlist = plotlist, common.legend = T, nrow = 5, ncol =3)
+p
+ggsave(file=paste0(output, "/06_Bulk_DayxPA_DEX_top10all_GOplot.svg"), plot = p)
+```
+
+```{r, fig.width=15, fig.height=20}
+plotlist = list()
+for (set in unique(resGO$result$query)){
+  dat=resGO$result[which(resGO$result$query == set & resGO$result$source == "GO:BP"),]
+  if(nrow(dat)>0){
+    plotlist[[set]]<-GOplot(dat, N = 10, Title = set, xlim=NA)
+  }else{
+    text="no significance"
+    plotlist[[set]]<-ggplot() + annotate("text", x = 4, y = 25, label = text) + 
+      ggtitle(set) + theme_void()
+  }
+}
+
+p <- ggpubr::ggarrange(plotlist = plotlist, common.legend = T, nrow = 5, ncol =3)
+p
+ggsave(file=paste0(output, "/06_Bulk_DayxPA_DEX_top10_BP_GOplot.svg"), plot = p)
+```
+
+
+```{r, fig.width=15, fig.height=20}
+plotlist = list()
+for (set in unique(resGO$result$query)){
+  dat=resGO$result[which(resGO$result$query == set & resGO$result$source == "TF"),]
+  if(nrow(dat)>0){
+    plotlist[[set]]<-GOplot(dat, N = 10, Title = set, xlim=NA)
+  }else{
+    text="no significance"
+    plotlist[[set]]<-ggplot() + annotate("text", x = 4, y = 25, label = text) + 
+      ggtitle(set) + theme_void()
+  }
+}
+
+p <- ggpubr::ggarrange(plotlist = plotlist, common.legend = T, nrow = 5, ncol =3)
+p
+ggsave(file=paste0(output, "/06_Bulk_DayxPA_DEX_top10_TF_GOplot.svg"), plot = p)
+```
+
+
+# Trajectories over time top genes per comparison
 
 ```{r plot top 10 DEX genes, fig.width=14, fig.height=21}
 
@@ -347,8 +680,47 @@ display_tab(results)
 
 ```
 
+## Selected genes over time
 
-## WGCNA 
+
+```{r, fig.width=7, fig.height=10}
+targetgenes = c("SYN1", "CAMK2A", "LHX2", "SLITRK5")
+
+dataplot <- log_2cpm[which(geneinfo$hgnc%in% targetgenes),] %>% reshape2::melt()
+colnames(dataplot) <- c("gene","Sample", "reads")  
+dataplot$PAmM = SampleInfo[dataplot$Sample, "PAmM"]
+dataplot$Batch = SampleInfo[dataplot$Sample, "Batch"]
+dataplot$Day = SampleInfo[dataplot$Sample, "Day"]
+dataplot$hgnc = hgnc$target[match(dataplot$gene, hgnc$input)]
+idx=is.na(dataplot$hgnc)
+dataplot$hgnc[idx] = dataplot$gene[idx]
+
+ggplot(dataplot, aes(x = Day, y = reads,col=PAmM, fill = PAmM)) +
+  geom_smooth(span=0.5) +scale_x_continuous(breaks=sort(unique(dataplot$Day)))+
+  theme_classic() + facet_wrap(~hgnc) +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))+
+  labs(x = "Day", y = "log2(CPM+1)") -> p
+
+p
+
+ggsave(file=paste0(output, "/06_Bulk_DEX_Astrocytes_lineplots.svg"), p)
+
+results<-data.frame(matrix(ncol=2, nrow=0))
+for(g in unique(dataplot$hgnc)){
+  subdat<-dataplot[dataplot$hgnc == g, ]
+  res <- lme4::glmer(reads~Day*PAmM+(1|Batch), data = subdat)
+  res_stat <- car::Anova(res, type="3")
+  results<-rbind(results, c(g, res_stat$`Pr(>Chisq)`[4]))
+}
+
+openxlsx2::write_xlsx(file=paste0(output, "/06_Bulk_DEX_SelectedGenes_stat_DayxmM.xlsx"), results)
+
+colnames(results) <- c("gene", "Pval")
+display_tab(results)
+
+```
+
+# WGCNA 
 
 
 
@@ -635,12 +1007,14 @@ dev.off()
 #### WGCNA GO terms
 
 ```{r, fig.width=15, fig.height=20}
-genelist = split(names(net$colors), net$colors)
-gene_univers = names(net$colors)
+genelist = split(names(net$colors) %>% getnames(), net$colors)
+gene_univers = names(net$colors) %>% getnames()
+
+
+names(genelist)
 
 pvallist = unlist(reslist)
-MOI = gsub("ME", "", names(pvallist)) %>% gsub(".PAmM5_Day", "", .)
-# MOI = MOI[pvallist<0.05]
+MOI = unique(net$colors)
 
 # if you want to have the affected genes set return_genelist = T; this takes roughly 4-8 hours 
 
@@ -655,6 +1029,24 @@ restab = Gores$result
 restab$parents<- as.character(restab$parents)
 
 openxlsx2::write_xlsx(restab, file=paste0(output,"06_DEX_Bulk_WGCNA_GO_Terms.xlsx"))
+
+
+
+Sfari_Syndromic_test <- test_Genelist(mygenelist = genelist[MOI], 
+                                      basegenelist = SFARI$gene.symbol[SFARI$syndromic==1], 
+                                      geneunivers = gene_univers)
+
+
+
+Sfari_All_test <- test_Genelist(mygenelist = genelist[MOI], 
+                                basegenelist = SFARI$gene.symbol, 
+                                geneunivers = gene_univers)
+
+
+
+l = list(Sfari_All_test, Sfari_Syndromic_test)
+openxlsx2::write_xlsx(l, file=paste0(output, "06_Bulk_WGCNA_SFARIenrichment.xlsx"), row_names=T)
+
 
 plotlist = list()
 for (set in unique(Gores$result$query)){
