@@ -153,7 +153,7 @@ Sfari_All_test <- test_Genelist(
 
 
 
-l = list(Sfari_All_test, Sfari_Syndromic_test)
+l = list(Sfari_all=Sfari_All_test, Sfari_Syndromic=Sfari_Syndromic_test)
 l
 openxlsx2::write_xlsx(l, file=paste0(output, "06_Bulk_DEX_SFARIenrichment.xlsx"), row_names=T )
 
@@ -305,7 +305,7 @@ Sfari_All_test <- test_Genelist(mygenelist = GOtermlist,
 
 
 
-l = list(Sfari_All_test, Sfari_Syndromic_test)
+l = list(Sfari_all=Sfari_All_test, Sfari_Syndromic=Sfari_Syndromic_test)
 openxlsx2::write_xlsx(l, file=paste0(output, "06_Bulk_Timepoints_DEX_SFARIenrichment.xlsx"), row_names=T)
 
 
@@ -446,7 +446,7 @@ Sfari_All_test <- test_Genelist(mygenelist = GOtermlist,
 
 
 
-l = list(Sfari_All_test, Sfari_Syndromic_test)
+l = list(Sfari_all=Sfari_All_test, Sfari_Syndromic=Sfari_Syndromic_test)
 openxlsx2::write_xlsx(l, file=paste0(output, "06_Bulk_DayxPA_DEX_SFARIenrichment.xlsx"), row_names=T)
 
 
@@ -1044,7 +1044,7 @@ Sfari_All_test <- test_Genelist(mygenelist = genelist[MOI],
 
 
 
-l = list(Sfari_All_test, Sfari_Syndromic_test)
+l = list(Sfari_all=Sfari_All_test, Sfari_Syndromic=Sfari_Syndromic_test)
 openxlsx2::write_xlsx(l, file=paste0(output, "06_Bulk_WGCNA_SFARIenrichment.xlsx"), row_names=T)
 
 
