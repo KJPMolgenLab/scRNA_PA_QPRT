@@ -91,7 +91,7 @@ Sfari_All_test <- test_Genelist(
   basegenelist = SFARI$gene.symbol, 
   geneunivers = genebackground)
 
-l = list(Sfari_All_test, Sfari_Syndromic_test)
+l = list(Sfari_all=Sfari_All_test, Sfari_Syndromic=Sfari_Syndromic_test)
 openxlsx2::write_xlsx(l, file=paste0(output, "Biostat_DEG_SFARI_ClusterMerged.xlsx"), row_names=T)
 
 for (set in sort(names(genelist))){
