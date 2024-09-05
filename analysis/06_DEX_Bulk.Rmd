@@ -165,7 +165,7 @@ plotlist = list()
 for (set in unique(resGO$result$query)){
   dat=resGO$result[which(resGO$result$query == set),]
   if(nrow(dat)>0){
-    plotlist[[set]]<-GOplot(dat, N = 10, Title = set, xlim=NA)
+    plotlist[[set]]<-GOplot(dat, N = 10, Title = set)
   }else{
     text="no significance"
     plotlist[[set]]<-ggplot() + annotate("text", x = 4, y = 25, label = text) + 
@@ -183,7 +183,7 @@ plotlist = list()
 for (set in unique(resGO$result$query)){
   dat=resGO$result[which(resGO$result$query == set & resGO$result$source == "GO:BP"),]
   if(nrow(dat)>0){
-    plotlist[[set]]<-GOplot(dat, N = 10, Title = set, xlim=NA)
+    plotlist[[set]]<-GOplot(dat, N = 10, Title = set)
   }else{
     text="no significance"
     plotlist[[set]]<-ggplot() + annotate("text", x = 4, y = 25, label = text) + 
@@ -203,7 +203,7 @@ plotlist = list()
 for (set in unique(resGO$result$query)){
   dat=resGO$result[which(resGO$result$query == set & resGO$result$source == "TF"),]
   if(nrow(dat)>0){
-    plotlist[[set]]<-GOplot(dat, N = 10, Title = set, xlim=NA)
+    plotlist[[set]]<-GOplot(dat, N = 10, Title = set)
   }else{
     text="no significance"
     plotlist[[set]]<-ggplot() + annotate("text", x = 4, y = 25, label = text) + 
@@ -253,6 +253,8 @@ l <- list(mget(apropos("TPrestab_")))[[1]]
 names(l) = gsub("TPrestab_", "", names(l)) %>% gsub("Day_5", "Day_05",.)
 l = l[sort(names(l))]
 openxlsx2::write_xlsx(l, file=paste0(output, "06_Bulk_timpoints_DEX_LFC_results.xlsx"), row_names=T )
+
+
 ```
 
 ## GO terms comparing eacht timpoint gainst previous timepoint Wildtype only
@@ -318,7 +320,7 @@ plotlist = list()
 for (set in unique(resGO$result$query)){
   dat=resGO$result[which(resGO$result$query == set),]
   if(nrow(dat)>0){
-    plotlist[[set]]<-GOplot(dat, N = 10, Title = set, xlim=NA)
+    plotlist[[set]]<-GOplot(dat, N = 10, Title = set)
   }else{
     text="no significance"
     plotlist[[set]]<-ggplot() + annotate("text", x = 4, y = 25, label = text) + 
@@ -336,7 +338,7 @@ plotlist = list()
 for (set in unique(resGO$result$query)){
   dat=resGO$result[which(resGO$result$query == set & resGO$result$source == "GO:BP"),]
   if(nrow(dat)>0){
-    plotlist[[set]]<-GOplot(dat, N = 10, Title = set, xlim=NA)
+    plotlist[[set]]<-GOplot(dat, N = 10, Title = set)
   }else{
     text="no significance"
     plotlist[[set]]<-ggplot() + annotate("text", x = 4, y = 25, label = text) + 
@@ -355,7 +357,7 @@ plotlist = list()
 for (set in unique(resGO$result$query)){
   dat=resGO$result[which(resGO$result$query == set & resGO$result$source == "TF"),]
   if(nrow(dat)>0){
-    plotlist[[set]]<-GOplot(dat, N = 10, Title = set, xlim=NA)
+    plotlist[[set]]<-GOplot(dat, N = 10, Title = set)
   }else{
     text="no significance"
     plotlist[[set]]<-ggplot() + annotate("text", x = 4, y = 25, label = text) + 
@@ -373,9 +375,9 @@ ggsave(file=paste0(output, "/06_Bulk_Timepoints_DEX_top10_TF_GOplot.svg"), plot 
 
 ```{r analyze DEX TPxPA}
 ## comparisons against 0MM PA
-PA=levels(SampleInfo$PAmM)
-Days=c(sort(unique(SampleInfo$Day)))
-
+PA=SampleInfo$PAmM
+Days=SampleInfo$Day
+Batch=SampleInfo$Batch
 p = 0
 d = Days[1]
 target = "Day*PAmM"
@@ -393,12 +395,29 @@ res <- comparison(dds_object = ddsMat,
 res$HGNC = rownames(res) %>% getnames()
 assign(lab, res)
 
-
 #Lists elements are written to individual worksheets, using list names as sheet names if available
 l <- list(mget(apropos("Restab_TPxPA")))[[1]]
 names(l) = "DayxPA"
 l = l[sort(names(l))]
 openxlsx2::write_xlsx(l, file=paste0(output, "06_Bulk_DayxPA_DEX_LFC_results.xlsx"), row_names=T )
+
+
+
+results<-data.frame(matrix(ncol=2, nrow=0))
+for(g in rownames(log_2cpm)){
+  print(which(rownames(log_2cpm)==g))
+  subdat<-data.frame(reads=log_2cpm[g,], Days, PA, Batch)
+  res <- lme4::glmer(reads~Days*PA+(1|Batch), data = subdat)
+  res_stat <- car::Anova(res, type="3")
+  results<-rbind(results, c(g, res_stat$`Pr(>Chisq)`[4]))
+}
+
+colnames(results)=c("Entrez","P.value")
+results$P.Adj <- p.adjust(results$P.value, method = "fdr")
+results$HGNC <- hgnc$name[match(results$Entrez, hgnc$input)]
+openxlsx2::write_xlsx(results, file=paste0(output, "06_Bulk_DayxPA_DEX_DxPspec.Pval_results.xlsx"), row_names=T)
+
+
 ```
 
 ## GO terms  Day xPA 
@@ -459,7 +478,7 @@ plotlist = list()
 for (set in unique(resGO$result$query)){
   dat=resGO$result[which(resGO$result$query == set),]
   if(nrow(dat)>0){
-    plotlist[[set]]<-GOplot(dat, N = 10, Title = set, xlim=NA)
+    plotlist[[set]]<-GOplot(dat, N = 10, Title = set)
   }else{
     text="no significance"
     plotlist[[set]]<-ggplot() + annotate("text", x = 4, y = 25, label = text) + 
@@ -477,7 +496,7 @@ plotlist = list()
 for (set in unique(resGO$result$query)){
   dat=resGO$result[which(resGO$result$query == set & resGO$result$source == "GO:BP"),]
   if(nrow(dat)>0){
-    plotlist[[set]]<-GOplot(dat, N = 10, Title = set, xlim=NA)
+    plotlist[[set]]<-GOplot(dat, N = 10, Title = set)
   }else{
     text="no significance"
     plotlist[[set]]<-ggplot() + annotate("text", x = 4, y = 25, label = text) + 
@@ -496,7 +515,7 @@ plotlist = list()
 for (set in unique(resGO$result$query)){
   dat=resGO$result[which(resGO$result$query == set & resGO$result$source == "TF"),]
   if(nrow(dat)>0){
-    plotlist[[set]]<-GOplot(dat, N = 10, Title = set, xlim=NA)
+    plotlist[[set]]<-GOplot(dat, N = 10, Title = set)
   }else{
     text="no significance"
     plotlist[[set]]<-ggplot() + annotate("text", x = 4, y = 25, label = text) + 
@@ -514,8 +533,15 @@ ggsave(file=paste0(output, "/06_Bulk_DayxPA_DEX_top10_TF_GOplot.svg"), plot = p)
 
 ```{r plot top 10 DEX genes, fig.width=14, fig.height=21}
 
+
+alle_restab <- apropos("restab_") # gibt alle wieder die restab beinhalten egal ob groß oder klein schreiben
+restab_nurTP0mM_und_Day0vs5 <- apropos("restab_", ignore.case = F) # berücksichtig groß und kleinschreibung, 
+restab_nur_Day0vs5  <- apropos("^restab_", ignore.case = F) # beginnt mit retab_ kleingeschreiben
+restab_nur_TP0mM  <- apropos("TPrestab_", ignore.case = F) # Beinhaltet TPrestab
+
+
 topgenes=c()
-for(r in apropos("restab_")){
+for(r in alle_restab){
   res <- get(r)
   topgenes <- c(topgenes, res$HGNC[1:10])
 }
@@ -685,6 +711,8 @@ display_tab(results)
 
 ```{r, fig.width=7, fig.height=10}
 targetgenes = c("SYN1", "CAMK2A", "LHX2", "SLITRK5")
+plotoutputname<- "/06_Bulk_DEX_SelectedGenes_lineplots.svg"
+xlsxoutputname <- "/06_Bulk_DEX_SelectedGenes_lineplots.xlsx"
 
 dataplot <- log_2cpm[which(geneinfo$hgnc%in% targetgenes),] %>% reshape2::melt()
 colnames(dataplot) <- c("gene","Sample", "reads")  
@@ -703,7 +731,7 @@ ggplot(dataplot, aes(x = Day, y = reads,col=PAmM, fill = PAmM)) +
 
 p
 
-ggsave(file=paste0(output, "/06_Bulk_DEX_Astrocytes_lineplots.svg"), p)
+ggsave(file=paste0(output, plotoutputname), p)
 
 results<-data.frame(matrix(ncol=2, nrow=0))
 for(g in unique(dataplot$hgnc)){
@@ -713,7 +741,7 @@ for(g in unique(dataplot$hgnc)){
   results<-rbind(results, c(g, res_stat$`Pr(>Chisq)`[4]))
 }
 
-openxlsx2::write_xlsx(file=paste0(output, "/06_Bulk_DEX_SelectedGenes_stat_DayxmM.xlsx"), results)
+openxlsx2::write_xlsx(file=paste0(output,xlsxoutputname), results)
 
 colnames(results) <- c("gene", "Pval")
 display_tab(results)
@@ -728,7 +756,7 @@ display_tab(results)
 library(org.Hs.eg.db)
 library(WGCNA)
 
-force.recalc = T
+force.recalc = F
 powers = c(seq(1,10,by=1), seq(12,20, by=2));
 
 datExpr <- t(counts(ddsMat, normalized=T))
@@ -910,9 +938,12 @@ nmodules <- length(unique(moduleColors))
 # merged gene symbol column
 colnames(geneInfo)[1]= "GeneSymbol"
 colnames(geneInfo)[2]= "Initially.Assigned.Module.Color"
+geneInfo$HGNC=hgnc$name[match(geneInfo$GeneSymbol, hgnc$input)]
+geneInfo$SFARI_genescore <- SFARI$gene.score[match(geneInfo$HGNC,SFARI$gene.symbol)]
+geneInfo$SFARI_category <- SFARI$genetic.category[match(geneInfo$HGNC,SFARI$gene.symbol)]
 
 # save info
-write.csv(geneInfo,file=paste0(output,'/geneInfoSigned.csv'))
+openxlsx2::write_xlsx(geneInfo,file=paste0(output,'/geneInfoSigned.xlsx'))
 
 PCvalues=MEs
 ```
@@ -1052,7 +1083,7 @@ plotlist = list()
 for (set in unique(Gores$result$query)){
   dat=Gores$result[which(Gores$result$query == set & Gores$result$source == "GO:BP"),]
   if(nrow(dat)>0){
-    plotlist[[set]]<-GOplot(dat, N = 10, Title = set, xlim=NA)
+    plotlist[[set]]<-GOplot(dat, N = 10, Title = set)
   }else {
     text="no significance"
     plotlist[[set]]<-ggplot() + annotate("text", x = 4, y = 25, label = text) + 
@@ -1069,7 +1100,7 @@ plotlist = list()
 for (set in unique(Gores$result$query)){
   dat=Gores$result[which(Gores$result$query == set & Gores$result$source == "TF"),]
   if(nrow(dat)>0){
-    plotlist[[set]]<-GOplot(dat, N = 10, Title = set, xlim=NA)
+    plotlist[[set]]<-GOplot(dat, N = 10, Title = set)
   }else {
     text="no significance"
     plotlist[[set]]<-ggplot() + annotate("text", x = 4, y = 25, label = text) + 
@@ -1086,7 +1117,7 @@ plotlist = list()
 for (set in unique(Gores$result$query)){
   dat=Gores$result[which(Gores$result$query == set),]
   if(nrow(dat)>0){
-    plotlist[[set]]<-GOplot(dat, N = 10, Title = set, xlim=NA)
+    plotlist[[set]]<-GOplot(dat, N = 10, Title = set)
   }else {
     text="no significance"
     plotlist[[set]]<-ggplot() + annotate("text", x = 4, y = 25, label = text) + 
