@@ -12,7 +12,7 @@ output:
 
 # DEX Analysis 
 
-```{r setup, include=FALSE}
+```{r setup, eval=FALSE}
 knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
 ```
 
@@ -30,8 +30,13 @@ library(dendextend)
 library(gprofiler2)
 library(Seurat)
 library(lme4)
+library(ggpubr)
+
+getnames = function(x){return(geneinfo[x,"hgnc"])}
 
 ```
+
+
 ```{r}
 options(stringsAsFactors = F)
 set.seed(157434538)
@@ -46,11 +51,16 @@ output= paste0("output/06_Bulk_DEX/")
 dir.create(output, showWarnings = F)
 source("code/custom_functions.R")
 ddsMat <- readRDS("data/Bulk_dds_matrix.rds")
+ddsMat <- ddsMat[,ddsMat$PAmM==0]
+
+
 chr16p11_genes <- openxlsx::read.xlsx("data/chr16p11_orig.xlsx")
 Kynurenine_genes <- openxlsx::read.xlsx("data/Kynurenine_genes_orig.xlsx")
 Astrocyte_genes <- openxlsx::read.xlsx("data/AstrocyteGenes.xlsx")
 
 SampleInfo = as.data.frame(colData(ddsMat))
+
+
 log_2cpm=log2(counts(ddsMat, normalize=T)+1)
 
 hgnc=gconvert(query=as.numeric(rownames(ddsMat)), 
@@ -64,7 +74,7 @@ hgnc=gconvert(query=as.numeric(rownames(ddsMat)),
 
 # Differential gene expression 
 
-```{r analyze DEX}
+```{r analyze DEX, eval=FALSE}
 ## comparisons against 0MM PA
 PA=levels(SampleInfo$PAmM)
 Days=c(sort(unique(SampleInfo$Day)))
@@ -92,130 +102,13 @@ for(d in Days){
 }
 
 #Lists elements are written to individual worksheets, using list names as sheet names if available
-l <- list(mget(apropos("restab_")))[[1]]
+l <- list(base::mget(apropos("restab_")))[[1]]
 names(l) = gsub("restab_", "", names(l)) %>% gsub("Day_5", "Day_05",.)
 l = l[sort(names(l))]
 openxlsx2::write_xlsx(l, file=paste0(output, "06_Bulk_DEX_LFC_results.xlsx"), row_names=T )
 
 ```
 
-## GO terms comparing eacht timpoint treated vs untreated 
-```{r, fig.width=15, fig.height=20}
-getnames = function(x){return(geneinfo[x,"hgnc"])}
-
-geneuniverses <- rownames(log_2cpm) %>% getnames()
-
-GOtermlist <- list()
-
-
-for (i in apropos("restab_")){
-  restab <- get(i)
-  if(padj_cu){
-    GOtermlist[[paste0(i, "_all")]] <- 
-      rownames(restab)[restab$adj.P.Val < cutoff] %>% getnames()
-    GOtermlist[[paste0(i, "_up")]] <- 
-      rownames(restab)[restab$adj.P.Val < cutoff  & restab$logFC >0]%>% getnames()
-    GOtermlist[[paste0(i, "_dwn")]] <- 
-      rownames(restab)[restab$adj.P.Val < cutoff  & restab$logFC < 0]%>% getnames()
-  }else{
-    GOtermlist[[paste0(i, "_all")]] <- 
-      rownames(restab)[restab$P.Value < cutoff]%>% getnames()
-    GOtermlist[[paste0(i, "_up")]] <- 
-      rownames(restab)[restab$P.Value < cutoff  & restab$logFC >0]%>% getnames()
-    GOtermlist[[paste0(i, "_dwn")]] <- 
-      rownames(restab)[restab$P.Value < cutoff  & restab$logFC < 0]%>% getnames()
-  }
-}
-
-
-
-names(GOtermlist) = gsub("restab_Day", "Day", names(GOtermlist))
-names(GOtermlist) = gsub("Day_5", "Day_05", names(GOtermlist))
-GOtermlist = GOtermlist[sort(names(GOtermlist))]
-
-
-resGO = getGOresults(GOtermlist, genereference = NULL, evcodes = T)
-
-openxlsx::write.xlsx(file = paste0(output, "/06_Bulk_DEX_GO_results.xlsx"), as.data.frame(resGO$result))
-
-
-Sfari_Syndromic_test <- test_Genelist(
-  mygenelist = GOtermlist, 
-  basegenelist=SFARI$gene.symbol[SFARI$syndromic==1],
-  geneunivers = geneuniverses)
-
-
-
-Sfari_All_test <- test_Genelist(
-  mygenelist = GOtermlist,
-  basegenelist = SFARI$gene.symbol,
-  geneunivers = geneuniverses)
-
-
-
-l = list(Sfari_all=Sfari_All_test, Sfari_Syndromic=Sfari_Syndromic_test)
-l
-openxlsx2::write_xlsx(l, file=paste0(output, "06_Bulk_DEX_SFARIenrichment.xlsx"), row_names=T )
-
-```
-
-```{r, fig.width=15, fig.height=20}
-
-plotlist = list()
-for (set in unique(resGO$result$query)){
-  dat=resGO$result[which(resGO$result$query == set),]
-  if(nrow(dat)>0){
-    plotlist[[set]]<-GOplot(dat, N = 10, Title = set)
-  }else{
-    text="no significance"
-    plotlist[[set]]<-ggplot() + annotate("text", x = 4, y = 25, label = text) + 
-      ggtitle(set) + theme_void()
-  }
-}
-
-p <- ggpubr::ggarrange(plotlist = plotlist, common.legend = T, nrow = 5, ncol =3)
-p
-ggsave(file=paste0(output, "/06_Bulk_DEX_top10all_GOplot.svg"), plot = p)
-```
-
-```{r, fig.width=15, fig.height=20}
-plotlist = list()
-for (set in unique(resGO$result$query)){
-  dat=resGO$result[which(resGO$result$query == set & resGO$result$source == "GO:BP"),]
-  if(nrow(dat)>0){
-    plotlist[[set]]<-GOplot(dat, N = 10, Title = set)
-  }else{
-    text="no significance"
-    plotlist[[set]]<-ggplot() + annotate("text", x = 4, y = 25, label = text) + 
-      ggtitle(set) + theme_void()
-  }
-}
-
-p <- ggpubr::ggarrange(plotlist = plotlist, common.legend = T, nrow = 5, ncol =3)
-p
-ggsave(file=paste0(output, "/06_Bulk_DEX_top10_BP_GOplot.svg"), plot = p)
-
-```
-
-
-```{r, fig.width=15, fig.height=20}
-plotlist = list()
-for (set in unique(resGO$result$query)){
-  dat=resGO$result[which(resGO$result$query == set & resGO$result$source == "TF"),]
-  if(nrow(dat)>0){
-    plotlist[[set]]<-GOplot(dat, N = 10, Title = set)
-  }else{
-    text="no significance"
-    plotlist[[set]]<-ggplot() + annotate("text", x = 4, y = 25, label = text) + 
-      ggtitle(set) + theme_void()
-  }
-}
-
-p <- ggpubr::ggarrange(plotlist = plotlist, common.legend = T, nrow = 5, ncol =3)
-p
-ggsave(file=paste0(output, "/06_Bulk_DEX_top10_TF_GOplot.svg"), plot = p)
-
-```
 
 # Differential gene expression between timepoints 0mM only 
 
@@ -232,6 +125,8 @@ randomeffect = "Batch"
 geneinfo = rowData(ddsMat) %>% as.data.frame()
 geneinfo$entrez_gene = rownames(geneinfo)
 geneinfo$hgnc[is.na(geneinfo$hgnc)] <- geneinfo$entrez_gene[is.na(geneinfo$hgnc)]
+
+geneuniverses <- geneinfo$hgnc
 
 for(i in 1:length(Days)){
   if(i==1){} else {
@@ -253,6 +148,18 @@ l <- list(mget(apropos("TPrestab_")))[[1]]
 names(l) = gsub("TPrestab_", "", names(l)) %>% gsub("Day_5", "Day_05",.)
 l = l[sort(names(l))]
 openxlsx2::write_xlsx(l, file=paste0(output, "06_Bulk_timpoints_DEX_LFC_results.xlsx"), row_names=T )
+
+
+
+
+## TODO PLOT Manhatten regulated genes 
+((TPrestab_Day_5vs10_0mM_PA$adj.P.Val<0.05) & (TPrestab_Day_5vs10_0mM_PA$logFC<0))*1 %>% sum()
+(TPrestab_Day_10vs17_0mM_PA$adj.P.Val<0.05) %>% sum()
+(TPrestab_Day_17vs40_0mM_PA$adj.P.Val<0.05) %>% sum()
+(TPrestab_Day_40vs80_0mM_PA$adj.P.Val<0.05) %>% sum()
+
+
+
 
 
 ```
@@ -373,7 +280,7 @@ ggsave(file=paste0(output, "/06_Bulk_Timepoints_DEX_top10_TF_GOplot.svg"), plot 
 
 # Differential gene expression time x PA
 
-```{r analyze DEX TPxPA}
+```{r analyze DEX TPxPA, eval=FALSE}
 ## comparisons against 0MM PA
 PA=SampleInfo$PAmM
 Days=SampleInfo$Day
@@ -422,7 +329,7 @@ openxlsx2::write_xlsx(results, file=paste0(output, "06_Bulk_DayxPA_DEX_DxPspec.P
 
 ## GO terms  Day xPA 
 
-```{r, fig.width=15, fig.height=20}
+```{r, fig.width=15, fig.height=20, eval=F}
 
 GOtermlist <- list()
 
@@ -472,7 +379,7 @@ openxlsx2::write_xlsx(l, file=paste0(output, "06_Bulk_DayxPA_DEX_SFARIenrichment
 ```
 
 
-```{r, fig.width=15, fig.height=20}
+```{r, fig.width=15, fig.height=20, eval=F}
 
 plotlist = list()
 for (set in unique(resGO$result$query)){
@@ -491,7 +398,7 @@ p
 ggsave(file=paste0(output, "/06_Bulk_DayxPA_DEX_top10all_GOplot.svg"), plot = p)
 ```
 
-```{r, fig.width=15, fig.height=20}
+```{r, fig.width=15, fig.height=20, eval=F}
 plotlist = list()
 for (set in unique(resGO$result$query)){
   dat=resGO$result[which(resGO$result$query == set & resGO$result$source == "GO:BP"),]
@@ -510,7 +417,7 @@ ggsave(file=paste0(output, "/06_Bulk_DayxPA_DEX_top10_BP_GOplot.svg"), plot = p)
 ```
 
 
-```{r, fig.width=15, fig.height=20}
+```{r, fig.width=15, fig.height=20, eval=F}
 plotlist = list()
 for (set in unique(resGO$result$query)){
   dat=resGO$result[which(resGO$result$query == set & resGO$result$source == "TF"),]
@@ -531,17 +438,17 @@ ggsave(file=paste0(output, "/06_Bulk_DayxPA_DEX_top10_TF_GOplot.svg"), plot = p)
 
 # Trajectories over time top genes per comparison
 
-```{r plot top 10 DEX genes, fig.width=14, fig.height=21}
+```{r plot top 10 DEX genes, fig.width=15, fig.height=15}
 
 
-alle_restab <- apropos("restab_") # gibt alle wieder die restab beinhalten egal ob groß oder klein schreiben
-restab_nurTP0mM_und_Day0vs5 <- apropos("restab_", ignore.case = F) # berücksichtig groß und kleinschreibung, 
-restab_nur_Day0vs5  <- apropos("^restab_", ignore.case = F) # beginnt mit retab_ kleingeschreiben
+#alle_restab <- apropos("restab_Day") # gibt alle wieder die restab beinhalten egal ob groß oder klein schreiben
+#restab_nurTP0mM_und_Day0vs5 <- apropos("restab_", ignore.case = F) # berücksichtig groß und kleinschreibung, 
+#restab_nur_Day0vs5  <- apropos("^restab_", ignore.case = F) # beginnt mit retab_ kleingeschreiben
 restab_nur_TP0mM  <- apropos("TPrestab_", ignore.case = F) # Beinhaltet TPrestab
 
 
 topgenes=c()
-for(r in alle_restab){
+for(r in restab_nur_TP0mM){
   res <- get(r)
   topgenes <- c(topgenes, res$HGNC[1:10])
 }
@@ -549,11 +456,14 @@ for(r in alle_restab){
 topgenes <- unique(topgenes)
 topgenes <- sort(topgenes)
 
+my_comparisons <- list(c(5, 10), c(10, 17), c(14, 40), c(40,80))
+
+
 plotDEX= function(geneToPlot){
-  data.frame(reads = log_2cpm[which(geneinfo$hgnc==geneToPlot),], Group = SampleInfo$PAmM, Day = SampleInfo$Day) %>%
-    ggplot(aes(x = Group, y = reads, fill = Group)) +
-    geom_boxplot() +
-    theme_classic() + facet_wrap(~Day, nrow  = 1) +
+  data.frame(reads = log_2cpm[which(geneinfo$hgnc==geneToPlot),],
+             Day = as.factor(SampleInfo$Day)) -> Plotdata
+  Plotdata %>% ggboxplot(x = "Day", y = "reads", color="Day", add="jitter")+
+    theme_classic() +
     theme(axis.text.x = element_text(angle = 90, hjust = 1))+
     labs(x = "Day", y = "log2(CPM+1)", title = geneToPlot) -> p
   return(p)
@@ -572,14 +482,13 @@ ggpubr::ggexport(filename = paste0(output, "/06_Bulk_DEX_Siggenes_boxplots.pdf")
 
 dataplot <- log_2cpm[which(geneinfo$hgnc%in%topgenes),] %>% reshape2::melt()
 colnames(dataplot) <- c("gene","Sample", "reads")  
-dataplot$PAmM = SampleInfo[dataplot$Sample, "PAmM"]
 dataplot$Day = SampleInfo[dataplot$Sample, "Day"]
 dataplot$hgnc = hgnc$target[match(dataplot$gene, hgnc$input)]
 idx=is.na(dataplot$hgnc)
 dataplot$hgnc[idx] = dataplot$gene[idx]
 
-ggplot(dataplot, aes(x = Day, y = reads,col=PAmM, fill = PAmM)) +
-  geom_smooth(span=0.5) + scale_x_continuous(breaks=c(5,10,17,40,80))+
+ggplot(dataplot, aes(x = Day, y = reads)) +
+  geom_smooth(span=0.5) +geom_jitter()+ scale_x_continuous(breaks=c(5,10,17,40,80))+
   theme_classic() + facet_wrap(~hgnc) +
   theme(axis.text.x = element_text(angle = 90, hjust = 1))+
   labs(x = "Day", y = "log2(CPM+1)") -> p
@@ -591,19 +500,17 @@ ggsave(file=paste0(output, "/06_Bulk_DEX_Siggenes_lineplots.svg"), p)
 
 ## 16p11 genes over time
 
-
 ```{r, fig.width=7, fig.height=10}
 dataplot <- log_2cpm[which(geneinfo$hgnc%in%chr16p11_genes$Gene_symbol),] %>% reshape2::melt()
 colnames(dataplot) <- c("gene","Sample", "reads")  
-dataplot$PAmM = SampleInfo[dataplot$Sample, "PAmM"]
 dataplot$Batch = SampleInfo[dataplot$Sample, "Batch"]
 dataplot$Day = SampleInfo[dataplot$Sample, "Day"]
 dataplot$hgnc = hgnc$target[match(dataplot$gene, hgnc$input)]
 idx=is.na(dataplot$hgnc)
 dataplot$hgnc[idx] = dataplot$gene[idx]
 
-ggplot(dataplot, aes(x = Day, y = reads,col=PAmM, fill = PAmM)) +
-  geom_smooth(span=0.5) + scale_x_continuous(breaks=sort(unique(dataplot$Day)))+
+ggplot(dataplot, aes(x = Day, y = reads)) +
+  geom_smooth(span=0.5) +geom_jitter()+ scale_x_continuous(breaks=c(5,10,17,40,80))+
   theme_classic() + facet_wrap(~hgnc) +
   theme(axis.text.x = element_text(angle = 90, hjust = 1))+
   labs(x = "Day", y = "log2(CPM+1)") -> p
@@ -613,14 +520,17 @@ p
 ggsave(file=paste0(output, "/06_Bulk_DEX_chr16p11_lineplots.svg"), p)
 
 results<-data.frame(matrix(ncol=2, nrow=0))
+
 for(g in unique(dataplot$hgnc)){
   subdat<-dataplot[dataplot$hgnc == g, ]
-  res <- lme4::glmer(reads~Day*PAmM+(1|Batch), data = subdat)
+  res <- lme4::glmer(reads~poly(Day,3)+(1|Batch), data = subdat)
   res_stat <- car::Anova(res, type="3")
-  results<-rbind(results, c(g, res_stat$`Pr(>Chisq)`[4]))
+  results<-rbind(results, c(g, res_stat$`Pr(>Chisq)`[2]))
 }
 
-openxlsx2::write_xlsx(file=paste0(output, "/06_Bulk_DEX_chr16p11_stat_DayxmM.xlsx"), results)
+colnames(results) <- c("gene", "Day.Pvalue")
+
+openxlsx2::write_xlsx(file=paste0(output, "/06_Bulk_DEX_chr16p11_stat_Day.xlsx"), results)
 
 colnames(results) <- c("gene", "Pval")
 display_tab(results)
@@ -642,8 +552,8 @@ dataplot$hgnc = hgnc$target[match(dataplot$gene, hgnc$input)]
 idx=is.na(dataplot$hgnc)
 dataplot$hgnc[idx] = dataplot$gene[idx]
 
-ggplot(dataplot, aes(x = Day, y = reads,col=PAmM, fill = PAmM)) +
-  geom_smooth(span=0.5) + scale_x_continuous(breaks=sort(unique(dataplot$Day)))+
+ggplot(dataplot, aes(x = Day, y = reads)) +
+  geom_smooth(span=0.5) + geom_jitter()+ scale_x_continuous(breaks=sort(unique(dataplot$Day)))+
   theme_classic() + facet_wrap(~hgnc) +
   theme(axis.text.x = element_text(angle = 90, hjust = 1))+
   labs(x = "Day", y = "log2(CPM+1)") -> p
@@ -655,14 +565,16 @@ ggsave(file=paste0(output, "/06_Bulk_DEX_Kynurenine_lineplots.svg"), p)
 results<-data.frame(matrix(ncol=2, nrow=0))
 for(g in unique(dataplot$hgnc)){
   subdat<-dataplot[dataplot$hgnc == g, ]
-  res <- lme4::glmer(reads~Day*PAmM+(1|Batch), data = subdat)
+  res <- lme4::glmer(reads~poly(Day,3)+(1|Batch), data = subdat)
   res_stat <- car::Anova(res, type="3")
-  results<-rbind(results, c(g, res_stat$`Pr(>Chisq)`[4]))
+  results<-rbind(results, c(g, res_stat$`Pr(>Chisq)`[2]))
 }
 
-openxlsx2::write_xlsx(file=paste0(output, "/06_Bulk_DEX_Kynurenine_stat_DayxmM.xlsx"), results)
+colnames(results) <- c("gene", "Day.Pvalue")
 
-colnames(results) <- c("gene", "Pval")
+openxlsx2::write_xlsx(file=paste0(output, "/06_Bulk_DEX_Kynurenine_stat_Day.xlsx"), results)
+
+
 display_tab(results)
 
 
@@ -681,7 +593,7 @@ dataplot$hgnc = hgnc$target[match(dataplot$gene, hgnc$input)]
 idx=is.na(dataplot$hgnc)
 dataplot$hgnc[idx] = dataplot$gene[idx]
 
-ggplot(dataplot, aes(x = Day, y = reads,col=PAmM, fill = PAmM)) +
+ggplot(dataplot, aes(x = Day, y = reads)) +
   geom_smooth(span=0.5) +scale_x_continuous(breaks=sort(unique(dataplot$Day)))+
   theme_classic() + facet_wrap(~hgnc) +
   theme(axis.text.x = element_text(angle = 90, hjust = 1))+
@@ -694,14 +606,15 @@ ggsave(file=paste0(output, "/06_Bulk_DEX_Astrocytes_lineplots.svg"), p)
 results<-data.frame(matrix(ncol=2, nrow=0))
 for(g in unique(dataplot$hgnc)){
   subdat<-dataplot[dataplot$hgnc == g, ]
-  res <- lme4::glmer(reads~Day*PAmM+(1|Batch), data = subdat)
+  res <- lme4::glmer(reads~poly(Day,3)+(1|Batch), data = subdat)
   res_stat <- car::Anova(res, type="3")
-  results<-rbind(results, c(g, res_stat$`Pr(>Chisq)`[4]))
+  results<-rbind(results, c(g, res_stat$`Pr(>Chisq)`[2]))
 }
 
+
+colnames(results) <- c("gene", "Day.Pvalue")
 openxlsx2::write_xlsx(file=paste0(output, "/06_Bulk_DEX_Astrocyte_stat_DayxmM.xlsx"), results)
 
-colnames(results) <- c("gene", "Pval")
 display_tab(results)
 
 ```
@@ -723,7 +636,7 @@ dataplot$hgnc = hgnc$target[match(dataplot$gene, hgnc$input)]
 idx=is.na(dataplot$hgnc)
 dataplot$hgnc[idx] = dataplot$gene[idx]
 
-ggplot(dataplot, aes(x = Day, y = reads,col=PAmM, fill = PAmM)) +
+ggplot(dataplot, aes(x = Day, y = reads)) +
   geom_smooth(span=0.5) +scale_x_continuous(breaks=sort(unique(dataplot$Day)))+
   theme_classic() + facet_wrap(~hgnc) +
   theme(axis.text.x = element_text(angle = 90, hjust = 1))+
@@ -736,10 +649,13 @@ ggsave(file=paste0(output, plotoutputname), p)
 results<-data.frame(matrix(ncol=2, nrow=0))
 for(g in unique(dataplot$hgnc)){
   subdat<-dataplot[dataplot$hgnc == g, ]
-  res <- lme4::glmer(reads~Day*PAmM+(1|Batch), data = subdat)
+  res <- lme4::glmer(reads~poly(Day,3)+(1|Batch), data = subdat)
   res_stat <- car::Anova(res, type="3")
-  results<-rbind(results, c(g, res_stat$`Pr(>Chisq)`[4]))
+  results<-rbind(results, c(g, res_stat$`Pr(>Chisq)`[2]))
 }
+
+
+colnames(results) <- c("gene", "Day.Pvalue")
 
 openxlsx2::write_xlsx(file=paste0(output,xlsxoutputname), results)
 
@@ -748,18 +664,18 @@ display_tab(results)
 
 ```
 
-# WGCNA 
-
+# WGCNA 0mM PA only (WT only)
 
 
 ```{r fig.width=8, fig.height=6}
 library(org.Hs.eg.db)
 library(WGCNA)
 
-force.recalc = F
+force.recalc = T
 powers = c(seq(1,10,by=1), seq(12,20, by=2));
 
-datExpr <- t(counts(ddsMat, normalized=T))
+datExpr <- t(counts(ddsMat[,ddsMat@colData$PAmM=="0"], normalized=T))
+
 
 # expressed in more than 10% of samples 
 exprgenes = colSums(datExpr>0)>nrow(datExpr)*0.1
@@ -943,41 +859,96 @@ geneInfo$SFARI_genescore <- SFARI$gene.score[match(geneInfo$HGNC,SFARI$gene.symb
 geneInfo$SFARI_category <- SFARI$genetic.category[match(geneInfo$HGNC,SFARI$gene.symbol)]
 
 # save info
-openxlsx2::write_xlsx(geneInfo,file=paste0(output,'/geneInfoSigned.xlsx'))
+
 
 PCvalues=MEs
 ```
 
+## merge modules
 
-```{r}
-p = WGCNA::plotDendroAndColors(consTree, moduleColors[net$goodGenes], "Module colors", dendroLabels = FALSE, hang = 0.03, addGuide = TRUE, guideHang = 0.05,
+```{r fig.width=8, fig.height=12}
+par(cex = 0.9)
+plotEigengeneNetworks(PCvalues, "", 
+                      marDendro = c(0,4,1,4), 
+                      marHeatmap = c(4,5,1,2), 
+                      cex.lab = 0.8, 
+                      xLabelsAngle= 90)
+
+MEDissThres = 0.5
+
+
+merged_col<- mergeCloseModules(datExpr,moduleColors, 
+                               cutHeight = MEDissThres)
+
+ME <- as.data.frame(merged_col$newMEs)
+
+plotEigengeneNetworks(ME, "", 
+                      marDendro = c(0,4,1,4), 
+                      marHeatmap = c(4,5,1,2), 
+                      cex.lab = 0.8, 
+                      xLabelsAngle= 90)
+
+
+WGCNA::plotDendroAndColors(consTree, merged_col$colors, "Module colors", 
+                               dendroLabels = FALSE, hang = 0.03, 
+                               addGuide = TRUE, guideHang = 0.05,
                                main = paste0("dendrogram and module colors"))
 
-ggsave(file=paste0(output, "06_Bulk_DEX_WGCNA_Dendrocolplot.svg"))
+
+svg(paste0(output, "06_Bulk_DEX_WGCNA_Dendrocolplot.svg"))
+WGCNA::plotDendroAndColors(consTree, merged_col$colors, "Module colors", 
+                               dendroLabels = FALSE, hang = 0.03, 
+                               addGuide = TRUE, guideHang = 0.05,
+                               main = paste0("dendrogram and module colors"))
+
+dev.off()
+
+
+geneInfo$Module_color <- merged_col$colors
+
+
+openxlsx2::write_xlsx(geneInfo %>% 
+                        dplyr::select(GeneSymbol, HGNC,SFARI_genescore, SFARI_category, Module_color), 
+                      file=paste0(output,'/GeneInfoSigned.xlsx'))
 
 ```
 
+
+
 ```{r, fig.width=12, fig.height=12}
 ## Todo adjust 
-targets=colData(ddsMat) %>% as.data.frame()
+
+PCvalues = ME %>%  dplyr::select(-MEgrey)
+targets=colData(ddsMat[,ddsMat@colData$PAmM==0]) %>% as.data.frame()
 
 targes = targets[rownames(PCvalues),]
+PCvalues_norm=t(limma::removeBatchEffect(t(PCvalues), batch=targets$Batch))
 
-plot_df <- cbind(dplyr::select(targets, c(Day, PAmM, Batch)), PCvalues)
-plot_df <- reshape2::melt(plot_df, id.vars = c('Day', 'PAmM', "Batch"))
+
+plot_df <- cbind(dplyr::select(targets, c(Day, Batch)), PCvalues_norm)
+plot_df <- reshape2::melt(plot_df, id.vars = c('Day', "Batch"))
 
 colors <- sub('ME', '', as.character(levels(plot_df$variable)))
 names(colors)<- as.character(levels(plot_df$variable))
-p <- ggplot(plot_df, aes(x=Day, y=value, fill=variable, lty=PAmM)) +
-  geom_smooth(col="black", span=0.5) +scale_x_continuous(breaks=sort(unique(plot_df$Day)))+
-  RotatedAxis() + ylab('Module Eigengene') + xlab('') +
+
+
+p <- ggplot(plot_df, aes(x=Day, y=value, fill=variable, color=variable)) + 
+  geom_point(color="black")+
+  stat_summary(fun.y = mean, geom = 'smooth', color="black") + 
+  scale_x_continuous(breaks=sort(unique(plot_df$Day)))+
+  RotatedAxis() + 
+  ylab('Module Eigengene') + 
+  xlab('') +
   theme(
     axis.text.x=element_blank(),
     axis.ticks.x=element_blank(),
-  )+scale_fill_manual(values = colors)
+  )+scale_fill_manual(values = colors)+
+  scale_color_manual(values = colors)
 
-p <- p + facet_wrap(~variable, scales='free_x')+theme_classic()
+p <- p + facet_wrap(~variable, scales="fixed")
+#p<- p + stat_summary(fun.data = 'mean_sdl', mult = 1, geom = 'ribbon', alpha=0.5)
 
+p <- p + geom_smooth(span=0.5, lwd=2)
 p
 
 ggsave(filename = paste0(output, "/06_Bulk_DEX_WGCNA_plots.svg"), p)
@@ -987,27 +958,26 @@ ggsave(filename = paste0(output, "/06_Bulk_DEX_WGCNA_plots.svg"), p)
 
 
 ```{r, fig.width=6, fig.height=4}
+
 reslist = list()
+
+
 for(M in unique(plot_df$variable)){
   
   Mdata = plot_df[plot_df$variable==M,]
-  fit=lmer(value~PAmM*poly(Day,2)+(1|Batch), data = Mdata)
+  fit=lmer(value~poly(Day,3)+(1|Batch), data = Mdata)
   resfit = car::Anova(fit, type=3)%>% as.data.frame()
-  res = c(PAmM5_Day = resfit["PAmM:poly(Day, 2)", "Pr(>Chisq)"])
-  for(d in unique(Mdata$Day)){
-    fit=lmer(value~PAmM+(1|Batch), data = Mdata[Mdata$Day==d,])
-    resfit = car::Anova(fit, type=3)%>% as.data.frame()
-    resd = resfit["PAmM", "Pr(>Chisq)"]
-    names(resd) = paste0("D",d)
-    res = c(res, resd)
-  }
+  res = c(Day.pval = resfit["poly(Day, 3)", "Pr(>Chisq)"])
   
   reslist[[M]] <- res
   
 }
 
-wgcnastats <- do.call(rbind, reslist)
+wgcnastats <- do.call(rbind, reslist) %>% as.data.frame()
+
 rownames(wgcnastats) <- names(reslist)
+wgcnastats$Day.adjp <- p.adjust(wgcnastats$Day.pval, method = "b")
+
 openxlsx2::write_xlsx(wgcnastats, paste0(output, "06_DEX_Bulk_WGCNA_Stats.xlsx"),
                       row_names=T)
 
@@ -1017,6 +987,8 @@ openxlsx2::write_xlsx(wgcnastats, paste0(output, "06_DEX_Bulk_WGCNA_Stats.xlsx")
 ```{r, fig.width=12, fig.height=12}
 targets$Day_PA = paste0(targets$Day, "d_",targets$PAmM, "mMPA")
 targets$Day_PA <- factor(targets$Day_PA, levels=c("5d_0mMPA", "5d_5mMPA", "10d_0mMPA","10d_5mMPA", "17d_0mMPA", "17d_5mMPA","40d_0mMPA", "40d_5mMPA","80d_0mMPA",   "80d_5mMPA"))
+
+MEs<- ME
 
 Meandata = MEs %>% group_by(targets$Day_PA) %>% summarise_all(mean) %>% column_to_rownames("targets$Day_PA") %>% t()
 SDdata = MEs %>% group_by(targets$Day_PA) %>% summarise_all(sd)%>% column_to_rownames("targets$Day_PA") %>% t()
@@ -1035,11 +1007,13 @@ labeledHeatmap(Meandata, xLabels = colLabels,
 dev.off()
 ```
 
-#### WGCNA GO terms
+## WGCNA GO terms
 
 ```{r, fig.width=15, fig.height=20}
-genelist = split(names(net$colors) %>% getnames(), net$colors)
-gene_univers = names(net$colors) %>% getnames()
+
+net <- merged_col
+genelist = split(rownames(ddsMat)%>% getnames(), net$colors) 
+gene_univers = rownames(ddsMat)%>% getnames()
 
 
 names(genelist)
