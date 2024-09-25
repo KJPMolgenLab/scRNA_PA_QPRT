@@ -366,7 +366,7 @@ div.tocify {
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-report" data-toggle="collapse" data-target="#workflowr-report">
 <span class="glyphicon glyphicon-list" aria-hidden="true"></span>
-workflowr <span class="glyphicon glyphicon-ok text-success"
+workflowr <span class="glyphicon glyphicon-exclamation-sign text-danger"
 aria-hidden="true"></span>
 </button>
 </p>
@@ -377,8 +377,8 @@ aria-hidden="true"></span>
 </li>
 <li>
 <a data-toggle="tab" href="#checks"> Checks <span
-class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>
-</a>
+class="glyphicon glyphicon-exclamation-sign text-danger"
+aria-hidden="true"></span> </a>
 </li>
 <li>
 <a data-toggle="tab" href="#versions">Past versions</a>
@@ -387,13 +387,13 @@ class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2024-05-14
+<strong>Last updated:</strong> 2024-09-25
 </p>
 <p>
 <strong>Checks:</strong> <span
-class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 7
+class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 6
 <span class="glyphicon glyphicon-exclamation-sign text-danger"
-aria-hidden="true"></span> 0
+aria-hidden="true"></span> 1
 </p>
 <p>
 <strong>Knit directory:</strong> <code>files/</code> <span
@@ -503,30 +503,56 @@ run.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongFilepathsstrongrelative">
-<span class="glyphicon glyphicon-ok text-success"
-aria-hidden="true"></span> <strong>File paths:</strong> relative </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongFilepathsstrongabsolute">
+<span class="glyphicon glyphicon-exclamation-sign text-danger"
+aria-hidden="true"></span> <strong>File paths:</strong> absolute </a>
 </p>
 </div>
-<div id="strongFilepathsstrongrelative" class="panel-collapse collapse">
+<div id="strongFilepathsstrongabsolute" class="panel-collapse collapse">
 <div class="panel-body">
-<p>Great job! Using relative paths to the files within your workflowr
-project makes it easier to run your code on other machines.</p>
+<p>
+Using absolute paths to the files within your workflowr project makes it
+difficult for you and others to run your code on a different machine.
+Change the absolute path(s) below to the suggested relative path(s) to
+make your code more reproducible.
+</p>
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th style="text-align:left;">
+absolute
+</th>
+<th style="text-align:left;">
+relative
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+/files/output/05_Bulk_Preprocessing/05_Bulk_Preprocessing_PCA.svg
+</td>
+<td style="text-align:left;">
+output/05_Bulk_Preprocessing/05_Bulk_Preprocessing_PCA.svg
+</td>
+</tr>
+</tbody>
+</table>
 </div>
 </div>
 </div>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomKJPMolgenLabscRNAPAQPRTtree0cb9fa06301a83f8876660e6cd57c76248b3c8a0targetblank0cb9fa0a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomKJPMolgenLabscRNAPAQPRTtree83516671ef38f6356759b8c90c2d6f7af7b67e53targetblank8351667a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/KJPMolgenLab/scRNA_PA_QPRT/tree/0cb9fa06301a83f8876660e6cd57c76248b3c8a0" target="_blank">0cb9fa0</a>
+<a href="https://github.com/KJPMolgenLab/scRNA_PA_QPRT/tree/83516671ef38f6356759b8c90c2d6f7af7b67e53" target="_blank">8351667</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomKJPMolgenLabscRNAPAQPRTtree0cb9fa06301a83f8876660e6cd57c76248b3c8a0targetblank0cb9fa0a"
+id="strongRepositoryversionstrongahrefhttpsgithubcomKJPMolgenLabscRNAPAQPRTtree83516671ef38f6356759b8c90c2d6f7af7b67e53targetblank8351667a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -536,7 +562,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/KJPMolgenLab/scRNA_PA_QPRT/tree/0cb9fa06301a83f8876660e6cd57c76248b3c8a0" target="_blank">0cb9fa0</a>.
+<a href="https://github.com/KJPMolgenLab/scRNA_PA_QPRT/tree/83516671ef38f6356759b8c90c2d6f7af7b67e53" target="_blank">8351667</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -554,14 +580,11 @@ Ignored files:
     Ignored:    .Rhistory
     Ignored:    .Rprofile
     Ignored:    .Rproj.user/
-    Ignored:    analysis/figure/
-    Ignored:    output/05_Bulk_Preprocessing/
 
 Untracked files:
     Untracked:  .bashrc
     Untracked:  .nuvolos/
     Untracked:  ConsensusTOM-block.1.rda
-    Untracked:  analysis/04b_GroupAnalysisMergedClusters_scRNA.Rmd
     Untracked:  analysis/08_GABA_subtypes.Rmd
     Untracked:  data/AstrocyteGenes.xlsx
     Untracked:  data/Bulk_dds_matrix.rds
@@ -577,12 +600,17 @@ Untracked files:
     Untracked:  data/QC_dataClustered.filtTyped.rds
     Untracked:  data/QC_dataClustered.filtTypedTraj.rds
     Untracked:  data/QC_dataFinal.rds
+    Untracked:  data/SFARI-Gene_genes_03-28-2024release_07-16-2024export.csv
     Untracked:  data/Sample Allocation P2023-224-LEX-LB.txt
     Untracked:  data/SummarizedCellTypes.xlsx
     Untracked:  data/alldata.rds
     Untracked:  data/chr16p11.xlsx
     Untracked:  data/chr16p11_orig.xlsx
+    Untracked:  data/genelist/
     Untracked:  data/tmp.xlsx
+    Untracked:  output/04_Biostat/06_Bulk_DayxPA_DEX_GO_results.xlsx
+    Untracked:  output/04_Biostat/06_Bulk_DayxPA_DEX_LFC_results.xlsx
+    Untracked:  output/04_Biostat/06_Bulk_DayxPA_DEX_SFARIenrichment.xlsx
     Untracked:  output/04_Biostat/Biostat_DEG_Astcells.xlsx
     Untracked:  output/04_Biostat/Biostat_DEG_Ex_Ncells.xlsx
     Untracked:  output/04_Biostat/Biostat_DEG_Ex_Pcells.xlsx
@@ -597,23 +625,55 @@ Untracked files:
     Untracked:  output/04_Biostat/Biostat_DEG_MergedClusters_In_Pcells.xlsx
     Untracked:  output/04_Biostat/Biostat_DEG_MergedClusters_ccRGcells.xlsx
     Untracked:  output/04_Biostat/Biostat_DEG_MergedClusters_o_RGcells.xlsx
+    Untracked:  output/04_Biostat/Biostat_DEG_SFARI.xlsx
+    Untracked:  output/04_Biostat/Biostat_DEG_SFARI_Cluster.xlsx
+    Untracked:  output/04_Biostat/Biostat_DEG_SFARI_ClusterMerged.xlsx
     Untracked:  output/04_Biostat/Biostat_DEG_ccRGcells.xlsx
     Untracked:  output/04_Biostat/Biostat_DEG_o_RGcells.xlsx
     Untracked:  output/04_Biostat/Biostat_clusterMergedFreq.xslsx
+    Untracked:  output/05_Bulk_Preprocessing/
     Untracked:  output/06_Bulk_DEX/06_Bulk_DEX_Astrocytes_lineplots.svg
+    Untracked:  output/06_Bulk_DEX/06_Bulk_DEX_Kynurenine_stat_Day.xlsx
     Untracked:  output/06_Bulk_DEX/06_Bulk_DEX_Modules_BP_GOplot.svg
     Untracked:  output/06_Bulk_DEX/06_Bulk_DEX_Modules_GOplot.svg
     Untracked:  output/06_Bulk_DEX/06_Bulk_DEX_Modules_TF_GOplot.svg
+    Untracked:  output/06_Bulk_DEX/06_Bulk_DEX_SFARIenrichment.xlsx
+    Untracked:  output/06_Bulk_DEX/06_Bulk_DEX_SelectedGenes_lineplots.svg
+    Untracked:  output/06_Bulk_DEX/06_Bulk_DEX_SelectedGenes_lineplots.xlsx
+    Untracked:  output/06_Bulk_DEX/06_Bulk_DEX_SelectedGenes_stat_DayxmM.xlsx
+    Untracked:  output/06_Bulk_DEX/06_Bulk_DEX_Siggenes_lineplots_copy_1.svg
+    Untracked:  output/06_Bulk_DEX/06_Bulk_DEX_WGCNA_BP_GOplot.svg
     Untracked:  output/06_Bulk_DEX/06_Bulk_DEX_WGCNA_Dendrocolplot.svg
+    Untracked:  output/06_Bulk_DEX/06_Bulk_DEX_WGCNA_GOplot.svg
+    Untracked:  output/06_Bulk_DEX/06_Bulk_DEX_WGCNA_TF_GOplot.svg
     Untracked:  output/06_Bulk_DEX/06_Bulk_DEX_WGCNA_plots.svg
+    Untracked:  output/06_Bulk_DEX/06_Bulk_DEX_chr16p11_stat_Day.xlsx
+    Untracked:  output/06_Bulk_DEX/06_Bulk_DayxPA_DEX_DxPspec.Pval_results.xlsx
+    Untracked:  output/06_Bulk_DEX/06_Bulk_DayxPA_DEX_GO_results.xlsx
+    Untracked:  output/06_Bulk_DEX/06_Bulk_DayxPA_DEX_LFC_results.xlsx
+    Untracked:  output/06_Bulk_DEX/06_Bulk_DayxPA_DEX_SFARIenrichment.xlsx
+    Untracked:  output/06_Bulk_DEX/06_Bulk_DayxPA_DEX_top10_BP_GOplot.svg
+    Untracked:  output/06_Bulk_DEX/06_Bulk_DayxPA_DEX_top10_TF_GOplot.svg
+    Untracked:  output/06_Bulk_DEX/06_Bulk_DayxPA_DEX_top10all_GOplot.svg
+    Untracked:  output/06_Bulk_DEX/06_Bulk_Timepoints_DEX_GO_results.xlsx
+    Untracked:  output/06_Bulk_DEX/06_Bulk_Timepoints_DEX_SFARIenrichment.xlsx
+    Untracked:  output/06_Bulk_DEX/06_Bulk_Timepoints_DEX_top10_BP_GOplot.svg
+    Untracked:  output/06_Bulk_DEX/06_Bulk_Timepoints_DEX_top10_TF_GOplot.svg
+    Untracked:  output/06_Bulk_DEX/06_Bulk_Timepoints_DEX_top10all_GOplot.svg
+    Untracked:  output/06_Bulk_DEX/06_Bulk_WGCNA_SFARIenrichment.xlsx
+    Untracked:  output/06_Bulk_DEX/06_Bulk_timpoints_DEX_LFC_results.xlsx
     Untracked:  output/06_Bulk_DEX/06_DEX_Bulk_WGCNA_GO_Terms.xlsx
     Untracked:  output/06_Bulk_DEX/06_DEX_Bulk_WGCNA_Stats.xlsx
     Untracked:  output/06_Bulk_DEX/06_DEX_WGCNA_labeled_Heatmap.svg
-    Untracked:  output/06_Bulk_DEX/geneInfoSigned.csv
+    Untracked:  output/06_Bulk_DEX/GeneInfoSigned.xlsx
+    Untracked:  output/06_Bulk_DEX/geneInfoSigned.xlsx
     Untracked:  output/06_Bulk_DEX/net.rds
     Untracked:  output/06_Bulk_DEX/powertable.rds
     Untracked:  output/07_Bulk_Deconv/07_DeconVol_Bulk_StatTimecourseDiff_KnCelltypes.xlsx
+    Untracked:  output/07_Bulk_Deconv/07_DeconVol_Bulk_StatTimecourseDiff_clusters.svg
     Untracked:  output/07_Bulk_Deconv/07_DeconVol_Bulk_StatTimecourseDiff_clusters.xlsx
+    Untracked:  output/07_Bulk_Deconv/07_DeconVol_Bulk_StatTimecourseDiff_clusters_merged.svg
+    Untracked:  output/07_Bulk_Deconv/07_DeconVol_Bulk_StatTimecourseDiff_clusters_merged.xlsx
     Untracked:  output/07_Bulk_Deconv/07_DeconVol_Bulk_StatTimecourseDiff_clusters_merged.xslx
     Untracked:  output/07_Bulk_Deconv/07_DeconVol_Bulk_propHeatmap_clusters_merged.svg
     Untracked:  output/07_Bulk_Deconv/07_DeconVol_Bulk_timeplots_clusters_batchcompare.svg
@@ -621,13 +681,14 @@ Untracked files:
     Untracked:  output/07_Bulk_Deconv/07_DeconVol_Bulk_timeplots_clusters_batchinline.svg
     Untracked:  output/07_Bulk_Deconv/07_DeconVol_Bulk_timeplots_clusters_batchinline_merged.svg
     Untracked:  output/07_Bulk_Deconv/07_DeconVol_Bulk_timeplots_clusters_merged.svg
+    Untracked:  output/08_GABA_subtypes/
     Untracked:  output/Microglia_WGCNA_Dendrocolplot.svg
     Untracked:  output/WGCNA_labeled_Heatmap.svg
     Untracked:  output/geneInfoSigned.csv
 
 Unstaged changes:
     Modified:   .gitignore
-    Modified:   analysis/04_GroupAnalysis_scRNA.Rmd
+    Modified:   README.md
     Modified:   analysis/06_DEX_Bulk.Rmd
     Modified:   analysis/07_DeconVol_Bulk.Rmd
     Modified:   analysis/index.Rmd
@@ -635,6 +696,7 @@ Unstaged changes:
     Modified:   output/02_Clustering/Cluster_markers.xls
     Modified:   output/03_Trajectories/Trajectories_All.svg
     Modified:   output/03_Trajectories/Trajectories_Lineages.svg
+    Modified:   output/04_Biostat/Biostat_Comparelineages.svg
     Modified:   output/04_Biostat/Biostat_DEG_GO_Cluster.xlsx
     Modified:   output/04_Biostat/Biostat_DEG_GO_clusters.svg
     Modified:   output/04_Biostat/Biostat_DEG_allcells.xlsx
@@ -720,6 +782,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/KJPMolgenLab/scRNA_PA_QPRT/blob/83516671ef38f6356759b8c90c2d6f7af7b67e53/analysis/05_Preprocessing_Bulk.Rmd" target="_blank">8351667</a>
+</td>
+<td>
+Andreas Chiocchetti
+</td>
+<td>
+2024-09-25
+</td>
+<td>
+wflow_publish("./analysis/05_Preprocessing_Bulk.Rmd")
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/KJPMolgenLab/scRNA_PA_QPRT/8b66e8bec67005bc31d4df5fd75306151186d7c2/docs/05_Preprocessing_Bulk.html" target="_blank">8b66e8b</a>
+</td>
+<td>
+Andreas Chiocchetti
+</td>
+<td>
+2024-05-14
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 html
@@ -3997,18 +4093,18 @@ Andreas Chiocchetti
 <div id="before-cleaning" class="section level3">
 <h3>before cleaning</h3>
 <ul>
-<li>Average reads per samples: 6 197 188</li>
-<li>Standard deviation reads per samples: 1 155 838</li>
+<li>Average reads per samples: 5 953 509</li>
+<li>Standard deviation reads per samples: 986 339.7</li>
 <li>Total genes mapped: 28 395</li>
 </ul>
 </div>
 <div id="after-cleaning" class="section level3">
 <h3>after cleaning</h3>
 <ul>
-<li>Average reads per samples: 5 693 841</li>
-<li>Standard deviation reads per samples: 143 294.9</li>
-<li>Genes removed due to low reads: 15 210</li>
-<li>Total genes included after filtering: 13 185</li>
+<li>Average reads per samples: 5 469 357</li>
+<li>Standard deviation reads per samples: 130 306.9</li>
+<li>Genes removed due to low reads: 15 294</li>
+<li>Total genes included after filtering: 13 101</li>
 </ul>
 </div>
 <div id="clustering" class="section level2">
@@ -4231,7 +4327,7 @@ Andreas Chiocchetti
 </div>
 <div id="pca-and-mds" class="section level2">
 <h2>PCA and MDS</h2>
-<p><img src="figure/05_Preprocessing_Bulk.Rmd/PCA_MDS-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="figure/05_Preprocessing_Bulk.Rmd/PCA_MDS-1.png" width="768" style="display: block; margin: auto;" /></p>
 <p>
 <button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-PCA_MDS-1">
 Past versions of PCA_MDS-1.png
@@ -4313,88 +4409,6 @@ Andreas Chiocchetti
 </table>
 </div>
 </div>
-<p><img src="figure/05_Preprocessing_Bulk.Rmd/PCA_MDS-2.png" width="672" style="display: block; margin: auto;" /></p>
-<p>
-<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-PCA_MDS-2">
-Past versions of PCA_MDS-2.png
-</button>
-</p>
-<div id="fig-PCA_MDS-2" class="collapse">
-<div class="table-responsive">
-<table class="table table-condensed table-hover">
-<thead>
-<tr>
-<th>
-Version
-</th>
-<th>
-Author
-</th>
-<th>
-Date
-</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>
-<a href="https://github.com/KJPMolgenLab/scRNA_PA_QPRT/blob/5f61e45ff20ef4c03a03df7eb1c4c122c4d56101/docs/figure/05_Preprocessing_Bulk.Rmd/PCA_MDS-2.png" target="_blank">5f61e45</a>
-</td>
-<td>
-Andreas Chiocchetti
-</td>
-<td>
-2024-05-06
-</td>
-</tr>
-<tr>
-<td>
-<a href="https://github.com/KJPMolgenLab/scRNA_PA_QPRT/blob/8963c8bff1bb9670e7597806d4a4954a1bdcd5b3/docs/figure/05_Preprocessing_Bulk.Rmd/PCA_MDS-2.png" target="_blank">8963c8b</a>
-</td>
-<td>
-Andreas Chiocchetti
-</td>
-<td>
-2024-02-12
-</td>
-</tr>
-<tr>
-<td>
-<a href="https://github.com/KJPMolgenLab/scRNA_PA_QPRT/blob/d6ec67131eed43d151e16b238dd56a9776546180/docs/figure/05_Preprocessing_Bulk.Rmd/PCA_MDS-2.png" target="_blank">d6ec671</a>
-</td>
-<td>
-Andreas Chiocchetti
-</td>
-<td>
-2024-02-12
-</td>
-</tr>
-<tr>
-<td>
-<a href="https://github.com/KJPMolgenLab/scRNA_PA_QPRT/blob/5827dff088cf16cfc6208ffc470f6a60e4cb15ec/docs/figure/05_Preprocessing_Bulk.Rmd/PCA_MDS-2.png" target="_blank">5827dff</a>
-</td>
-<td>
-Andreas Chiocchetti
-</td>
-<td>
-2024-01-13
-</td>
-</tr>
-<tr>
-<td>
-<a href="https://github.com/KJPMolgenLab/scRNA_PA_QPRT/blob/f206c289f1dda0185da1dcbfdc067a262aba4279/docs/figure/05_Preprocessing_Bulk.Rmd/PCA_MDS-2.png" target="_blank">f206c28</a>
-</td>
-<td>
-Andreas Chiocchetti
-</td>
-<td>
-2024-01-11
-</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
@@ -4458,51 +4472,53 @@ loaded via a namespace (and not attached):
  [28] gfonts_0.2.0            svglite_2.1.3           parallelly_1.37.1      
  [31] httpcode_0.3.0          rstudioapi_0.16.0       generics_0.1.3         
  [34] shape_1.4.6.1           ica_1.0-3               spatstat.random_3.2-3  
- [37] zip_2.3.1               Matrix_1.6-5            fansi_1.0.6            
- [40] abind_1.4-5             lifecycle_1.0.4         whisker_0.4.1          
- [43] yaml_2.3.8              SparseArray_1.2.2       Rtsne_0.17             
- [46] grid_4.3.1              promises_1.3.0          crayon_1.5.2           
- [49] mitml_0.4-5             miniUI_0.1.1.1          lattice_0.22-6         
- [52] cowplot_1.1.3           pillar_1.9.0            boot_1.3-30            
- [55] future.apply_1.11.2     codetools_0.2-20        pan_1.9                
- [58] leiden_0.4.3.1          glue_1.7.0              getPass_0.2-4          
- [61] fontLiberation_0.1.0    data.table_1.15.4       vctrs_0.6.5            
- [64] png_0.1-8               spam_2.10-0             gtable_0.3.4           
- [67] cachem_1.0.8            xfun_0.43               S4Arrays_1.2.0         
- [70] mime_0.12               survival_3.5-8          iterators_1.0.14       
- [73] fitdistrplus_1.1-11     ROCR_1.0-11             nlme_3.1-164           
- [76] fontquiver_0.2.1        RcppAnnoy_0.0.22        rprojroot_2.0.4        
- [79] bslib_0.7.0             irlba_2.3.5.1           KernSmooth_2.23-22     
- [82] rpart_4.1.23            colorspace_2.1-0        nnet_7.3-19            
- [85] tidyselect_1.2.1        processx_3.8.4          curl_5.2.1             
- [88] compiler_4.3.1          chron_2.3-61            git2r_0.33.0           
- [91] glmnet_4.1-8            HardyWeinberg_1.7.8     flextable_0.9.5        
- [94] mice_3.16.0             xml2_1.3.6              fontBitstreamVera_0.1.1
- [97] DelayedArray_0.28.0     plotly_4.10.4           scales_1.3.0           
-[100] lmtest_0.9-40           callr_3.7.6             digest_0.6.35          
-[103] goftest_1.2-3           spatstat.utils_3.0-4    minqa_1.2.6            
-[106] rmarkdown_2.26          XVector_0.42.0          htmltools_0.5.8.1      
-[109] pkgconfig_2.0.3         lme4_1.1-35.2           highr_0.10             
-[112] fastmap_1.1.1           rlang_1.1.3             htmlwidgets_1.6.4      
-[115] shiny_1.8.1.1           farver_2.1.1            jquerylib_0.1.4        
-[118] zoo_1.8-12              jsonlite_1.8.8          BiocParallel_1.34.2    
-[121] magrittr_2.0.3          GenomeInfoDbData_1.2.11 dotCall64_1.1-1        
-[124] patchwork_1.2.0         munsell_0.5.1           Rcpp_1.0.12            
-[127] gdtools_0.3.7           viridis_0.6.5           reticulate_1.36.0      
-[130] stringi_1.8.3           zlibbioc_1.48.0         MASS_7.3-60.0.1        
-[133] plyr_1.8.9              parallel_4.3.1          listenv_0.9.1          
-[136] ggrepel_0.9.5           deldir_2.0-4            splines_4.3.1          
-[139] tensor_1.5              hms_1.1.3               locfit_1.5-9.9         
-[142] ps_1.7.6                uuid_1.2-0              igraph_2.0.3           
-[145] spatstat.geom_3.2-9     RcppHNSW_0.6.0          reshape2_1.4.4         
-[148] crul_1.4.2              evaluate_0.23           nloptr_2.0.3           
-[151] tzdb_0.4.0              foreach_1.5.2           httpuv_1.6.15          
-[154] RANN_2.6.1              openssl_2.1.1           polyclip_1.10-6        
-[157] future_1.33.2           scattermore_1.2         broom_1.0.5            
-[160] xtable_1.8-4            RSpectra_0.16-1         Rsolnp_1.16            
-[163] later_1.3.2             viridisLite_0.4.2       ragg_1.3.0             
-[166] truncnorm_1.0-9         writexl_1.5.0           cluster_2.1.6          
-[169] timechange_0.3.0        globals_0.16.3         </code></pre>
+ [37] car_3.1-2               zip_2.3.1               Matrix_1.6-5           
+ [40] fansi_1.0.6             abind_1.4-5             lifecycle_1.0.4        
+ [43] whisker_0.4.1           yaml_2.3.8              carData_3.0-5          
+ [46] SparseArray_1.2.2       Rtsne_0.17              grid_4.3.1             
+ [49] promises_1.3.0          crayon_1.5.2            mitml_0.4-5            
+ [52] miniUI_0.1.1.1          lattice_0.22-6          cowplot_1.1.3          
+ [55] pillar_1.9.0            boot_1.3-30             future.apply_1.11.2    
+ [58] codetools_0.2-20        pan_1.9                 leiden_0.4.3.1         
+ [61] glue_1.7.0              getPass_0.2-4           fontLiberation_0.1.0   
+ [64] data.table_1.15.4       vctrs_0.6.5             png_0.1-8              
+ [67] spam_2.10-0             gtable_0.3.4            cachem_1.0.8           
+ [70] xfun_0.43               S4Arrays_1.2.0          mime_0.12              
+ [73] survival_3.5-8          iterators_1.0.14        fitdistrplus_1.1-11    
+ [76] ROCR_1.0-11             nlme_3.1-164            fontquiver_0.2.1       
+ [79] RcppAnnoy_0.0.22        rprojroot_2.0.4         bslib_0.7.0            
+ [82] irlba_2.3.5.1           KernSmooth_2.23-22      rpart_4.1.23           
+ [85] colorspace_2.1-0        nnet_7.3-19             tidyselect_1.2.1       
+ [88] processx_3.8.4          curl_5.2.1              compiler_4.3.1         
+ [91] chron_2.3-61            git2r_0.33.0            glmnet_4.1-8           
+ [94] HardyWeinberg_1.7.8     flextable_0.9.5         mice_3.16.0            
+ [97] xml2_1.3.6              fontBitstreamVera_0.1.1 DelayedArray_0.28.0    
+[100] plotly_4.10.4           scales_1.3.0            lmtest_0.9-40          
+[103] callr_3.7.6             digest_0.6.35           goftest_1.2-3          
+[106] spatstat.utils_3.0-4    minqa_1.2.6             rmarkdown_2.26         
+[109] XVector_0.42.0          htmltools_0.5.8.1       pkgconfig_2.0.3        
+[112] lme4_1.1-35.2           highr_0.10              fastmap_1.1.1          
+[115] rlang_1.1.3             htmlwidgets_1.6.4       shiny_1.8.1.1          
+[118] farver_2.1.1            jquerylib_0.1.4         zoo_1.8-12             
+[121] jsonlite_1.8.8          BiocParallel_1.34.2     magrittr_2.0.3         
+[124] GenomeInfoDbData_1.2.11 dotCall64_1.1-1         patchwork_1.2.0        
+[127] munsell_0.5.1           Rcpp_1.0.12             gdtools_0.3.7          
+[130] viridis_0.6.5           reticulate_1.36.0       stringi_1.8.3          
+[133] zlibbioc_1.48.0         MASS_7.3-60.0.1         plyr_1.8.9             
+[136] parallel_4.3.1          listenv_0.9.1           ggrepel_0.9.5          
+[139] deldir_2.0-4            splines_4.3.1           tensor_1.5             
+[142] hms_1.1.3               locfit_1.5-9.9          ps_1.7.6               
+[145] ggpubr_0.6.0            uuid_1.2-0              igraph_2.0.3           
+[148] spatstat.geom_3.2-9     ggsignif_0.6.4          RcppHNSW_0.6.0         
+[151] reshape2_1.4.4          crul_1.4.2              evaluate_0.23          
+[154] nloptr_2.0.3            tzdb_0.4.0              foreach_1.5.2          
+[157] httpuv_1.6.15           RANN_2.6.1              openssl_2.1.1          
+[160] polyclip_1.10-6         future_1.33.2           scattermore_1.2        
+[163] broom_1.0.5             xtable_1.8-4            RSpectra_0.16-1        
+[166] rstatix_0.7.2           Rsolnp_1.16             later_1.3.2            
+[169] viridisLite_0.4.2       ragg_1.3.0              truncnorm_1.0-9        
+[172] writexl_1.5.0           cluster_2.1.6           timechange_0.3.0       
+[175] globals_0.16.3         </code></pre>
 </div>
 </div>
 
