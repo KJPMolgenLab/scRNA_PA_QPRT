@@ -41,9 +41,11 @@ output= paste0("output/05_Bulk_Preprocessing")
 dir.create(output, showWarnings = FALSE)
 
 filetarget <- "./data/Bulkdata_Countmatrix.rds"
+
 Countdata <- readRDS(filetarget)
 
 Ntot= nrow(Countdata)
+
 
 #merge non unique annotations
 if(length(unique(rownames(Countdata))) != Ntot){
@@ -103,7 +105,6 @@ SampleInfo$reads_per_sample = colSums(Countdata)
 ```
 
 ```{r display data}
-
 display_tab(head(Countdata))
 display_tab(SampleInfo)
 ```
@@ -142,6 +143,14 @@ plot(density(log2(rowMeans(Countdata))), main="distribution of gene expression",
      xlab="mean log2(counts +1)")
 ```
 
+```{r only 0mM PA}
+
+Countdata <- Countdata[,SampleInfo$PAmM==0]
+SampleInfo <- SampleInfo[SampleInfo$PAmM==0,]
+
+```
+
+
 
 ```{r clean and plot_counts, fig.height=5, fig.width=8}
 # remove genes wich were not detected in at least 25% of the samples 
@@ -151,7 +160,7 @@ Countdata_cl = Countdata[keeperidx, ]
 
 rowdescription = rowdescription[row.names(Countdata_cl),]
 
-fullmodel = as.formula("~Day+PAmM")
+fullmodel = as.formula("~Day")
 
 ddsMat <- DESeqDataSetFromMatrix(countData = Countdata_cl,
                                  colData = SampleInfo,
@@ -211,7 +220,7 @@ rownames(cpm.sel.trans)=rownames(SampleInfo)
 
 distance = dist(cpm.sel.trans)
 hc = stats::hclust(distance, method="ward.D2")
-cutN=10 #number of different conditions (2xPA, 5xDay)
+cutN=5 #number of different conditions (2xPA, 5xDay)
 clusters = cutree(hc, k=cutN)
 Colors=sample(jetcolors(cutN))[clusters]
 
@@ -224,7 +233,7 @@ Plotdata=data.frame(Rows=addRow, numRow = numRow, Cols = SampleInfo$Col,
                     Group=clusters, Colors=Colors)
 
 par(mar=c(15,3,5,3))
-plot(as.dendrogram(hc), main=paste("Similairtiy by gene expression, guessed",cutN,"clusters"), cex=0.7)
+plot(as.dendrogram(hc), main=paste("Similarity by gene expression, guessed",cutN,"clusters"), cex=0.7)
 colored_dots(colors = Colors, dend = as.dendrogram(hc), rowLabels = "cluster")
 
 ```
@@ -291,7 +300,7 @@ pheatmap(sampleDistMatrix,
 
 ## PCA and MDS
 
-```{r PCA_MDS}
+```{r PCA_MDS, fig.width=8, fig.height=4}
 
 # PCA
 gpca <- glmpca(t(cpm.sel.trans), L = 2)
@@ -306,12 +315,18 @@ rownames(gpca.dat) = rownames(SampleInfo)
 mds = as.data.frame(SampleInfo) %>% cbind(cmdscale(distance))
 
 
-ggplot(gpca.dat, aes(x = dim1, y = dim2, color = Day, 
-                     shape = PAmM)) +
-            geom_point(size = 2)  + ggtitle("PCA with log2 counts")
+ppca <- ggplot(gpca.dat, aes(x = dim1, y = dim2, color = as.factor(Day), pch=Batch)) +
+            geom_point(size = 2)  + ggtitle("PCA with log2 counts")+theme_classic()
 
-ggplot(mds, aes(x = `1`, y = `2`, color = Day, shape = PAmM)) +
-            geom_point(size = 2)  + ggtitle("MDS with log2 counts")
+pmds <- ggplot(mds, aes(x = `1`, y = `2`, color = as.factor(Day), pch=Batch)) +
+            geom_point(size = 2)  + ggtitle("MDS with log2 counts")+theme_classic()
+
+
+pcmb <- ggpubr::ggarrange(ppca,pmds,common.legend = T, legend = "bottom")
+
+pcmb
+
+ggsave("/files/output/05_Bulk_Preprocessing/05_Bulk_Preprocessing_PCA.svg", pcmb)
 
 saveRDS(ddsMat, file=paste0("./data/Bulk_dds_matrix.rds"))
 ```
