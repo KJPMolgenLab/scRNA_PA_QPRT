@@ -50,6 +50,8 @@ Dark8 = RColorBrewer::brewer.pal(8, "Dark2")
 output= paste0("output/06_Bulk_DEX/")
 dir.create(output, showWarnings = F)
 source("code/custom_functions.R")
+
+
 ddsMat <- readRDS("data/Bulk_dds_matrix.rds")
 ddsMat <- ddsMat[,ddsMat$PAmM==0]
 
@@ -69,48 +71,15 @@ hgnc=gconvert(query=as.numeric(rownames(ddsMat)),
               target = "HGNC")
 
 
-
-```
-
-# Differential gene expression 
-
-```{r analyze DEX, eval=FALSE}
-## comparisons against 0MM PA
-PA=levels(SampleInfo$PAmM)
-Days=c(sort(unique(SampleInfo$Day)))
-
-p = 0
-d = Days[1]
-target = "PAmM"
-randomeffect = "Batch"
-
 geneinfo = rowData(ddsMat) %>% as.data.frame()
 geneinfo$entrez_gene = rownames(geneinfo)
 geneinfo$hgnc[is.na(geneinfo$hgnc)] <- geneinfo$entrez_gene[is.na(geneinfo$hgnc)]
 
-for(d in Days){
-  Dayfilter = SampleInfo$Day == d
-  Set = rownames(SampleInfo)[Dayfilter]
-  lab = paste("restab", "Day", d,"0vs5mM_PA",sep="_")
-  print(lab)
-  res <- comparison(dds_object = ddsMat, 
-                    samples = Set, 
-                    target = target, 
-                    randomeffect = randomeffect)
-  res$HGNC = geneinfo[match(as.character(rownames(res)), as.character(rownames(geneinfo))), "hgnc"]
-  assign(lab, res)
-}
-
-#Lists elements are written to individual worksheets, using list names as sheet names if available
-l <- list(base::mget(apropos("restab_")))[[1]]
-names(l) = gsub("restab_", "", names(l)) %>% gsub("Day_5", "Day_05",.)
-l = l[sort(names(l))]
-openxlsx2::write_xlsx(l, file=paste0(output, "06_Bulk_DEX_LFC_results.xlsx"), row_names=T )
+geneuniverses <- geneinfo$hgnc
 
 ```
 
-
-# Differential gene expression between timepoints 0mM only 
+#  Differential gene expression between timepoints 0mM only 
 
 ```{r analyze DEX TP}
 ## comparisons against 0MM PA
@@ -122,11 +91,6 @@ d = Days[1]
 target = "Day"
 randomeffect = "Batch"
 
-geneinfo = rowData(ddsMat) %>% as.data.frame()
-geneinfo$entrez_gene = rownames(geneinfo)
-geneinfo$hgnc[is.na(geneinfo$hgnc)] <- geneinfo$entrez_gene[is.na(geneinfo$hgnc)]
-
-geneuniverses <- geneinfo$hgnc
 
 for(i in 1:length(Days)){
   if(i==1){} else {
@@ -150,24 +114,42 @@ l = l[sort(names(l))]
 openxlsx2::write_xlsx(l, file=paste0(output, "06_Bulk_timpoints_DEX_LFC_results.xlsx"), row_names=T )
 
 
+counts <- c(
+  all_10=(TPrestab_Day_5vs10_0mM_PA$adj.P.Val<0.05) %>% sum(),
+all_17=(TPrestab_Day_10vs17_0mM_PA$adj.P.Val<0.05) %>% sum(),
+all_40=(TPrestab_Day_17vs40_0mM_PA$adj.P.Val<0.05) %>% sum(),
+all_80=(TPrestab_Day_40vs80_0mM_PA$adj.P.Val<0.05) %>% sum(),
+dwn_10=TPrestab_Day_5vs10_0mM_PA %>% filter(adj.P.Val<0.05, logFC<0) %>% nrow(),
+dwn_17=TPrestab_Day_10vs17_0mM_PA %>% filter(adj.P.Val<0.05, logFC<0) %>% nrow(),
+dwn_40=TPrestab_Day_17vs40_0mM_PA %>% filter(adj.P.Val<0.05, logFC<0) %>% nrow(),
+dwn_80=TPrestab_Day_40vs80_0mM_PA %>% filter(adj.P.Val<0.05, logFC<0) %>% nrow(),
+up_10=TPrestab_Day_5vs10_0mM_PA %>% filter(adj.P.Val<0.05, logFC>0) %>% nrow(),
+up_17=TPrestab_Day_10vs17_0mM_PA %>% filter(adj.P.Val<0.05, logFC>0) %>% nrow(),
+up_40=TPrestab_Day_17vs40_0mM_PA %>% filter(adj.P.Val<0.05, logFC>0) %>% nrow(),
+up_80=TPrestab_Day_40vs80_0mM_PA %>% filter(adj.P.Val<0.05, logFC>0) %>% nrow()
+)
 
 
-## TODO PLOT Manhatten regulated genes 
-((TPrestab_Day_5vs10_0mM_PA$adj.P.Val<0.05) & (TPrestab_Day_5vs10_0mM_PA$logFC<0))*1 %>% sum()
-(TPrestab_Day_10vs17_0mM_PA$adj.P.Val<0.05) %>% sum()
-(TPrestab_Day_17vs40_0mM_PA$adj.P.Val<0.05) %>% sum()
-(TPrestab_Day_40vs80_0mM_PA$adj.P.Val<0.05) %>% sum()
+dat <- data.frame(
+    regulation = rep(c("Downreg.", "Upreg."), each=4),
+    Day = rep(c(10,17,40,80),2),
+    nGenes = counts[-c(1:4)]
+)
 
+dat$nGenes[dat$regulation=="Downreg."] <- -1*dat$nGenes[dat$regulation=="Downreg."]
+dat$Day <- factor(dat$Day, levels=c(10,17,40,80))
 
+p<-ggplot(dat, aes(x=Day, y=nGenes, fill=regulation)) + 
+  geom_bar(stat="identity", position="identity")+theme_classic()
 
-
+p
+ggsave(paste0(output, "06_DEX_nGenes.svg"), p)
 
 ```
 
-## GO terms comparing eacht timpoint gainst previous timepoint Wildtype only
+## Enrichment analyses comparing eacht timpoint gainst previous timepoint Wildtype only
 
-```{r, fig.width=15, fig.height=20}
-
+```{r, fig.width=6, fig.height=15}
 GOtermlist <- list()
 
 for (i in apropos("TPrestab_")){
@@ -196,31 +178,26 @@ names(GOtermlist) = gsub("Day_5", "Day_05", names(GOtermlist))
 GOtermlist = GOtermlist[sort(names(GOtermlist))]
 
 
-
 resGO = getGOresults(GOtermlist, genereference = NULL, evcodes = T)
 
 openxlsx::write.xlsx(file = paste0(output, "/06_Bulk_Timepoints_DEX_GO_results.xlsx"), as.data.frame(resGO$result))
+```
 
+### genelist enrichment
 
-Sfari_Syndromic_test <- test_Genelist(mygenelist = GOtermlist, 
-                                      basegenelist = SFARI$gene.symbol[SFARI$syndromic==1], 
+```{r, fig.width=6, fig.height=15}
+Genelist_test <- test_Genelist(mygenelist = GOtermlist, 
                                       geneunivers = geneuniverses)
 
+p <- plot_Genelist_test(Genelist_test)
+p
 
-
-Sfari_All_test <- test_Genelist(mygenelist = GOtermlist, 
-                                basegenelist = SFARI$gene.symbol, 
-                                geneunivers = geneuniverses)
-
-
-
-l = list(Sfari_all=Sfari_All_test, Sfari_Syndromic=Sfari_Syndromic_test)
-openxlsx2::write_xlsx(l, file=paste0(output, "06_Bulk_Timepoints_DEX_SFARIenrichment.xlsx"), row_names=T)
-
+ggsave(file=paste0(output, "06_Bulk_Timepoints_DEX_Gene_enrichment.svg"), p)
+openxlsx2::write_xlsx(Genelist_test, file=paste0(output, "06_Bulk_Timepoints_DEX_Gene_enrichment.xlsx"), row_names=T)
 
 ```
 
-
+### GO plots
 ```{r, fig.width=15, fig.height=20}
 
 plotlist = list()
@@ -277,109 +254,135 @@ p
 ggsave(file=paste0(output, "/06_Bulk_Timepoints_DEX_top10_TF_GOplot.svg"), plot = p)
 ```
 
+#  Differential gene expression one timepoints vs all others 0mM 
 
-# Differential gene expression time x PA
-
-```{r analyze DEX TPxPA, eval=FALSE}
+```{r analyze DEX TP}
 ## comparisons against 0MM PA
-PA=SampleInfo$PAmM
-Days=SampleInfo$Day
-Batch=SampleInfo$Batch
+PA=levels(SampleInfo$PAmM)
+Days=c(sort(unique(SampleInfo$Day)))
+
 p = 0
 d = Days[1]
-target = "Day*PAmM"
+target = "targetDay"
 randomeffect = "Batch"
 
 geneinfo = rowData(ddsMat) %>% as.data.frame()
 geneinfo$entrez_gene = rownames(geneinfo)
 geneinfo$hgnc[is.na(geneinfo$hgnc)] <- geneinfo$entrez_gene[is.na(geneinfo$hgnc)]
 
-lab = paste("Restab_TPxPA")
-print(lab)
-res <- comparison(dds_object = ddsMat, 
-                  target = target,
-                  randomeffect = randomeffect)
-res$HGNC = rownames(res) %>% getnames()
-assign(lab, res)
+geneuniverses <- geneinfo$hgnc
+
+for(i in 1:length(Days)){
+    Dayfilter = SampleInfo$PAmM==0
+    Set = rownames(SampleInfo)[Dayfilter]
+    lab = paste("TPrestab", "Day", paste0(Days[i], "vs_rest"),"0mM_PA",sep="_")
+    print(lab)
+    ddsMat$targetDay <- factor(ddsMat$Day==Days[i], levels=c(T,F), labels=c(Days[i], paste0("not",Days[i]))) %>% 
+                                 relevel(., ref=paste0("not",Days[i]))
+    
+    res <- comparison(dds_object = ddsMat, 
+                      samples = Set, 
+                      target = target,
+                      randomeffect = randomeffect)
+    res$HGNC = rownames(res) %>% getnames()
+    assign(lab, res)
+}
 
 #Lists elements are written to individual worksheets, using list names as sheet names if available
-l <- list(mget(apropos("Restab_TPxPA")))[[1]]
-names(l) = "DayxPA"
+l <- list(mget(apropos("vs_rest")))[[1]]
+names(l) = gsub("TPrestab_", "", names(l)) %>% gsub("Day_5", "Day_05",.)
 l = l[sort(names(l))]
-openxlsx2::write_xlsx(l, file=paste0(output, "06_Bulk_DayxPA_DEX_LFC_results.xlsx"), row_names=T )
+openxlsx2::write_xlsx(l, file=paste0(output, "06_Bulk_timpoints_DEX_LFC_TPvsRest_results.xlsx"), row_names=T )
 
 
+counts <- c(
+  all_05=(TPrestab_Day_5vs_rest_0mM_PA$adj.P.Val<0.05) %>% sum(),
+  all_10=(TPrestab_Day_10vs_rest_0mM_PA$adj.P.Val<0.05) %>% sum(),
+  all_17=(TPrestab_Day_17vs_rest_0mM_PA$adj.P.Val<0.05) %>% sum(),
+  all_40=(TPrestab_Day_40vs_rest_0mM_PA$adj.P.Val<0.05) %>% sum(),
+  all_80=(TPrestab_Day_80vs_rest_0mM_PA$adj.P.Val<0.05) %>% sum(),
+  
+  dwn_05=TPrestab_Day_5vs_rest_0mM_PA %>% filter(adj.P.Val<0.05, logFC<0) %>% nrow(),
+  dwn_10=TPrestab_Day_10vs_rest_0mM_PA %>% filter(adj.P.Val<0.05, logFC<0) %>% nrow(),
+  dwn_17=TPrestab_Day_17vs_rest_0mM_PA %>% filter(adj.P.Val<0.05, logFC<0) %>% nrow(),
+  dwn_40=TPrestab_Day_40vs_rest_0mM_PA %>% filter(adj.P.Val<0.05, logFC<0) %>% nrow(),
+  dwn_80=TPrestab_Day_80vs_rest_0mM_PA %>% filter(adj.P.Val<0.05, logFC<0) %>% nrow(),
+  
+  up_05=TPrestab_Day_5vs_rest_0mM_PA %>% filter(adj.P.Val<0.05, logFC>0) %>% nrow(),
+  up_10=TPrestab_Day_10vs_rest_0mM_PA %>% filter(adj.P.Val<0.05, logFC>0) %>% nrow(),
+  up_17=TPrestab_Day_17vs_rest_0mM_PA %>% filter(adj.P.Val<0.05, logFC>0) %>% nrow(),
+  up_40=TPrestab_Day_40vs_rest_0mM_PA %>% filter(adj.P.Val<0.05, logFC>0) %>% nrow(),
+  up_80=TPrestab_Day_80vs_rest_0mM_PA %>% filter(adj.P.Val<0.05, logFC>0) %>% nrow()
+)
 
-results<-data.frame(matrix(ncol=2, nrow=0))
-for(g in rownames(log_2cpm)){
-  print(which(rownames(log_2cpm)==g))
-  subdat<-data.frame(reads=log_2cpm[g,], Days, PA, Batch)
-  res <- lme4::glmer(reads~Days*PA+(1|Batch), data = subdat)
-  res_stat <- car::Anova(res, type="3")
-  results<-rbind(results, c(g, res_stat$`Pr(>Chisq)`[4]))
-}
 
-colnames(results)=c("Entrez","P.value")
-results$P.Adj <- p.adjust(results$P.value, method = "fdr")
-results$HGNC <- hgnc$name[match(results$Entrez, hgnc$input)]
-openxlsx2::write_xlsx(results, file=paste0(output, "06_Bulk_DayxPA_DEX_DxPspec.Pval_results.xlsx"), row_names=T)
+dat <- data.frame(
+    regulation = rep(c("Downreg.", "Upreg."), each=5),
+    Day = rep(c(5,10,17,40,80),2),
+    nGenes = counts[-c(1:5)]
+)
 
+dat$nGenes[dat$regulation=="Downreg."] <- -1*dat$nGenes[dat$regulation=="Downreg."]
+dat$Day <- factor(dat$Day, levels=c(5, 10,17,40,80))
+
+p<-ggplot(dat, aes(x=Day, y=nGenes, fill=regulation)) + 
+  geom_bar(stat="identity", position="identity")+theme_classic() + ggtitle("Markers DAYx vs Rest")
+
+p
+ggsave(paste0(output, "06_DEX_DayXvsRest_nGenes.svg"), p)
 
 ```
 
-## GO terms  Day xPA 
 
-```{r, fig.width=15, fig.height=20, eval=F}
-
+```{r, fig.width=6, fig.height=15}
 GOtermlist <- list()
 
-restab <- Restab_TPxPA
-i="Restab_TPxPA"
-if(padj_cu){
-  GOtermlist[[paste0(i, "_all")]] <- 
-    rownames(restab)[restab$adj.P.Val < cutoff] %>% getnames()
-  GOtermlist[[paste0(i, "_up")]] <- 
-    rownames(restab)[restab$adj.P.Val < cutoff  & restab$Day.PAmM5 >0]%>% getnames()
-  GOtermlist[[paste0(i, "_dwn")]] <- 
-    rownames(restab)[restab$adj.P.Val < cutoff  & restab$Day.PAmM5 < 0]%>% getnames()
-}else{
-  GOtermlist[[paste0(i, "_all")]] <- 
-    rownames(restab)[restab$P.Value < cutoff]%>% getnames()
-  GOtermlist[[paste0(i, "_up")]] <- 
-    rownames(restab)[restab$P.Value < cutoff  & restab$Day.PAmM5 >0]%>% getnames()
-  GOtermlist[[paste0(i, "_dwn")]] <- 
-    rownames(restab)[restab$P.Value < cutoff  & restab$Day.PAmM5 < 0]%>% getnames()
+for (i in apropos("vs_rest")){
+  restab <- get(i)
+  if(padj_cu){
+    GOtermlist[[paste0(i, "_all")]] <- 
+      rownames(restab)[restab$adj.P.Val < cutoff] %>% getnames()
+    GOtermlist[[paste0(i, "_up")]] <- 
+      rownames(restab)[restab$adj.P.Val < cutoff  & restab$logFC >0]%>% getnames()
+    GOtermlist[[paste0(i, "_dwn")]] <- 
+      rownames(restab)[restab$adj.P.Val < cutoff  & restab$logFC < 0]%>% getnames()
+  }else{
+    GOtermlist[[paste0(i, "_all")]] <- 
+      rownames(restab)[restab$P.Value < cutoff]%>% getnames()
+    GOtermlist[[paste0(i, "_up")]] <- 
+      rownames(restab)[restab$P.Value < cutoff  & restab$logFC >0]%>% getnames()
+    GOtermlist[[paste0(i, "_dwn")]] <- 
+      rownames(restab)[restab$P.Value < cutoff  & restab$logFC < 0]%>% getnames()
+  }
 }
 
 
-names(GOtermlist) = gsub("Restab_TPxPA", "TPxPA", names(GOtermlist))
+
+names(GOtermlist) = gsub("TPrestab_Day", "Day", names(GOtermlist))
+names(GOtermlist) = gsub("Day_5", "Day_05", names(GOtermlist))
 GOtermlist = GOtermlist[sort(names(GOtermlist))]
 
+
 resGO = getGOresults(GOtermlist, genereference = NULL, evcodes = T)
+openxlsx::write.xlsx(file = paste0(output, "/06_Bulk_DayXvsRest_GO_results.xlsx"), as.data.frame(resGO$result))
+```
 
-openxlsx::write.xlsx(file = paste0(output, "/06_Bulk_DayxPA_DEX_GO_results.xlsx"), as.data.frame(resGO$result))
+### genelist enrichment
 
-
-Sfari_Syndromic_test <- test_Genelist(mygenelist = GOtermlist, 
-                                      basegenelist = SFARI$gene.symbol[SFARI$syndromic==1], 
+```{r, fig.width=6, fig.height=15}
+Genelist_test <- test_Genelist(mygenelist = GOtermlist, 
                                       geneunivers = geneuniverses)
 
+p <- plot_Genelist_test(Genelist_test)
+p
 
-
-Sfari_All_test <- test_Genelist(mygenelist = GOtermlist, 
-                                basegenelist = SFARI$gene.symbol, 
-                                geneunivers = geneuniverses)
-
-
-
-l = list(Sfari_all=Sfari_All_test, Sfari_Syndromic=Sfari_Syndromic_test)
-openxlsx2::write_xlsx(l, file=paste0(output, "06_Bulk_DayxPA_DEX_SFARIenrichment.xlsx"), row_names=T)
-
+ggsave(file=paste0(output, "06_Bulk_DayXvsRest__Gene_enrichment.svg"), p)
+openxlsx2::write_xlsx(Genelist_test, file=paste0(output, "06_Bulk_DayXvsRest__Gene_enrichment.xlsx"), row_names=T)
 
 ```
 
-
-```{r, fig.width=15, fig.height=20, eval=F}
+### GO plots
+```{r, fig.width=20, fig.height=20}
 
 plotlist = list()
 for (set in unique(resGO$result$query)){
@@ -395,10 +398,10 @@ for (set in unique(resGO$result$query)){
 
 p <- ggpubr::ggarrange(plotlist = plotlist, common.legend = T, nrow = 5, ncol =3)
 p
-ggsave(file=paste0(output, "/06_Bulk_DayxPA_DEX_top10all_GOplot.svg"), plot = p)
+ggsave(file=paste0(output, "/06_Bulk_DayXvsRest_top10all_GOplot.svg"), plot = p)
 ```
 
-```{r, fig.width=15, fig.height=20, eval=F}
+```{r, fig.width=20, fig.height=20}
 plotlist = list()
 for (set in unique(resGO$result$query)){
   dat=resGO$result[which(resGO$result$query == set & resGO$result$source == "GO:BP"),]
@@ -413,11 +416,11 @@ for (set in unique(resGO$result$query)){
 
 p <- ggpubr::ggarrange(plotlist = plotlist, common.legend = T, nrow = 5, ncol =3)
 p
-ggsave(file=paste0(output, "/06_Bulk_DayxPA_DEX_top10_BP_GOplot.svg"), plot = p)
+ggsave(file=paste0(output, "/06_Bulk_DayXvsRest_top10_BP_GOplot.svg"), plot = p)
 ```
 
 
-```{r, fig.width=15, fig.height=20, eval=F}
+```{r, fig.width=20, fig.height=20}
 plotlist = list()
 for (set in unique(resGO$result$query)){
   dat=resGO$result[which(resGO$result$query == set & resGO$result$source == "TF"),]
@@ -432,14 +435,13 @@ for (set in unique(resGO$result$query)){
 
 p <- ggpubr::ggarrange(plotlist = plotlist, common.legend = T, nrow = 5, ncol =3)
 p
-ggsave(file=paste0(output, "/06_Bulk_DayxPA_DEX_top10_TF_GOplot.svg"), plot = p)
+ggsave(file=paste0(output, "/06_Bulk_DayXvsRest_TF_GOplot.svg"), plot = p)
 ```
 
 
 # Trajectories over time top genes per comparison
 
 ```{r plot top 10 DEX genes, fig.width=15, fig.height=15}
-
 
 #alle_restab <- apropos("restab_Day") # gibt alle wieder die restab beinhalten egal ob groß oder klein schreiben
 #restab_nurTP0mM_und_Day0vs5 <- apropos("restab_", ignore.case = F) # berücksichtig groß und kleinschreibung, 
@@ -623,9 +625,9 @@ display_tab(results)
 
 
 ```{r, fig.width=7, fig.height=10}
-targetgenes = c("SYN1", "CAMK2A", "LHX2", "SLITRK5")
-plotoutputname<- "/06_Bulk_DEX_SelectedGenes_lineplots.svg"
-xlsxoutputname <- "/06_Bulk_DEX_SelectedGenes_lineplots.xlsx"
+targetgenes = c("MKI67", "PAX6", "SOX2", "TBR2", "MAP2", "GFAP", "S100B", "CTIP2", "SATB2", "IL6ST", "JAK1", "STAT3", "DEPDC5")
+plotoutputname<- "/06_Bulk_DEX_SelectedGenes_lineplots_20251014.svg"
+xlsxoutputname <- "/06_Bulk_DEX_SelectedGenes_lineplots_20251014.xlsx"
 
 dataplot <- log_2cpm[which(geneinfo$hgnc%in% targetgenes),] %>% reshape2::melt()
 colnames(dataplot) <- c("gene","Sample", "reads")  
@@ -638,11 +640,15 @@ dataplot$hgnc[idx] = dataplot$gene[idx]
 
 ggplot(dataplot, aes(x = Day, y = reads)) +
   geom_smooth(span=0.5) +scale_x_continuous(breaks=sort(unique(dataplot$Day)))+
-  theme_classic() + facet_wrap(~hgnc) +
+  theme_classic() + facet_wrap(~hgnc, axes="all", scales = "free_y") +
   theme(axis.text.x = element_text(angle = 90, hjust = 1))+
   labs(x = "Day", y = "log2(CPM+1)") -> p
 
 p
+
+# scales  must be one of "fixed", "free_x", "free_y", or "free"
+# axes must be one of "margins", "all_x", "all_y", or "all"
+
 
 ggsave(file=paste0(output, plotoutputname), p)
 
@@ -692,12 +698,8 @@ checkSets(multiExpr) # check data size
 
 if(force.recalc | (! file.exists(file=paste0(output,"/net.rds")))){ # skips recalculation of net object as it takes long... 
   
-  
-  
+
   #annotated only 
-  
-  
-  
   
   powers = c(seq(1,10,by=1), seq(12,20, by=2));
   
@@ -830,14 +832,17 @@ consMEs = net$multiMEs;
 moduleLabels = net$colors;
 
 
+
 # Convert the numeric labels to color labels
 moduleColors = as.character(moduleLabels)
+names(moduleColors) <- names(net$colors)
 consTree = net$dendrograms[[1]];
 
 
 
 # module eigengenes
-MEs=moduleEigengenes(multiExpr[[1]]$data, colors = moduleColors, nPC=1)$eigengenes
+expr <- multiExpr[[1]]$data
+MEs=moduleEigengenes(expr, colors = moduleColors, nPC=1)$eigengenes
 MEs=orderMEs(MEs)
 meInfo<-data.frame(rownames(datExpr), MEs)
 colnames(meInfo)[1]= "SampleID"
@@ -855,8 +860,10 @@ nmodules <- length(unique(moduleColors))
 colnames(geneInfo)[1]= "GeneSymbol"
 colnames(geneInfo)[2]= "Initially.Assigned.Module.Color"
 geneInfo$HGNC=hgnc$name[match(geneInfo$GeneSymbol, hgnc$input)]
-geneInfo$SFARI_genescore <- SFARI$gene.score[match(geneInfo$HGNC,SFARI$gene.symbol)]
-geneInfo$SFARI_category <- SFARI$genetic.category[match(geneInfo$HGNC,SFARI$gene.symbol)]
+
+
+
+
 
 # save info
 
@@ -906,9 +913,10 @@ dev.off()
 
 geneInfo$Module_color <- merged_col$colors
 
+geneInfo <- attach_boolean_Genelist(geneInfo)
 
 openxlsx2::write_xlsx(geneInfo %>% 
-                        dplyr::select(GeneSymbol, HGNC,SFARI_genescore, SFARI_category, Module_color), 
+                        dplyr::select(-c(starts_with("kME"))), 
                       file=paste0(output,'/GeneInfoSigned.xlsx'))
 
 ```
@@ -934,16 +942,13 @@ names(colors)<- as.character(levels(plot_df$variable))
 
 p <- ggplot(plot_df, aes(x=Day, y=value, fill=variable, color=variable)) + 
   geom_point(color="black")+
-  stat_summary(fun.y = mean, geom = 'smooth', color="black") + 
-  scale_x_continuous(breaks=sort(unique(plot_df$Day)))+
+  stat_summary(fun.y = mean, geom = 'smooth', color="black")+
   RotatedAxis() + 
   ylab('Module Eigengene') + 
   xlab('') +
-  theme(
-    axis.text.x=element_blank(),
-    axis.ticks.x=element_blank(),
-  )+scale_fill_manual(values = colors)+
-  scale_color_manual(values = colors)
+  scale_fill_manual(values = colors)+
+  scale_color_manual(values = colors)+ 
+  scale_x_continuous(breaks=sort(unique(plot_df$Day)))
 
 p <- p + facet_wrap(~variable, scales="fixed")
 #p<- p + stat_summary(fun.data = 'mean_sdl', mult = 1, geom = 'ribbon', alpha=0.5)
@@ -956,11 +961,9 @@ ggsave(filename = paste0(output, "/06_Bulk_DEX_WGCNA_plots.svg"), p)
 ```
 
 
-
 ```{r, fig.width=6, fig.height=4}
 
 reslist = list()
-
 
 for(M in unique(plot_df$variable)){
   
@@ -982,6 +985,9 @@ openxlsx2::write_xlsx(wgcnastats, paste0(output, "06_DEX_Bulk_WGCNA_Stats.xlsx")
                       row_names=T)
 
 ```
+
+
+
 
 
 ```{r, fig.width=12, fig.height=12}
@@ -1007,10 +1013,49 @@ labeledHeatmap(Meandata, xLabels = colLabels,
 dev.off()
 ```
 
-## WGCNA GO terms
+### DEX Moduls by day 
+
+```{r}
+Days=c(sort(unique(targets$Day)))
+
+p = 0
+d = Days[1]
+target = "Day"
+randomeffect = "Batch"
+
+
+for(i in 1:length(Days)){
+  if(i==1){} else {
+    Dayfilter = targets$Day %in% Days[c(i-1,i)]
+    Set = rownames(MEs)[Dayfilter]
+    lab = paste("Module_restab", "Day", paste0(Days[c(i-1,i)], collapse = "vs"),"0mM_PA",sep="_")
+    print(lab)
+        
+    data_targets= targets %>% dplyr::select(Day, Batch) %>% filter(Dayfilter) 
+    design = model.matrix(as.formula("~Day"), data_targets)
+    rande = data_targets$Batch
+    target_ME <- ME[Dayfilter,] %>% t()
+    dupcor <- duplicateCorrelation(target_ME, design, block=rande)
+    fitDupCor <- lmFit(target_ME, design, block=rande, correlation=dupcor$consensus)
+    fit<- eBayes(fitDupCor)
+    res = topTable(fit,n=Inf)
+    assign(lab, res)
+  }
+}
+
+#Lists elements are written to individual worksheets, using list names as sheet names if available
+l <- list(mget(apropos("Module_restab")))[[1]]
+names(l) = gsub("Module_restab", "", names(l)) %>% gsub("Day_5", "Day_05",.)
+l = l[sort(names(l))]
+openxlsx2::write_xlsx(l, file=paste0(output, "06_WGCNA_timpoints_DEX_LFC_results.xlsx"), row_names=T )
+
+```
+
+
+
+## WGCNA enrichtment analyses
 
 ```{r, fig.width=15, fig.height=20}
-
 net <- merged_col
 genelist = split(rownames(ddsMat)%>% getnames(), net$colors) 
 gene_univers = rownames(ddsMat)%>% getnames()
@@ -1034,25 +1079,26 @@ restab = Gores$result
 restab$parents<- as.character(restab$parents)
 
 openxlsx2::write_xlsx(restab, file=paste0(output,"06_DEX_Bulk_WGCNA_GO_Terms.xlsx"))
+```
 
 
+### genelist enrichment
 
-Sfari_Syndromic_test <- test_Genelist(mygenelist = genelist[MOI], 
-                                      basegenelist = SFARI$gene.symbol[SFARI$syndromic==1], 
+```{r, fig.width=6, fig.height=15}
+Genelist_test <- test_Genelist(mygenelist = genelist[MOI], 
                                       geneunivers = gene_univers)
 
+p <- plot_Genelist_test(Genelist_test)
+p
 
+ggsave(file=paste0(output, "06_DEX_Bulk_WGCNA_Gene_enrichment.svg"), p)
+openxlsx2::write_xlsx(Genelist_test, file=paste0(output, "06_DEX_Bulk_WGCNA_Gene_enrichment.xlsx"), row_names=T)
 
-Sfari_All_test <- test_Genelist(mygenelist = genelist[MOI], 
-                                basegenelist = SFARI$gene.symbol, 
-                                geneunivers = gene_univers)
+```
 
+### GO plots 
 
-
-l = list(Sfari_all=Sfari_All_test, Sfari_Syndromic=Sfari_Syndromic_test)
-openxlsx2::write_xlsx(l, file=paste0(output, "06_Bulk_WGCNA_SFARIenrichment.xlsx"), row_names=T)
-
-
+```{r, fig.width=15, fig.height=20}
 plotlist = list()
 for (set in unique(Gores$result$query)){
   dat=Gores$result[which(Gores$result$query == set & Gores$result$source == "GO:BP"),]

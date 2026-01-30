@@ -5,7 +5,9 @@ require("RColorBrewer")
 require("stringr")
 require("pheatmap")
 require("DESeq2")
-
+require("tidyverse")
+require(openxlsx)
+require(data.table)
 
 
 Dark8 = brewer.pal(8, "Dark2")
@@ -40,7 +42,7 @@ PCAplot=function(PCA_res, Sampledf, label){
 
 
 # comparison fucntion of target
-comparison <- function(dds_object, samples, target, randomeffect){
+comparison <- function(dds_object, samples=NULL, target, randomeffect){
   require(DESeq2)
   require(limma)
 
@@ -72,17 +74,17 @@ comparison <- function(dds_object, samples, target, randomeffect){
 
 
 # go profiler function
-getGOresults = function(geneset, genereference=NULL, evcodes=FALSE){
+getGOresults <- function(geneset, genereference=NULL, evcodes=FALSE, organism = "hsapiens"){
   require(gprofiler2)
   if(is.null(genereference)){
-    resgo = gost(geneset, organism = "hsapiens",
+    resgo = gost(geneset, organism = organism,
                  correction_method = "gSCS",
                  #domain_scope = "custom",
                  evcodes=evcodes,
                  sources = c("GO:BP", "GO:MF", "GO:CC", "KEGG", "TF", "HP", "HPA"),
                  numeric_ns = "ENTREZGENE_ACC")
   } else {
-  resgo = gost(geneset, organism = "hsapiens",
+  resgo = gost(geneset, organism = organism,
                correction_method = "gSCS",
                domain_scope = "custom",
                evcodes=evcodes,
@@ -99,7 +101,7 @@ getGOresults = function(geneset, genereference=NULL, evcodes=FALSE){
 }
 
 
-GOplot = function(GOtable, N, Title="GO plot", ylabel="GO term", xlim=15){
+GOplot = function(GOtable, N, Title="GO plot", xlim=NA){
   if(nrow(GOtable)<N){N=nrow(GOtable)}
   GOtable = GOtable[GOtable$parents!="character(0)",]
   Tabtoplot=GOtable[order(GOtable$p_value, decreasing = F)[1:N],]
@@ -118,27 +120,19 @@ GOplot = function(GOtable, N, Title="GO plot", ylabel="GO term", xlim=15){
 
   Tabtoplot$term_name = sapply(Tabtoplot$term_name, wrapit, cutoff=40)
 
-  p <- ggplot(Tabtoplot) + geom_point(aes(x =log10pvalue,
+  ggplot(Tabtoplot) + geom_point(aes(x =log10pvalue,
                                      y = N:1,
                                      size=precision,
-                                     colour=genperc)) +
-    scale_color_viridis_c(limits = c(0,0.05))+
-    labs(fill="genomic cov", size="precision")+
-    xlab("- log10(p-value)") + ylab(ylabel)+
-    scale_size_area(limits=c(0,1))+
+                                     colour=genperc),
+                                 alpha=0.7) +
+    scale_colour_gradient(low="#00FF33", high ="#FF0000", guide = "colourbar")+
+    labs(colour="genomic cov", size="precision")+
+    xlab("- log10(p-value)") + ylab("GO term")+
+    scale_size(range = c(3, 8))+
     theme_bw(base_size = 12) + ggtitle(Title)+
     theme(plot.title = element_text(hjust = 0.5))+
     scale_y_continuous(breaks=N:1,
-                       labels=Tabtoplot$term_name)+
-    guides(size = guide_legend(order = 2),
-           colour = guide_colorsteps(order = 1, barheight = 4))
-  if(is.na(xlim)){
-    p+xlim(0,max(Tabtoplot$log10pvalue, na.rm=T))
-    return(p)
-  }else{
-    p+xlim(0,xlim)
-    return(p)
-  }
+                       labels=Tabtoplot$term_name)
 }
 
 
@@ -305,5 +299,103 @@ EigengenePlot=function(data, Sampledata, samplesincl){
     #legend(0,0.125, legend = names(ann_colors[["CellLine"]]),fill = ann_colors[["CellLine"]], xpd=T,bty = "n")
   }
 }
+
+
+
+
+
+test_Genelist <- function(mygenelist=list(GOtermlist),
+                          basegenelist=c("/files/data/genelist/Genelist_ASD_Epilepsy_ID.xlsx",
+                                         "/files/data/genelist/Genelist_Regions_CellTypes_Processes.xlsx"),
+                          geneunivers=geneuniverses){
+
+  genesets=list()
+  for(i in basegenelist){
+    sheets <- readxl::excel_sheets(i)
+    sheets <- sheets[-1]
+    x <- lapply(sheets, function(X) readxl::read_excel(i, sheet = X)$SYMBOL)
+    names(x) <- sheets
+    genesets <- c(genesets, x)
+  }
+  genesets <- genesets[sort(names(genesets))]
+
+  TF_Matrix <- lapply(genesets, function(i){geneunivers %in% i}) %>% do.call(cbind,.) %>% as.data.frame()
+  TF_Matrix<- TF_Matrix %>% mutate_all(factor, levels=c(T,F))
+
+  res<-data.frame(geneset=names(mygenelist))
+  res[,paste0("OR.", names(genesets))] <- NA
+  res[,paste0("LCI.", names(genesets))] <- NA
+  res[,paste0("UCI.", names(genesets))] <- NA
+  res[,paste0("pval.", names(genesets))] <- NA
+  res <- res %>% column_to_rownames("geneset")
+  for(n in names(mygenelist)){
+    for(g in names(genesets)){
+      TF_Matrix$target = factor(geneunivers %in% mygenelist[[n]], levels=c(T,F))
+      restest = fisher.test(table(TF_Matrix$target,TF_Matrix[[g]]))
+      res[n,paste0("OR.",g)]<-restest$estimate
+      res[n,paste0("LCI.",g)]<-restest$conf.int[1]
+      res[n,paste0("UCI.",g)]<-restest$conf.int[2]
+      res[n,paste0("pval.",g)]<-restest$p.value
+    }
+  }
+
+  datatoplot <- res %>%
+    rownames_to_column("Geneset") %>%
+    data.table::melt(., id.vars = c("Geneset"),variable.name = "Parameter")
+  datatoplot$TypeVal = gsub("\\.[0-9A-z_]*", "", datatoplot$Parameter)
+  datatoplot$TypeVal = gsub("\\.[0-9A-z_]*", "", datatoplot$Parameter)
+  datatoplot$Testlist = gsub("[0-9A-z_]*\\.", "", datatoplot$Parameter)
+
+  datatoplot <- datatoplot %>% dplyr::select(-"Parameter") %>%
+    reshape(idvar = c("Geneset","Testlist"), timevar = "TypeVal", direction = "wide")
+  datatoplot$value.adj.pval = p.adjust(datatoplot$value.pval)
+
+  return(datatoplot)
+}
+
+####
+
+plot_Genelist_test <- function(Genelist_test, title="enrichment testing", adjusted=F){
+
+  if(adjusted){
+    pvar = "value.adj.pval"
+  } else {
+    pvar = "value.pval"
+  }
+
+  Genelist_test["log10_pval"] <- -log10(Genelist_test[,pvar])
+  Genelist_test["log10_pval"][Genelist_test["log10_pval"]< -log10(0.05)]<-NA
+  Genelist_test["value.OR"][Genelist_test["value.OR"]<1]<-NA
+
+  p <- ggplot(Genelist_test, aes(x=Geneset, y=Testlist, size=value.OR, col=log10_pval))+geom_point() +
+    theme_minimal()+ggtitle(title)+scale_color_viridis_b()+theme(axis.text.x = element_text(angle = 90))
+  return(p)
+}
+
+
+
+attach_boolean_Genelist <- function(dataframe=geneInfo,
+                                    hgnc_column="HGNC",
+                                    basegenelist=c("/files/data/genelist/Genelist_ASD_Epilepsy_ID.xlsx",
+                                         "/files/data/genelist/Genelist_Regions_CellTypes_Processes.xlsx")){
+  genesets=list()
+  tmp <- dataframe
+  for(i in basegenelist){
+    sheets <- readxl::excel_sheets(i)
+    sheets <- sheets[-1]
+    x <- lapply(sheets, function(X) readxl::read_excel(i, sheet = X)$SYMBOL)
+    names(x) <- sheets
+    genesets <- c(genesets, x)
+  }
+  genesets <- genesets[sort(names(genesets))]
+
+  for(n in names(genesets)){
+
+    tmp[[n]] <- tmp[[hgnc_column]] %in% genesets[[n]]
+  }
+  return(tmp)
+}
+
+
 
 

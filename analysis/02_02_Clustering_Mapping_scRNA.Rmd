@@ -44,6 +44,10 @@ dir.create("./output/02_Clustering/", showWarnings = F)
 seurat_integrated <- readRDS(file="./data/QC_dataClustered.filt.rds")
 scRNA.sce <- as.SingleCellExperiment(seurat_integrated)
 
+geneuniverses <- rownames(seurat_integrated)
+
+
+
 DefaultAssay(seurat_integrated) <- "RNA"
 Idents(seurat_integrated) <- "type"
 
@@ -69,6 +73,8 @@ knoblichtypes <- scSorter(data@assays$RNA@counts, knoblichgenelist)
 metadata = data@meta.data 
 metadata = metadata[,! colnames(metadata) %in% c("KnoblichPredType")]
 data@meta.data <- cbind(metadata, KnoblichPredType = knoblichtypes$Pred_Type)
+
+
 ```
 
 
@@ -343,6 +349,9 @@ ggarrange(plotlist=p, nrow = 4,ncol=4, common.legend = T, legend = "right")
 
 ```
 
+
+## Merged Clusters 
+
 ```{r}
 summ_lab<- openxlsx2::read_xlsx("./data/SummarizedCellTypes.xlsx")
 summ_lab$Abbrev <- gsub("\\(", "", summ_lab$Abbrev)
@@ -352,9 +361,133 @@ seuratmeta <- seurat_integrated@meta.data
 seuratmeta$merges_clusters <- summ_lab[seuratmeta$seurat_clusters, "Abbrev"]
 seuratmeta -> seurat_integrated@meta.data
 
-
 p<- DimPlot(seurat_integrated, group.by = "merges_clusters")
 ggsave(file="output/Clusterain_final_optimized_all_merged_lables.svg", p)
+p
+```
+
+
+```{r, fig.height=6}
+Idents(seurat_integrated) <- "merges_clusters"
+DefaultAssay(seurat_integrated) = "RNA"
+markers <- FindAllMarkers(object = seurat_integrated, 
+                          only.pos = TRUE,
+                          logfc.threshold = 0.25)  
+
+openxlsx2::write_xlsx(markers,"./output/02_Clustering/ClustersMerged_markers.xls")
+
+markers %>%
+  group_by(cluster) %>%
+  top_n(n = 10, wt = avg_log2FC) -> top10
+
+p1<-DoHeatmap(seurat_integrated, features = top10$gene, slot = "scale.data")
+p1
+ggsave("./output/02_Clustering/ClustersMerged_Heatmap_Markers.svg")
+
+
+```
+
+
+```{r GO res analysis, fig.height=8,warning=FALSE}
+
+genelist = list()
+for( i in unique(markers$cluster)){
+  genelist[[i]] = markers$gene[markers$cluster == i ]
+}
+
+genebackground = rownames(seurat_integrated)
+gostres = gost(query = genelist, evcodes = T, custom_bg = genebackground)
+
+names(gostres)
+
+tablegostres = gostres$result[grepl("GO:", gostres$result$source), c("query", "source", "term_name","p_value", "intersection"
+)]
+
+DT::datatable(tablegostres, extensions = "Buttons",
+              filter="top",
+              options = list(
+                pageLength = 15,
+                info = FALSE,
+                lengthMenu = list(c(15,50, 100, -1),
+                                  c("15","50", "100" ,"All")
+                ),dom = 'Blfrtip',
+                buttons = c('copy', 'csv', 'excel', 'pdf')
+              ))
+
+restab <- gostres$result
+
+
+openxlsx2::write_xlsx(restab %>% dplyr::select(-parents), "/files/output/02_Clustering/ClustersMerged_GO_termsCluster.xlsx")
+
+```
+
+
+
+```{r, fig.width=15, fig.height=20}
+
+Gores = gostres
+plotlist = list()
+for (set in unique(Gores$result$query)){
+  dat=Gores$result[which(Gores$result$query == set & Gores$result$source == "GO:BP"),]
+  if(nrow(dat)>0){
+    plotlist[[set]]<-GOplot(dat, N = 10, Title = set)
+  }else {
+    text="no significance"
+    plotlist[[set]]<-ggplot() + annotate("text", x = 4, y = 25, label = text) + 
+      ggtitle(set) + theme_void()
+  }
+}
+
+p <- ggpubr::ggarrange(plotlist = plotlist, common.legend = T, nrow = 5, ncol =3)
+p
+ggsave(file="./output/02_Clustering/ClustersMerged_Markers_BP_GOplot.svg", plot = p)
+
+
+plotlist = list()
+for (set in unique(Gores$result$query)){
+  dat=Gores$result[which(Gores$result$query == set & Gores$result$source == "TF"),]
+  if(nrow(dat)>0){
+    plotlist[[set]]<-GOplot(dat, N = 10, Title = set)
+  }else {
+    text="no significance"
+    plotlist[[set]]<-ggplot() + annotate("text", x = 4, y = 25, label = text) + 
+      ggtitle(set) + theme_void()
+  }
+}
+
+p <- ggpubr::ggarrange(plotlist = plotlist, common.legend = T, nrow = 5, ncol =3)
+p
+ggsave(file="./output/02_Clustering/ClustersMerged_Markers_TF_GOplot.svg", plot = p)
+
+
+plotlist = list()
+for (set in unique(Gores$result$query)){
+  dat=Gores$result[which(Gores$result$query == set),]
+  if(nrow(dat)>0){
+    plotlist[[set]]<-GOplot(dat, N = 10, Title = set)
+  }else {
+    text="no significance"
+    plotlist[[set]]<-ggplot() + annotate("text", x = 4, y = 25, label = text) + 
+      ggtitle(set) + theme_void()
+  }
+}
+
+p <- ggpubr::ggarrange(plotlist = plotlist, common.legend = T, nrow = 5, ncol =3)
+p
+ggsave(file="./output/02_Clustering/ClustersMerged_Markers_GOplot.svg", plot = p)
+
+```
+
+
+```{r, fig.width=6, fig.height=15}
+Genelist_test <- test_Genelist(mygenelist = genelist, 
+                                      geneunivers = geneuniverses)
+
+p <- plot_Genelist_test(Genelist_test)
+p
+
+ggsave(file="./output/02_Clustering/ClustersMerged_Markers_Gene_enrichment.svg", p)
+openxlsx2::write_xlsx(Genelist_test, file="./output/02_Clustering/ClustersMerged_Markers_Gene_enrichment.xlsx", row_names=T)
 
 ```
 

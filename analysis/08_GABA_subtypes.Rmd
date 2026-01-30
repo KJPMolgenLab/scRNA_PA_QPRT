@@ -1,0 +1,51 @@
+---
+title: "GABA_subtypes"
+author: "A Chiocchetti"
+date: "2024-02-23"
+output: html_document
+---
+
+
+# Compare across treatment
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
+```
+
+```{r Calling libraries, echo=FALSE, include=FALSE}
+library(SingleR)
+library(DropletUtils)
+library(SingleCellExperiment)
+library(Seurat)
+library(slingshot)
+library(gprofiler2)
+library(tidyverse)
+
+dir.create("./output/04_Biostat/", showWarnings = F)
+source("./code/custom_functions.R")
+SamplePalette =  c("#000000","#3399FF")
+```
+
+```{r load files}
+seurat_integrated <- readRDS("./data/QC_dataClustered.filtTypedTraj.rds")
+metadata<- seurat_integrated@meta.data
+```
+
+
+```{r expr plot GABA markers, fig.height=6, fig.width=18}
+
+p1<- FeaturePlot(seurat_integrated, features = c("GAD1", "GAD2", "SLC6A1", "SLC6A13", "SLC6A11"), 
+            slot = "counts", keep.scale = NULL, order = T)
+
+p2<- FeaturePlot(seurat_integrated, features = c("PVALB", "SST", "VIP", "SERPINF1", "SNCG", "LAMP5", "CHODL"), 
+            slot = "counts", keep.scale = NULL, order = T)
+
+p3<- FeaturePlot(seurat_integrated, features = c("CPNE5", "VIPR2", "NKX2-2", "LAMP5"), 
+            slot = "counts", keep.scale = NULL, order = T)
+
+pcomb <- p1|p2|p3
+
+
+ggsave(file="./output/08_GABA_subtypes/08_GABA_Markerexpression.svg", pcomb)
+
+```
+

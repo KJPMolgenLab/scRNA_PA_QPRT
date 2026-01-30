@@ -21,9 +21,11 @@ editor_options:
 
 -   [Biostatistical group comparison scRNA](04_GroupAnalysis_scRNA.html)
 
+-   [Biostatistical group comparison scRNA merged clusters](04b_GroupAnalysisMergedClusters_scRNA.html)
+
 -   [Bulk sequencing Preprocessing](05_Preprocessing_Bulk.html)
 
--   [Bulk seq differential gene expression](06_DEX_Bulk.html)
+-   [Bulk seq differential gene expression](06_DEX_Bulk.html) (contains merges clusters too)
 
 -   [Bulk seq deconvolution](07_DeconVol_Bulk.html)
 

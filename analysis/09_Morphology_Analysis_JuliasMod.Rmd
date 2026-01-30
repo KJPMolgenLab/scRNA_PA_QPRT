@@ -1,0 +1,1228 @@
+---
+title: "Julias_Morphology_Analysis_modDH"
+author: "Julia_modDH"
+date: "2024-10-11"
+output: html_document
+---
+
+#Load Libraries
+```{r}
+library(dplyr)
+library(ggplot2)
+library(readr)
+library(writexl)
+library(openxlsx)
+library(ggpubr)
+library(nlme)
+library(lmtest)
+library("readxl")
+library(ggbeeswarm)
+library(ggpubr)
+
+output_path <- "output/data_Denise/"
+```
+
+# Daten einlesen
+```{r}
+
+# Excel-Datei einlesen
+file_path <- "data/MorphMeasurements_0mM_DH.xlsx"  # Pfad zur Excel-Datei anpassen
+Rosette_data <- openxlsx::read.xlsx(file_path, sheet = "Sheet 1")
+```
+
+summary(Rosette_data)
+
+
+# Farben für Plots
+```{r}
+# Define color for each timepoint - dots
+basecolors_dots <- c(
+  "d25" = "#154360",
+  "d40" = "#186a3b",
+  "d60" = "#512e5f",
+  "d80" = "#784212"
+)
+
+basecolors_violin <- c(
+  "d25" = "#2471a399",
+  "d40" = "#28b46399",
+  "d60" = "#7d3c9899",
+  "d80" = "#ca6f1e99"
+)
+
+
+```
+
+# Funktion für Test auf Normalverteilung und Wilcoxon Test (don't touch) #removed 5mM
+```{r}
+# Function to perform the Wilcoxon test and check normality
+perform_wilcox_test_and_normality <- function(timepoint_data, variableofinterest) {
+   # Filter data for 0mM and 5mM groups
+  group_0mM <- timepoint_data %>% filter(group == "0mM") %>% pull(variableofinterest)
+  
+  # Check for normality using Shapiro-Wilk test
+  normal_0mM <- ifelse(length(group_0mM) > 0 && shapiro.test(group_0mM)$p.value > 0.05, "Yes", "No")
+  
+  # Perform Wilcoxon test (non-parametric) if not normally distributed
+  test_result <- wilcox.test(group_0mM, exact = FALSE)
+  
+
+  # Return the p-value, test statistic, and normality results
+  return(list(
+    p_value = test_result$p.value,
+    statistic = test_result$statistic,
+    normal_0mM = normal_0mM,
+    mean_0mM =mean(group_0mM), 
+    sd_0mM =sd(group_0mM), 
+    median_0mM =median(group_0mM), 
+    iqr_0mM =quantile(group_0mM, c(0.25,0.75)) %>% paste(., collapse = "-"),
+  ))
+}
+```
+
+
+# Rosettes per Timepoint
+```{r}
+# Calculate the number of rosettes per original.name and join with relevant information
+results_Rosetten_per_TP <- Rosette_data %>%
+  dplyr::filter(type == "Rosette") %>%
+  group_by(original.name) %>%
+  summarise(Anzahl_Rosetten = n()) %>%
+  left_join(unique(Rosette_data[, c("original.name", "group", "timepoint", "Batch")]), by = "original.name")
+
+
+
+Target="Anzahl_Rosetten"
+attach(results_Rosetten_per_TP)
+res<- pairwise.wilcox.test(Anzahl_Rosetten, timepoint, p.adjust.method = 'BH')
+res
+detach(results_Rosetten_per_TP)
+# Apply the Wilcoxon test and normality check for each timepoint
+
+
+
+my_comparisons=list(c("d25", "d40"),c("d25", "d60"),c("d25", "d80"),c("d40", "d60"),c("40", "d80"),c("d60", "d80"))
+ggplot(results_Rosetten_per_TP, aes(x = timepoint, y = Anzahl_Rosetten, fill = timepoint, col=timepoint)) +
+  geom_violin(alpha = 0.5) +
+  geom_quasirandom() +
+  ggpubr::stat_compare_means(comparisons = my_comparisons, hide.ns=F,
+                     label.y = c(40, 45, 50, 55, 60,65))+
+  ylim(c(0,70))+
+  theme(legend.position = "none")+
+  scale_fill_manual(values=basecolors_violin)+
+  scale_color_manual(values=basecolors_dots)+theme_classic()
+  
+
+
+```
+
+
+#copy from above and adjust features
+
+#everything below not needed
+```{r}
+wilcoxon_Rosetten_per_TP <- results_Rosetten_per_TP %>%
+  group_by(timepoint) %>%
+  summarise(
+    test_result = list(perform_wilcox_test_and_normality(cur_data(), variableofinterest=Target))
+  ) %>%
+  unnest_wider(test_result)%>%
+  mutate(p_adjusted=p.adjust(p_value,method="bonferroni"))
+
+
+# Add a column to indicate if both groups are normally distributed
+wilcoxon_Rosetten_per_TP <- wilcoxon_Rosetten_per_TP %>%
+  mutate(
+    normality_check = ifelse(normal_0mM == "Yes", "Normally Distributed", "Not Normally Distributed")
+  )
+
+# Print the results
+wilcoxon_Rosetten_per_TP
+
+# Optional: Save the results to a CSV file
+write_xlsx(wilcoxon_Rosetten_per_TP, paste0(output_path, "wilcoxon_results_", Target,"_per_TP.xlsx"))
+
+#Überprüfen auf Batch Effekte 
+mod_mixed_RosettesperTP<-lme(Anzahl_Rosetten~group, random=~1|Batch, data=results_Rosetten_per_TP %>% filter(.,timepoint=="d60"))
+
+mod_summary_RosettesperTP <- summary(mod_mixed_RosettesperTP)
+
+mod_coeffs_RosettesperTP <- as.data.frame(mod_summary_RosettesperTP$tTable)
+
+mod_coeffs_RosettesperTP$Parameter <- rownames(mod_coeffs_RosettesperTP)
+
+write_xlsx(mod_coeffs_RosettesperTP,paste0(output_path, "Batch_effect_results_",Target,".xlsx"))
+
+
+# Ensure correct factor levels for timepoint and group
+results_Rosetten_per_TP$timepoint <- factor(results_Rosetten_per_TP$timepoint, levels = c("d25", "d40", "d60", "d80"))
+results_Rosetten_per_TP$group <- as.factor(results_Rosetten_per_TP$group) %>% 
+  relevel(., ref="0mM") # Ensure group is a factor
+
+
+# Create a new column for color based on group and timepoint
+results_Rosetten_per_TP <- results_Rosetten_per_TP %>%
+  mutate(color_dots = case_when(
+    group == "0mM" ~ adjustcolor(basecolors_dots[as.character(timepoint)], alpha.f = 0.65),
+    group == "5mM" ~ basecolors_dots[as.character(timepoint)]
+  ))
+
+
+# Create a new column for color based on group and timepoint
+results_Rosetten_per_TP <- results_Rosetten_per_TP %>%
+  mutate(color_violin = case_when(
+    group == "0mM" ~ adjustcolor(basecolors_violin[as.character(timepoint)], alpha.f = 0.65),
+    group == "5mM" ~ basecolors_violin[as.character(timepoint)]
+  ))
+
+#Create the plot
+p <- ggplot(results_Rosetten_per_TP, aes(x = group, y = Anzahl_Rosetten)) +
+  geom_violin(aes(fill = color_violin), trim = FALSE, scale = "width") +
+  geom_jitter(aes(color = color_dots, shape = Batch), width = 0.15, size = 2, stroke = 0.5, fill = "black") +
+  facet_grid(cols = vars(timepoint), switch = "x") +
+  theme_minimal() +
+  labs(
+    title = NULL,
+    x = NULL,
+    y = "Number of Rosettes"
+  ) +
+  stat_summary(fun = mean, geom = "crossbar", width = 0.4, size = 0.3, position = position_dodge(width = 0.75))+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1, color="black"))+
+  scale_fill_identity() +
+  scale_color_identity() +
+  scale_shape_manual(values = c(16, 17))+
+  theme(axis.title.y=element_text(size=14),
+        axis.text.x=element_text(size=14),
+        legend.text = element_text(size=14),
+        legend.title=element_text(size=14))
+
+
+adjusted_p_values<-wilcoxon_Rosetten_per_TP$p_adjusted
+timepoints<-wilcoxon_Rosetten_per_TP$timepoint
+
+max_y_value<-max(results_Rosetten_per_TP$Anzahl_Rosetten)*1.3
+
+p_rosette<-p+geom_text(data = wilcoxon_Rosetten_per_TP, 
+            aes(x = 1.5, y = max_y_value*0.9, 
+                label = ifelse(p_adjusted < 0.001, "***", 
+                               ifelse(p_adjusted < 0.01, "**", 
+                                      ifelse(p_adjusted < 0.05, "*", "ns")))),
+            size = 6, color = "black", vjust = -0.5)
+
+p_rosette
+
+# Save the plot as SVG
+ggsave(paste0(output_path, "plot_Rosettes_per_TP.svg"),p_rosette, width = 15, height = 6, dpi = 300)
+```
+
+
+
+# Rosetten/Fläche
+```{r}
+
+# Calculate the number of rosettes per original.name and join with relevant information
+results_Rosetten_per_area <- data %>%
+  # Wähle die relevanten Spalten aus
+  dplyr::select(original.name, group, timepoint, Batch, type) %>%
+  # Filtere nach Rosette-Typ
+  filter(type == "Rosette") %>%
+  # Gruppiere nach original.name
+  group_by(original.name) %>%
+  # Zähle die Anzahl der Rosetten
+  summarise(Anzahl_Rosetten = n()) %>%
+  # Führe einen Left Join durch, um die Flächendaten hinzuzufügen
+  left_join(
+    data %>% 
+      filter(type == "Size whole") %>% 
+      dplyr::select(original.name, area, group, timepoint, Batch), 
+    by = "original.name"
+  ) %>%
+  # Berechne die Anzahl der Rosetten pro Fläche
+  mutate(rosettes_per_area = Anzahl_Rosetten / area)
+
+
+results_Rosetten_per_area<-results_Rosetten_per_area[!is.na(results_Rosetten_per_area$timepoint), ]
+
+Target="rosettes_per_area"
+
+
+# Apply the Wilcoxon test and normality check for each timepoint
+wilcoxon_Rosetten_per_area <- results_Rosetten_per_area %>%   group_by(timepoint) %>%
+  summarise(
+    test_result = list(perform_wilcox_test_and_normality(cur_data(), variableofinterest=Target))
+  ) %>%
+  unnest_wider(test_result)%>%
+  mutate(p_adjusted=p.adjust(p_value,method="bonferroni"))
+
+# Add a column to indicate if both groups are normally distributed
+wilcoxon_Rosetten_per_area <- wilcoxon_Rosetten_per_area %>%
+  mutate(
+    normality_check = ifelse(normal_0mM == "Yes" & normal_5mM == "Yes", "Both Normally Distributed", "Not Normally Distributed")
+  )
+
+# Print the results
+wilcoxon_Rosetten_per_area
+
+# Optional: Save the results to a CSV file
+write_xlsx(wilcoxon_Rosetten_per_area, paste0(output_path, "wilcoxon_results_", Target,"_per_TP.xlsx"))
+
+#Überprüfen auf Batch Effekte
+mod_mixed_RosettenproFläche<-lme(rosettes_per_area~group, random=~1|Batch, data=results_Rosetten_per_area %>% filter(.,timepoint=="d40"))
+
+mod_summary_RosettenproFläche <- summary(mod_mixed_RosettenproFläche)
+
+mod_coeffs_RosettenproFläche <- as.data.frame(mod_summary_RosettenproFläche$tTable)
+
+mod_coeffs_RosettenproFläche$Parameter <- rownames(mod_coeffs_RosettenproFläche)
+
+write_xlsx(mod_coeffs_RosettenproFläche,paste0(output_path, "Batch_effect_results_",Target,".xlsx"))
+
+
+# Ensure correct factor levels for timepoint and group
+results_Rosetten_per_area$timepoint <- factor(results_Rosetten_per_area$timepoint, levels = c("d25", "d40", "d60", "d80"))
+results_Rosetten_per_area$group <- as.factor(results_Rosetten_per_area$group) %>% 
+  relevel(., ref="0mM") # Ensure group is a factor
+
+
+# Create a new column for color based on group and timepoint
+results_Rosetten_per_area <- results_Rosetten_per_area%>%
+  mutate(color_dots = case_when(
+    group == "0mM" ~ adjustcolor(basecolors_dots[as.character(timepoint)], alpha.f = 0.65),
+    group == "5mM" ~ basecolors_dots[as.character(timepoint)]
+  ))
+
+
+# Create a new column for color based on group and timepoint
+results_Rosetten_per_area <- results_Rosetten_per_area %>%
+  mutate(color_violin = case_when(
+    group == "0mM" ~ adjustcolor(basecolors_violin[as.character(timepoint)], alpha.f = 0.65),
+    group == "5mM" ~ basecolors_violin[as.character(timepoint)]
+  ))
+
+# Create the plot
+compare_means(formula(paste0(Target, " ~ group")), method = "wilcox.test", 
+              group.by = "timepoint", data=results_Rosetten_per_area, p.adjust.method = "bonferroni")
+
+
+p <- ggplot(results_Rosetten_per_area, aes(x = group, y = rosettes_per_area)) +
+  geom_violin(aes(fill = color_violin), trim = FALSE, scale = "width") +
+  geom_jitter(aes(color = color_dots, shape = Batch), width = 0.15, size = 2, stroke = 0.5, fill = "black") +
+ facet_grid(cols = vars(timepoint), switch = "x") +
+  theme_minimal() +
+  labs(
+    title = NULL,
+    x = NULL,
+    y = "Rosettes/µm^2"
+  ) +
+  stat_summary(fun = mean, geom = "crossbar", width = 0.4, size = 0.3, position = position_dodge(width = 0.75))+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1, color="black"))+
+  scale_fill_identity() +
+  scale_color_identity() +
+  scale_shape_manual(values = c(16, 17))+
+  theme(axis.title.y=element_text(size=14),
+        axis.text.x=element_text(size=14),
+        legend.text = element_text(size=14),
+        legend.title=element_text(size=14))
+
+adjusted_p_values<-wilcoxon_Rosetten_per_area$p_adjusted
+timepoints<-wilcoxon_Rosetten_per_area$timepoint
+
+max_y_value<-max(results_Rosetten_per_area$rosettes_per_area)*1.3
+
+p_rosette_per_area<-p+geom_text(data = wilcoxon_Rosetten_per_area, 
+            aes(x = 1.5, y = max_y_value*0.8, 
+                label = ifelse(p_adjusted < 0.001, "***", 
+                               ifelse(p_adjusted < 0.01, "**", 
+                                      ifelse(p_adjusted < 0.05, "*", "ns")))),
+            size = 6, color = "black", vjust = -0.5)
+
+p_rosette_per_area
+
+
+# Save the plot as SVG
+ggsave(paste0(output_path, "plot_Rosettes_per_area.svg"),p_rosette_per_area, width = 15, height = 6)
+```
+
+# Size whole
+```{r}
+  Results_Size_whole <- data %>%
+  filter(type == "Size whole") %>%
+   dplyr::select(original.name, type, group, Batch, timepoint, area)
+
+Target="area"
+
+# Apply the Wilcoxon test and normality check for each timepoint
+wilcoxon_size_whole <- Results_Size_whole %>%   group_by(timepoint) %>%
+  summarise(
+    test_result = list(perform_wilcox_test_and_normality(cur_data(), variableofinterest=Target))
+  ) %>%
+  unnest_wider(test_result)%>%
+mutate(p_adjusted = p.adjust(p_value, method="bonferroni"))
+
+
+# Add a column to indicate if both groups are normally distributed
+wilcoxon_size_whole <- wilcoxon_size_whole %>%
+  mutate(
+    normality_check = ifelse(normal_0mM == "Yes" & normal_5mM == "Yes", "Both Normally Distributed", "Not Normally Distributed")
+  )
+
+# Print the results
+wilcoxon_size_whole
+
+# Optional: Save the results to a CSV file
+write_xlsx(wilcoxon_size_whole, paste0(output_path, "wilcoxon_results_Size_whole_per_TP.xlsx"))
+
+# Ensure correct factor levels for timepoint and group
+Results_Size_whole$timepoint <- factor(Results_Size_whole$timepoint, levels = c("d25", "d40", "d60", "d80"))
+Results_Size_whole$group <- as.factor(Results_Size_whole$group) %>% 
+  relevel(., ref="0mM") # Ensure group is a factor
+
+
+# Create a new column for color based on group and timepoint
+Results_Size_whole <- Results_Size_whole%>%
+  mutate(color_dots = case_when(
+    group == "0mM" ~ adjustcolor(basecolors_dots[as.character(timepoint)], alpha.f = 0.65),
+    group == "5mM" ~ basecolors_dots[as.character(timepoint)]
+  ))
+
+# Define color for each timepoint - violin
+
+# Create a new column for color based on group and timepoint
+Results_Size_whole <- Results_Size_whole %>%
+  mutate(color_violin = case_when(
+    group == "0mM" ~ adjustcolor(basecolors_violin[as.character(timepoint)], alpha.f = 0.65),
+    group == "5mM" ~ basecolors_violin[as.character(timepoint)]
+  ))
+
+# Create the plot
+
+p <- ggplot(Results_Size_whole, aes(x = group, y = area)) +
+  geom_violin(aes(fill = color_violin), trim = FALSE, scale = "width") +
+  geom_jitter(aes(color = color_dots, shape = Batch), width = 0.15, size = 2, stroke = 0.5, fill = "black") +
+ facet_grid(cols = vars(timepoint), switch = "x") +
+  theme_minimal() +
+  labs(
+    title = NULL,
+    x = NULL,
+    y = "Size (µm^2)" ) +
+    stat_summary(fun = mean, geom = "crossbar", width = 0.4, size = 0.3, position = position_dodge(width = 0.75))+
+ 
+  theme(axis.text.x = element_text(angle = 45, hjust = 1, color="black"))+
+  scale_fill_identity() +
+  scale_color_identity() +
+  scale_shape_manual(values = c(16, 17))+
+  theme(axis.title.y=element_text(size=14),
+        axis.text.x=element_text(size=14),
+        legend.text = element_text(size=14),
+        legend.title=element_text(size=14))
+
+adjusted_p_values<-wilcoxon_size_whole$p_adjusted
+timepoints<-wilcoxon_size_whole$timepoint
+
+max_y_value<-max(Results_Size_whole$area)*1.3
+
+p_sizewhole<-p+geom_text(data = wilcoxon_size_whole, 
+            aes(x = 1.5, y = max_y_value*0.9, 
+                label = ifelse(p_adjusted < 0.001, "***", 
+                               ifelse(p_adjusted < 0.01, "**", 
+                                      ifelse(p_adjusted < 0.05, "*", "ns")))),
+            size = 6, color = "black", vjust = -0.5)
+
+p_sizewhole
+
+# Save the plot as SVG
+ggsave(paste0(output_path, "plot_sizewhole.svg"),p_sizewhole, width = 15, height = 6)
+
+```
+
+
+# Circle Form Factor (4 x pi x Fläche/PerimeterCrofton^2) = Circularity in Lanc Paper
+```{r}
+  Results_Circle_FF <- data %>%
+  filter(type == "Size whole") %>%
+   dplyr::select(original.name, type, group, Batch, timepoint, area,circle_form_factor)
+
+Target="circle_form_factor"
+
+# Apply the Wilcoxon test and normality check for each timepoint
+wilcoxon_Circle_FF <- Results_Circle_FF %>%   group_by(timepoint) %>%
+  summarise(
+    test_result = list(perform_wilcox_test_and_normality(cur_data(), variableofinterest=Target))
+  ) %>%
+  unnest_wider(test_result)%>%
+mutate(p_adjusted = p.adjust(p_value, method="bonferroni"))
+
+# Add a column to indicate if both groups are normally distributed
+wilcoxon_Circle_FF <- wilcoxon_Circle_FF %>%
+  mutate(
+    normality_check = ifelse(normal_0mM == "Yes" & normal_5mM == "Yes", "Both Normally Distributed", "Not Normally Distributed")
+  )
+
+# Print the results
+wilcoxon_Circle_FF
+
+# Optional: Save the results to a CSV file
+write_xlsx(wilcoxon_Circle_FF, paste0(output_path, "wilcoxon_results_", Target,"_per_TP.xlsx"))
+
+# Zeitpunkte definieren
+timepoints <- c("d25", "d40", "d60", "d80")
+
+# Ergebnisse für jeden Zeitpunkt berechnen und zusammenführen
+final_results_CCF <- data.frame()  # Leeres DataFrame initialisieren
+
+# Berechnungen für jeden Zeitpunkt
+for (time in timepoints) {
+  # Modell berechnen
+  mod_mixed <- lme(as.formula(paste(Target, "~ group")), random = ~1 | Batch, 
+                   data = Results_Circle_FF %>% filter(timepoint == time))
+  
+  # Zusammenfassung des Modells
+  mod_summary <- summary(mod_mixed)
+  
+  # Koeffizienten als DataFrame
+  mod_coeffs <- as.data.frame(mod_summary$tTable)
+  
+  # Zeitpunktsinformation hinzufügen
+  mod_coeffs$Timepoint <- time
+  
+  # Ergebnisse zusammenfügen
+  final_results_CCF <- bind_rows(final_results_CCF, mod_coeffs)
+}
+
+# Ergebnisse in eine Excel-Datei schreiben
+write_xlsx(final_results_CCF, paste0(output_path, "Batch_effect_results_", Target, ".xlsx"))
+
+# Ausgabe der Ergebnisse zur Kontrolle
+print(final_results_CCF)
+
+
+
+#Überprüfen auf Batch Effekte
+#mod_mixed_CCF<-lme(circle_form_factor~group, random=~1|Batch, data=Results_Circle_FF %>% filter(.,timepoint=="d60"))
+#mod_summary_CCF <- summary(mod_mixed_CCF)
+#mod_coeffs_CCF <- as.data.frame(mod_summary_CCF$tTable)
+#mod_coeffs_CCF$Parameter <- rownames(mod_coeffs_CCF)
+#write_xlsx(mod_coeffs_CCF,paste0(output_path, "Batch_effect_results_",Target,".xlsx"))
+
+# Ensure correct factor levels for timepoint and group
+Results_Circle_FF$timepoint <- factor(Results_Circle_FF$timepoint, levels = c("d25", "d40", "d60", "d80"))
+Results_Circle_FF$group <- as.factor(Results_Circle_FF$group) %>% 
+  relevel(., ref="0mM") # Ensure group is a factor
+
+
+# Create a new column for color based on group and timepoint
+Results_Circle_FF <- Results_Circle_FF%>%
+  mutate(color_dots = case_when(
+    group == "0mM" ~ adjustcolor(basecolors_dots[as.character(timepoint)], alpha.f = 0.65),
+    group == "5mM" ~ basecolors_dots[as.character(timepoint)]
+  ))
+
+# Define color for each timepoint - violin
+
+# Create a new column for color based on group and timepoint
+Results_Circle_FF <- Results_Circle_FF %>%
+  mutate(color_violin = case_when(
+    group == "0mM" ~ adjustcolor(basecolors_violin[as.character(timepoint)], alpha.f = 0.65),
+    group == "5mM" ~ basecolors_violin[as.character(timepoint)]
+  ))
+
+# Create the plot
+compare_means(formula(paste0(Target, " ~ group")), method = "wilcox.test", 
+              group.by = "timepoint", data=Results_Circle_FF, p.adjust.method = "bonferroni")
+
+
+p <- ggplot(Results_Circle_FF, aes(x = group, y = circle_form_factor)) +
+  geom_violin(aes(fill = color_violin), trim = FALSE, scale = "width") +
+  geom_jitter(aes(color = color_dots, shape = Batch), width = 0.15, size = 2, stroke = 0.5, fill = "black") +
+ facet_grid(cols = vars(timepoint), switch = "x") +
+  theme_minimal() +
+  labs(
+    title = NULL,
+    x = NULL,
+    y = "Circle form factor"
+  ) +  stat_summary(fun = mean, geom = "crossbar", width = 0.4, size = 0.3, position = position_dodge(width = 0.75))+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1, color="black"))+
+  scale_fill_identity() +
+  scale_color_identity() +
+  scale_shape_manual(values = c(16, 17))+
+  theme(axis.title.y=element_text(size=14),
+        axis.text.x=element_text(size=14),
+        legend.text = element_text(size=14),
+        legend.title=element_text(size=14))
+
+adjusted_p_values<-wilcoxon_Circle_FF$p_adjusted
+timepoints<-wilcoxon_Circle_FF$timepoint
+
+max_y_value<-max(Results_Circle_FF$circle_form_factor)*1.3
+
+p_Circle_FF<-p+geom_text(data = wilcoxon_Circle_FF, 
+            aes(x = 1.5, y = max_y_value*0.82, 
+                label = ifelse(p_adjusted < 0.001, "***", 
+                               ifelse(p_adjusted < 0.01, "**", 
+                                      ifelse(p_adjusted < 0.05, "*", "ns")))),
+            size = 6, color = "black", vjust = -0.5)
+
+p_Circle_FF
+
+# Save the plot as SVG
+ggsave(paste0(output_path, "plot_Circle_FF.svg"),p_Circle_FF, width = 15, height = 6)
+
+```
+
+
+# Circular Shape/Roundness (4x Fläche/(pi x FeretMax)^2) = Roundess in Lanc Paper
+```{r}
+  Results_Circular_shape <- data %>%
+  filter(type == "Size whole") %>%
+   dplyr::select(original.name, type, group, Batch, timepoint, area,circular_shape)
+
+Target="circular_shape"
+
+# Apply the Wilcoxon test and normality check for each timepoint
+wilcoxon_Circular_Shape <- Results_Circular_shape %>%   group_by(timepoint) %>%
+  summarise(
+    test_result = list(perform_wilcox_test_and_normality(cur_data(), variableofinterest=Target))
+  ) %>%
+  unnest_wider(test_result)%>%
+mutate(p_adjusted = p.adjust(p_value, method="bonferroni"))
+
+# Add a column to indicate if both groups are normally distributed
+wilcoxon_Circular_Shape <- wilcoxon_Circular_Shape %>%
+  mutate(
+    normality_check = ifelse(normal_0mM == "Yes" & normal_5mM == "Yes", "Both Normally Distributed", "Not Normally Distributed")
+  )
+
+# Print the results
+wilcoxon_Circular_Shape
+
+# Optional: Save the results to a CSV file
+write_xlsx(wilcoxon_Circular_Shape, paste0(output_path, "wilcoxon_results_", Target,"_per_TP.xlsx"))
+
+
+# Ensure correct factor levels for timepoint and group
+Results_Circular_shape$timepoint <- factor(Results_Circular_shape$timepoint, levels = c("d25", "d40", "d60", "d80"))
+Results_Circular_shape$group <- as.factor(Results_Circular_shape$group) %>% 
+  relevel(., ref="0mM") # Ensure group is a factor
+
+
+# Create a new column for color based on group and timepoint
+Results_Circular_shape <- Results_Circular_shape%>%
+  mutate(color_dots = case_when(
+    group == "0mM" ~ adjustcolor(basecolors_dots[as.character(timepoint)], alpha.f = 0.65),
+    group == "5mM" ~ basecolors_dots[as.character(timepoint)]
+  ))
+
+# Define color for each timepoint - violin
+
+# Create a new column for color based on group and timepoint
+Results_Circular_shape <- Results_Circular_shape %>%
+  mutate(color_violin = case_when(
+    group == "0mM" ~ adjustcolor(basecolors_violin[as.character(timepoint)], alpha.f = 0.65),
+    group == "5mM" ~ basecolors_violin[as.character(timepoint)]
+  ))
+
+# Create the plot
+compare_means(formula(paste0(Target, " ~ group")), method = "wilcox.test", 
+              group.by = "timepoint", data=Results_Circular_shape, p.adjust.method = "bonferroni")
+
+
+p <- ggplot(Results_Circular_shape, aes(x = group, y = circular_shape)) +
+  geom_violin(aes(fill = color_violin), trim = FALSE, scale = "width") +
+  geom_jitter(aes(color = color_dots, shape = Batch), width = 0.15, size = 2, stroke = 0.5, fill = "black") +
+ facet_grid(cols = vars(timepoint), switch = "x") +
+  theme_minimal() +
+  labs(
+    title = NULL,
+    x = NULL,
+    y = "Roundness"
+  ) + stat_summary(fun = mean, geom = "crossbar", width = 0.4, size = 0.3, position = position_dodge(width = 0.75))+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1, color="black"))+
+  scale_fill_identity() +
+  scale_color_identity() +
+  scale_shape_manual(values = c(16, 17))+
+  theme(axis.title.y=element_text(size=14),
+        axis.text.x=element_text(size=14),
+        legend.text = element_text(size=14),
+        legend.title=element_text(size=14))
+
+adjusted_p_values<-wilcoxon_Circular_Shape$p_adjusted
+timepoints<-wilcoxon_Circular_Shape$timepoint
+
+max_y_value<-max(Results_Circular_shape$circular_shape)*1.3
+
+p_circular_shape<-p+geom_text(data = wilcoxon_Circular_Shape, 
+            aes(x = 1.5, y = max_y_value*0.82, 
+                label = ifelse(p_adjusted < 0.001, "***", 
+                               ifelse(p_adjusted < 0.01, "**", 
+                                      ifelse(p_adjusted < 0.05, "*", "ns")))),
+            size = 6, color = "black", vjust = -0.5)
+
+p_circular_shape
+
+
+# Save the plot as SVG
+ggsave(paste0(output_path, "plot_circular_shape.svg"),p_circular_shape, width = 15, height = 6)
+
+```
+
+#GFAP signal
+```{r}
+# Calculate GFAP signal normalized by Hoechst Signal
+results_gfap <- data %>%
+  # Filtere nur die Zeilen, in denen type == "Size whole" und gfap_usable == "yes"
+  filter(type == "Size whole", gfap_usable == "yes") %>%
+  # Erstelle eine neue Spalte für das normalisierte GFAP-Signal
+  mutate(gfap_normalized = gfap / hoechst)
+
+Target="gfap_normalized"
+
+# Apply the Wilcoxon test and normality check for each timepoint
+wilcoxon_GFAP <- results_gfap %>%   group_by(timepoint) %>%
+  summarise(
+    test_result = list(perform_wilcox_test_and_normality(cur_data(), variableofinterest=Target))
+  ) %>%
+  unnest_wider(test_result)%>%
+mutate(p_adjusted = p.adjust(p_value, method="bonferroni"))
+
+# Add a column to indicate if both groups are normally distributed
+wilcoxon_GFAP <- wilcoxon_GFAP %>%
+  mutate(
+    normality_check = ifelse(normal_0mM == "Yes" & normal_5mM == "Yes", "Both Normally Distributed", "Not Normally Distributed")
+  )
+
+# Print the results
+wilcoxon_GFAP
+
+# Optional: Save the results to a CSV file
+write_xlsx(wilcoxon_GFAP, paste0(output_path, "wilcoxon_results_", Target,"_per_TP.xlsx"))
+
+# Zeitpunkte definieren
+timepoints <- c("d25", "d40", "d60", "d80")
+
+# Ergebnisse für jeden Zeitpunkt berechnen und zusammenführen
+final_results_GFAP <- data.frame()  # Leeres DataFrame initialisieren
+
+# Berechnungen für jeden Zeitpunkt
+for (time in timepoints) {
+  # Modell berechnen
+  mod_mixed <- lme(as.formula(paste(Target, "~ group")), random = ~1 | Batch, 
+                   data = results_gfap %>% filter(timepoint == time))
+  
+  # Zusammenfassung des Modells
+  mod_summary <- summary(mod_mixed)
+   # Koeffizienten als DataFrame
+  mod_coeffs <- as.data.frame(mod_summary$tTable)
+  # Zeitpunktsinformation hinzufügen
+  mod_coeffs$Timepoint <- time
+  # Ergebnisse zusammenfügen
+  final_results_GFAP <- bind_rows(final_results_GFAP, mod_coeffs)
+}
+
+# Ergebnisse in eine Excel-Datei schreiben
+write_xlsx(final_results_GFAP, paste0(output_path, "Batch_effect_results_", Target, ".xlsx"))
+
+# Ausgabe der Ergebnisse zur Kontrolle
+(final_results_GFAP)
+
+# Ensure correct factor levels for timepoint and group
+results_gfap$timepoint <- factor(results_gfap$timepoint, levels = c("d25", "d40", "d60", "d80"))
+results_gfap$group <- as.factor(results_gfap$group) %>% 
+  relevel(., ref="0mM") # Ensure group is a factor
+
+
+# Create a new column for color based on group and timepoint
+results_gfap <- results_gfap%>%
+  mutate(color_dots = case_when(
+    group == "0mM" ~ adjustcolor(basecolors_dots[as.character(timepoint)], alpha.f = 0.65),
+    group == "5mM" ~ basecolors_dots[as.character(timepoint)]
+  ))
+
+# Define color for each timepoint - violin
+
+# Create a new column for color based on group and timepoint
+results_gfap <- results_gfap %>%
+  mutate(color_violin = case_when(
+    group == "0mM" ~ adjustcolor(basecolors_violin[as.character(timepoint)], alpha.f = 0.65),
+    group == "5mM" ~ basecolors_violin[as.character(timepoint)]
+  ))
+
+# Create the plot
+compare_means(formula(paste0(Target, " ~ group")), method = "wilcox.test", 
+              group.by = "timepoint", data=results_gfap, p.adjust.method = "bonferroni")
+
+
+p <- ggplot(results_gfap, aes(x = group, y = gfap_normalized)) +
+  geom_violin(aes(fill = color_violin), trim = FALSE, scale = "width") +
+  geom_jitter(aes(color = color_dots, shape = Batch), width = 0.15, size = 2, stroke = 0.5, fill = "black") +
+ facet_grid(cols = vars(timepoint), switch = "x") +
+  theme_minimal() +
+  labs(
+    title = NULL,
+    x = NULL,
+    y = "GFAP intensity"
+  ) + stat_summary(fun = mean, geom = "crossbar", width = 0.4, size = 0.3, position = position_dodge(width = 0.75))+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1, color="black"))+
+  scale_fill_identity() +
+  scale_color_identity() +
+  scale_shape_manual(values = c(16, 17))+
+  theme(axis.title.y=element_text(size=14),
+        axis.text.x=element_text(size=14),
+        legend.text = element_text(size=14),
+        legend.title=element_text(size=14))
+
+adjusted_p_values<-wilcoxon_GFAP$p_adjusted
+timepoints<-wilcoxon_GFAP$timepoint
+
+
+max_y_value<-max(results_gfap$gfap_normalized)*1.3
+
+p_gfap<-p+geom_text(data = wilcoxon_GFAP, 
+            aes(x = 1.5, y = max_y_value*0.82, 
+                label = ifelse(p_adjusted < 0.001, "***", 
+                               ifelse(p_adjusted < 0.01, "**", 
+                                      ifelse(p_adjusted < 0.05, "*", "ns")))),
+            size = 6, color = "black", vjust = -0.5)
+
+p_gfap
+
+# Save the plot as SVG
+ggsave(paste0(output_path, "plot_GFAP.svg"),p_gfap, width = 15, height = 6)
+
+
+
+
+```
+
+# Area of all Rosettes
+```{r}
+
+# Ergebnisse für Rosetten und deren Fläche erstellen
+results_Area_Rosettes <- data %>%
+  # Filtere nur die Zeilen, in denen type == "Rosette"
+  filter(type == "Rosette") %>%
+  # Wähle nur die Spalten original.name und area aus
+  dplyr::select(original.name, type, group, Batch, timepoint, area) 
+
+Target="area"
+
+# Apply the Wilcoxon test and normality check for each timepoint
+wilcoxon_Area_Rosettes <- results_Area_Rosettes %>%   group_by(timepoint) %>%
+  summarise(
+    test_result = list(perform_wilcox_test_and_normality(cur_data(), variableofinterest=Target))
+  ) %>%
+  unnest_wider(test_result)%>%
+mutate(p_adjusted = p.adjust(p_value, method="bonferroni"))
+
+# Add a column to indicate if both groups are normally distributed
+wilcoxon_Area_Rosettes<- wilcoxon_Area_Rosettes %>%
+  mutate(
+    normality_check = ifelse(normal_0mM == "Yes" & normal_5mM == "Yes", "Both Normally Distributed", "Not Normally Distributed")
+  )
+
+# Print the results
+wilcoxon_Area_Rosettes
+
+# Optional: Save the results to a CSV file
+write_xlsx(wilcoxon_Area_Rosettes, paste0(output_path, "wilcoxon_results_", Target,"_per_TP.xlsx"))
+
+# Zeitpunkte definieren
+timepoints <- c("d25", "d40", "d60", "d80")
+
+# Ergebnisse für jeden Zeitpunkt berechnen und zusammenführen
+final_results_AreaRosettes <- data.frame()  # Leeres DataFrame initialisieren
+
+# Berechnungen für jeden Zeitpunkt
+for (time in timepoints) {
+  # Modell berechnen
+  mod_mixed <- lme(as.formula(paste(Target, "~ group")), random = ~1 | Batch, 
+                   data = results_Area_Rosettes %>% filter(timepoint == time))
+  
+  # Zusammenfassung des Modells
+  mod_summary <- summary(mod_mixed)
+   # Koeffizienten als DataFrame
+  mod_coeffs <- as.data.frame(mod_summary$tTable)
+  # Zeitpunktsinformation hinzufügen
+  mod_coeffs$Timepoint <- time
+  # Ergebnisse zusammenfügen
+  final_results_AreaRosettes <- bind_rows(final_results_AreaRosettes, mod_coeffs)
+}
+
+# Ergebnisse in eine Excel-Datei schreiben
+write_xlsx(final_results_AreaRosettes, paste0(output_path, "Batch_effect_results_", Target, ".xlsx"))
+
+# Ausgabe der Ergebnisse zur Kontrolle
+(final_results_AreaRosettes)
+
+# Ensure correct factor levels for timepoint and group
+results_Area_Rosettes$timepoint <- factor(results_Area_Rosettes$timepoint, levels = c("d25", "d40", "d60", "d80"))
+results_Area_Rosettes$group <- as.factor(results_Area_Rosettes$group) %>% 
+  relevel(., ref="0mM") # Ensure group is a factor
+
+
+# Create a new column for color based on group and timepoint
+results_Area_Rosettes <- results_Area_Rosettes%>%
+  mutate(color_dots = case_when(
+    group == "0mM" ~ adjustcolor(basecolors_dots[as.character(timepoint)], alpha.f = 0.65),
+    group == "5mM" ~ basecolors_dots[as.character(timepoint)]
+  ))
+
+# Define color for each timepoint - violin
+
+# Create a new column for color based on group and timepoint
+results_Area_Rosettes <- results_Area_Rosettes %>%
+  mutate(color_violin = case_when(
+    group == "0mM" ~ adjustcolor(basecolors_violin[as.character(timepoint)], alpha.f = 0.65),
+    group == "5mM" ~ basecolors_violin[as.character(timepoint)]
+  ))
+
+# Create the plot
+compare_means(formula(paste0(Target, " ~ group")), method = "wilcox.test", 
+              group.by = "timepoint", data=results_gfap, p.adjust.method = "bonferroni")
+
+
+p <- ggplot(results_Area_Rosettes, aes(x = group, y = area)) +
+  geom_violin(aes(fill = color_violin), trim = FALSE, scale = "width") +
+  geom_jitter(aes(color = color_dots, shape = Batch), width = 0.15, size = 2, stroke = 0.5, fill = "black") +
+ facet_grid(cols = vars(timepoint), switch = "x") +
+  theme_minimal() +
+  labs(
+    title = NULL,
+    x = NULL,
+    y = "Area (µm^2)/Rosette"
+  ) + stat_summary(fun = mean, geom = "crossbar", width = 0.4, size = 0.3, position = position_dodge(width = 0.75))+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1, color="black"))+
+  scale_fill_identity() +
+  scale_color_identity() +
+  scale_shape_manual(values = c(16, 17))+
+  theme(axis.title.y=element_text(size=14),
+        axis.text.x=element_text(size=14),
+        legend.text = element_text(size=14),
+        legend.title=element_text(size=14))
+
+adjusted_p_values<-wilcoxon_Area_Rosettes$p_adjusted
+timepoints<-wilcoxon_Area_Rosettes$timepoint
+
+max_y_value<-max(results_Area_Rosettes$area)*1.3
+
+p_area_rosettes<-p+geom_text(data = wilcoxon_Area_Rosettes, 
+            aes(x = 1.5, y = max_y_value*0.75, 
+                label = ifelse(p_adjusted < 0.001, "***", 
+                               ifelse(p_adjusted < 0.01, "**", 
+                                      ifelse(p_adjusted < 0.05, "*", "ns")))),
+            size = 6, color = "black", vjust = -0.5)
+p_area_rosettes
+
+
+# Save the plot as SVG
+ggsave(paste0(output_path, "plot_area_Rosettes.svg"),p_area_rosettes, width = 15, height = 6)
+
+```
+
+
+
+#Pax6 - Just for Fun
+```{r}
+# Calculate Pax6 signal normalized by Hoechst Signal
+results_Pax6 <- data %>%
+  # Filtere nur die Zeilen, in denen type == "Size whole" und gfap_usable == "yes"
+  filter(type == "Size whole") %>%
+  # Erstelle eine neue Spalte für das normalisierte GFAP-Signal
+  mutate(Pax6_normalized = pax6 / hoechst) %>%
+filter(Pax6_normalized < 3)
+
+Target="Pax6_normalized"
+
+# Apply the Wilcoxon test and normality check for each timepoint
+wilcoxon_Pax6 <- results_Pax6 %>%   group_by(timepoint) %>%
+  summarise(
+    test_result = list(perform_wilcox_test_and_normality(cur_data(), variableofinterest=Target))
+  ) %>%
+  unnest_wider(test_result)%>%
+mutate(p_adjusted = p.adjust(p_value, method="bonferroni"))
+
+# Add a column to indicate if both groups are normally distributed
+wilcoxon_Pax6 <- wilcoxon_Pax6 %>%
+  mutate(
+    normality_check = ifelse(normal_0mM == "Yes" & normal_5mM == "Yes", "Both Normally Distributed", "Not Normally Distributed")
+  )
+
+# Print the results
+wilcoxon_Pax6
+
+# Optional: Save the results to a CSV file
+write_xlsx(wilcoxon_Pax6, paste0(output_path, "wilcoxon_results_", Target,"_per_TP.xlsx"))
+
+# Ensure correct factor levels for timepoint and group
+results_Pax6$timepoint <- factor(results_Pax6$timepoint, levels = c("d25", "d40", "d60", "d80"))
+results_Pax6$group <- as.factor(results_Pax6$group) %>% 
+  relevel(., ref="0mM") # Ensure group is a factor
+
+
+# Create a new column for color based on group and timepoint
+results_Pax6 <- results_Pax6%>%
+  mutate(color_dots = case_when(
+    group == "0mM" ~ adjustcolor(basecolors_dots[as.character(timepoint)], alpha.f = 0.65),
+    group == "5mM" ~ basecolors_dots[as.character(timepoint)]
+  ))
+
+# Define color for each timepoint - violin
+
+# Create a new column for color based on group and timepoint
+results_Pax6 <- results_Pax6 %>%
+  mutate(color_violin = case_when(
+    group == "0mM" ~ adjustcolor(basecolors_violin[as.character(timepoint)], alpha.f = 0.65),
+    group == "5mM" ~ basecolors_violin[as.character(timepoint)]
+  ))
+
+# Create the plot
+compare_means(formula(paste0(Target, " ~ group")), method = "wilcox.test", 
+              group.by = "timepoint", data=results_Pax6, p.adjust.method = "bonferroni")
+
+
+p <- ggplot(results_Pax6, aes(x = group, y = Pax6_normalized)) +
+  geom_violin(aes(fill = color_violin), trim = FALSE, scale = "width") +
+  geom_jitter(aes(color = color_dots, shape = Batch), width = 0.15, size = 2, stroke = 0.5, fill = "black") +
+  geom_boxplot(aes(fill=NA))+
+ facet_grid(cols = vars(timepoint), switch = "x") +
+  theme_minimal() +
+  labs(
+    title = NULL,
+    x = NULL,
+    y = "Pax6"
+  ) + stat_summary(fun = mean, geom = "crossbar", width = 0.4, size = 0.3, position = position_dodge(width = 0.75))+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1, color="black"))+
+  scale_fill_identity() +
+  scale_color_identity() +
+  scale_shape_manual(values = c(16, 17))+
+  theme(axis.title.y=element_text(size=14),
+        axis.text.x=element_text(size=14),
+        legend.text = element_text(size=14),
+        legend.title=element_text(size=14))
+
+adjusted_p_values<-wilcoxon_Pax6$p_adjusted
+timepoints<-wilcoxon_Pax6$timepoint
+
+max_y_value<-max(results_Pax6$Pax6_normalized)*1.3
+
+p_Pax6<-p+geom_text(data = wilcoxon_Pax6, 
+            aes(x = 1.5, y = max_y_value, 
+                label = ifelse(p_adjusted < 0.001, "***", 
+                               ifelse(p_adjusted < 0.01, "**", 
+                                      ifelse(p_adjusted < 0.05, "*", "ns")))),
+            size = 6, color = "black", vjust = -0.5)
+
+
+p_Pax6
+
+# Save the plot as SVG
+ggsave(paste0(output_path, "plot_Pax6.svg"),p_Pax6, width = 15, height = 6)
+```
+# Results GABA vs. Glut
+# Daten einlesen -> Data wird überschrieben! 
+```{r}
+# Excel-Datei einlesen
+file_path <- "data_Julia/ICC_Comb.2_Measurements_wide.xlsx"  # Pfad zur Excel-Datei anpassen
+data <- openxlsx::read.xlsx(file_path, sheet = "Sheet1")
+```
+
+# GAD65/67
+```{r}
+ Results_GAD65 <- data %>%
+   dplyr::select(original.name, group, timepoint, Batch, GAD65_norm)
+  
+Target <- "GAD65_norm"
+
+# Apply the Wilcoxon test and normality check for each timepoint
+wilcoxon_GAD65 <- Results_GAD65 %>%   group_by(timepoint) %>%
+  summarise(
+    test_result = list(perform_wilcox_test_and_normality(cur_data(), variableofinterest=Target))
+  ) %>%
+  unnest_wider(test_result)%>%
+mutate(p_adjusted = p.adjust(p_value, method="bonferroni"))
+
+
+# Add a column to indicate if both groups are normally distributed
+wilcoxon_GAD65 <- wilcoxon_GAD65 %>%
+  mutate(
+    normality_check = ifelse(normal_0mM == "Yes" & normal_5mM == "Yes", "Both Normally Distributed", "Not Normally Distributed")
+  )
+
+# Print the results
+wilcoxon_GAD65
+
+# Optional: Save the results to a CSV file
+write_xlsx(wilcoxon_GAD65, paste0(output_path, "wilcoxon_results_", Target,"_per_TP.xlsx"))
+
+
+# Exportiere die Endtabelle als Excel-Datei
+write_xlsx(final_results, paste0(output_path, "Batch_effect_results_", Target, ".xlsx"))
+
+# Ausgabe der Endtabelle zur Kontrolle
+final_results
+
+
+
+# Ensure correct factor levels for timepoint and group
+Results_GAD65$timepoint <- factor(Results_GAD65$timepoint, levels = c("d60", "d80"))
+Results_GAD65$group <- as.factor(Results_GAD65$group) %>% 
+  relevel(., ref="0mM") # Ensure group is a factor
+
+
+# Create a new column for color based on group and timepoint
+Results_GAD65 <- Results_GAD65%>%
+  mutate(color_dots = case_when(
+    group == "0mM" ~ adjustcolor(basecolors_dots[as.character(timepoint)], alpha.f = 0.65),
+    group == "5mM" ~ basecolors_dots[as.character(timepoint)]
+  ))
+
+
+# Create a new column for color based on group and timepoint
+Results_GAD65 <- Results_GAD65 %>%
+  mutate(color_violin = case_when(
+    group == "0mM" ~ adjustcolor(basecolors_violin[as.character(timepoint)], alpha.f = 0.65),
+    group == "5mM" ~ basecolors_violin[as.character(timepoint)]
+  ))
+
+# Create the plot
+compare_means(formula(paste0(Target, " ~ group")), method = "wilcox.test", 
+              group.by = "timepoint", data=Results_GAD65, p.adjust.method = "bonferroni")
+
+
+p <- ggplot(Results_GAD65, aes(x = group, y = GAD65_norm)) +
+  geom_violin(aes(fill = color_violin), trim = FALSE, scale = "width") +
+  geom_jitter(aes(color = color_dots, shape = Batch), width = 0.15, size = 2, stroke = 0.5, fill = "black") +
+ facet_grid(cols = vars(timepoint), switch = "x") +
+  theme_minimal() +
+  labs(
+    title = NULL,
+    x = NULL,
+    y = "Intensity GAD65/67" ) +
+    stat_summary(fun = mean, geom = "crossbar", width = 0.4, size = 0.3, position = position_dodge(width = 0.75))+
+ 
+  theme(axis.text.x = element_text(angle = 45, hjust = 1, color="black"))+
+  scale_fill_identity() +
+  scale_color_identity() +
+  scale_shape_manual(values = c(16, 17))+
+  theme(axis.title.y=element_text(size=14),
+        axis.text.x=element_text(size=14),
+        legend.text = element_text(size=14),
+        legend.title=element_text(size=14))
+
+adjusted_p_values<-wilcoxon_GAD65$p_adjusted
+timepoints<-wilcoxon_GAD65$timepoint
+
+max_y_value<-max(Results_GAD65$GAD65_norm)*1.3
+
+
+p_GAD65<-p+geom_text(data = wilcoxon_GAD65, 
+            aes(x = 1.5, y = max_y_value*0.9, 
+                label = ifelse(p_adjusted < 0.001, "***", 
+                               ifelse(p_adjusted < 0.01, "**", 
+                                      ifelse(p_adjusted < 0.05, "*", "ns")))),
+            size = 6, color = "black", vjust = -0.5)
+
+p_GAD65
+
+
+# Save the plot as SVG
+ggsave(paste0(output_path, "p_GAD65.svg"),p_GAD65, width = 15, height = 6)
+
+```
+
+
+# Glut1+2
+```{r}
+ Results_vGlut <- data %>%
+   dplyr::select(original.name, group, timepoint, Batch, vGlut_norm)
+  
+Target <- "vGlut_norm"
+
+# Apply the Wilcoxon test and normality check for each timepoint
+wilcoxon_vGlut <- Results_vGlut %>%   group_by(timepoint) %>%
+  summarise(
+    test_result = list(perform_wilcox_test_and_normality(cur_data(), variableofinterest=Target))
+  ) %>%
+  unnest_wider(test_result)%>%
+mutate(p_adjusted = p.adjust(p_value, method="bonferroni"))
+
+
+# Add a column to indicate if both groups are normally distributed
+wilcoxon_vGlut <- wilcoxon_vGlut %>%
+  mutate(
+    normality_check = ifelse(normal_0mM == "Yes" & normal_5mM == "Yes", "Both Normally Distributed", "Not Normally Distributed")
+  )
+
+# Print the results
+wilcoxon_vGlut
+
+# Optional: Save the results to a CSV file
+write_xlsx(wilcoxon_vGlut, paste0(output_path, "wilcoxon_results_", Target,"_per_TP.xlsx"))
+
+# Ensure correct factor levels for timepoint and group
+Results_vGlut$timepoint <- factor(Results_vGlut$timepoint, levels = c("d60", "d80"))
+Results_vGlut$group <- as.factor(Results_vGlut$group) %>% 
+  relevel(., ref="0mM") # Ensure group is a factor
+
+
+# Create a new column for color based on group and timepoint
+Results_vGlut <- Results_vGlut%>%
+  mutate(color_dots = case_when(
+    group == "0mM" ~ adjustcolor(basecolors_dots[as.character(timepoint)], alpha.f = 0.65),
+    group == "5mM" ~ basecolors_dots[as.character(timepoint)]
+  ))
+
+# Define color for each timepoint - violin
+
+# Create a new column for color based on group and timepoint
+Results_vGlut <- Results_vGlut %>%
+  mutate(color_violin = case_when(
+    group == "0mM" ~ adjustcolor(basecolors_violin[as.character(timepoint)], alpha.f = 0.65),
+    group == "5mM" ~ basecolors_violin[as.character(timepoint)]
+  ))
+
+
+p <- ggplot(Results_vGlut, aes(x = group, y = vGlut_norm)) +
+  geom_violin(aes(fill = color_violin), trim = FALSE, scale = "width") +
+  geom_jitter(aes(color = color_dots, shape = Batch), width = 0.15, size = 2, stroke = 0.5, fill = "black") +
+ facet_grid(cols = vars(timepoint), switch = "x") +
+  theme_minimal() +
+  labs(
+    title = NULL,
+    x = NULL,
+    y = "Intensity vGlut1/2" ) +
+    stat_summary(fun = mean, geom = "crossbar", width = 0.4, size = 0.3, position = position_dodge(width = 0.75))+
+ 
+  theme(axis.text.x = element_text(angle = 45, hjust = 1, color="black"))+
+  scale_fill_identity() +
+  scale_color_identity() +
+  scale_shape_manual(values = c(16, 17))+
+  theme(axis.title.y=element_text(size=14),
+        axis.text.x=element_text(size=14),
+        legend.text = element_text(size=14),
+        legend.title=element_text(size=14))
+
+adjusted_p_values<-wilcoxon_vGlut$p_adjusted
+timepoints<-wilcoxon_vGlut$timepoint
+
+max_y_value<-max(Results_vGlut$vGlut_norm)*1.3
+
+p_vGlut<-p+geom_text(data = wilcoxon_vGlut, 
+            aes(x = 1.5, y = max_y_value*0.8, 
+                label = ifelse(p_adjusted < 0.001, "***", 
+                               ifelse(p_adjusted < 0.01, "**", 
+                                      ifelse(p_adjusted < 0.05, "*", "ns")))),
+            size = 6, color = "black", vjust = -0.5)
+
+p_vGlut
+
+
+# Save the plot as SVG
+ggsave(paste0(output_path, "p_vGlut.svg"),p_vGlut, width = 15, height = 6)
+
+```
+
+
+
+
+
+
